@@ -1,6 +1,5 @@
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
-import Copyright from "../Copyright";
 
 export default function MainPage() {
   return (
@@ -13,7 +12,6 @@ export default function MainPage() {
       }}
     >
       <Toolbar />
-      <Copyright sx={{ mb: 4 }} />
     </Container>
   )
 }

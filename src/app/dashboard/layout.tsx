@@ -10,7 +10,10 @@ import SchoolIcon from '@mui/icons-material/School';
 import AppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
 import PersonIcon from '@mui/icons-material/Person';
+import GroupsIcon from '@mui/icons-material/Groups';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import IconButton from "@mui/material/IconButton";
+import Copyright from "../Copyright";
 
 const drawerWidth = 240
 
@@ -44,16 +47,33 @@ export default function MainLayout({
         anchor="left"
       >
         <Toolbar />
-        <List>
-          <ListItem key="Class" disablePadding>
+        <List sx={{ flexGrow: 1 }}>
+          <ListItem key="Course" disablePadding>
             <ListItemButton>
               <ListItemIcon>
                 <SchoolIcon />
               </ListItemIcon>
-              <ListItemText primary="Class" />
+              <ListItemText primary="Course" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key="Group" disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <GroupsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Group" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key="Assignment" disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <AssignmentIcon />
+              </ListItemIcon>
+              <ListItemText primary="Assignment" />
             </ListItemButton>
           </ListItem>
         </List>
+        <Copyright sx={{ mb: 4 }} />
       </Drawer>
       {children} 
     </Box>
