@@ -11,8 +11,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Copyright from '../Copyright';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter()
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -20,6 +23,7 @@ export default function LoginPage() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    router.push("/dashboard")
   };
 
   return (
