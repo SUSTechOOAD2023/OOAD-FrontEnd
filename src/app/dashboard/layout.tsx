@@ -7,6 +7,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon"
 import SchoolIcon from '@mui/icons-material/School';
+import AppBar from "@mui/material/AppBar";
+import Typography from "@mui/material/Typography";
+import PersonIcon from '@mui/icons-material/Person';
+import IconButton from "@mui/material/IconButton";
 
 const drawerWidth = 240
 
@@ -17,6 +21,16 @@ export default function MainLayout({
 }) {
   return (
     <Box display="flex">
+      <AppBar position="fixed" color="primary" sx={{ zIndex: 1500 }}>
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            ProGenius
+          </Typography>
+          <IconButton color="inherit" aria-label="profile">
+            <PersonIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <Drawer
         sx={{
             width: drawerWidth, 
