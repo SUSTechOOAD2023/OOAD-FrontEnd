@@ -58,7 +58,7 @@ return (
     </Typography>
     <List>
         {events.map((event, index) => (
-            <ListItem key={index} style={{ padding: '8px 0' }}>
+            <ListItem key={index} style={{ padding: '0 0' }}>
                 <Box display="flex" flexDirection="column">
                     <button
                         style={{

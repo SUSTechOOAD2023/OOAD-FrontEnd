@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 
 const drawerWidth = 240
 
+
 export default function MainLayout({
   children
 }: {
@@ -32,15 +33,15 @@ export default function MainLayout({
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             ProGenius
           </Typography>
-          <IconButton color="inherit" aria-label="profile" onClick={() => router.push('/profile')}>
+          <IconButton color="inherit" aria-label="profile" onClick={() => router.push('/dashboard/profile')}>
             <PersonIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
         sx={{
-            width: drawerWidth, 
-            flexShrink: 0, 
+            width: drawerWidth,
+            flexShrink: 0,
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
@@ -78,7 +79,7 @@ export default function MainLayout({
         </List>
         <Copyright sx={{ mb: 4 }} />
       </Drawer>
-      {children} 
+      {children}
     </Box>
   )
 }
