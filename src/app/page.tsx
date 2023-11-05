@@ -33,16 +33,12 @@ export default function LandingPage() {
           </Typography>
         </Stack>
         <Stack direction="row" alignItems="center" spacing={3}>
-          <Link href="/login">
-            <Button variant="contained">
-              Log In
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button variant="contained">
-              Register
-            </Button>
-          </Link>
+          <Button component={Link} href="/login" variant="contained">
+            Log In
+          </Button>
+          <Button component={Link} href="/register" variant="contained">
+            Register
+          </Button>
         </Stack>
       </Stack>
       <Stack alignItems="center" marginTop={4} marginBottom={4} spacing={5}>

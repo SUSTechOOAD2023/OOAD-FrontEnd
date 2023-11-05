@@ -1,17 +1,12 @@
-import Toolbar from "@mui/material/Toolbar";
-import Container from "@mui/material/Container";
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
 
 export default function MainPage() {
   return (
-    <Container 
-      component="main"
-      sx={{
-          flexShrink: 1, 
-          p: 3, 
-          minHeight: "100vh"
-      }}
-    >
-      <Toolbar />
-    </Container>
+    <Box display="flex" justifyContent="center">
+      <Typography variant="h1">
+        Sending!
+      </Typography>
+    </Box>
   )
 }

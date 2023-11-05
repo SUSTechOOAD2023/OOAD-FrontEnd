@@ -1,4 +1,3 @@
-'use client'
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
@@ -14,8 +13,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Copyright from "../Copyright";
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const drawerWidth = 240
 
@@ -25,15 +25,17 @@ export default function MainLayout({
 }: {
   children: React.ReactNode
 }) {
-  const router = useRouter();
   return (
     <Box display="flex">
       <AppBar position="fixed" color="primary" sx={{ zIndex: 1500 }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            ProGenius
-          </Typography>
-          <IconButton color="inherit" aria-label="profile" onClick={() => router.push('/dashboard/profile')}>
+          <Button component={Link} href="/dashboard" color="inherit" sx={{ textTransform: "none" }}>
+            <Typography variant="h6">
+              ProGenius
+            </Typography>
+          </Button>
+          <Typography sx={{ flexGrow: 1 }}/>
+          <IconButton component={Link} href="/dashboard/profile" color="inherit" aria-label="profile">
             <PersonIcon />
           </IconButton>
         </Toolbar>
@@ -79,7 +81,18 @@ export default function MainLayout({
         </List>
         <Copyright sx={{ mb: 4 }} />
       </Drawer>
-      {children}
+      <Box 
+        component="main" 
+        sx={{ 
+          display: "flex", 
+          flexDirection: "column",
+          width: `calc(100% - ${drawerWidth}px)`, 
+          minHeight: "100vh", 
+        }}
+      >
+        <Toolbar />
+        {children}
+      </Box>
     </Box>
   )
 }
