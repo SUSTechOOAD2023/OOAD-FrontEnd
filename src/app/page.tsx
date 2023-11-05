@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Copyright from './Copyright';
 
+
 const SUSTechLogoStyle = {
   borderRadius: "50%"
 }
