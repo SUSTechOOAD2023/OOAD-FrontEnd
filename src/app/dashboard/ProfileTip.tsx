@@ -27,7 +27,7 @@ export const ProfileToolTip = styled(({ className, ...props }: TooltipProps) => 
 export default function ProfileTip() {
   return (
     <Stack>
-      <List>
+      <List sx={{ paddingTop: 0 }}>
         <ListItem disablePadding>
           <ListItemButton>
             <ListItemIcon sx={{ minWidth: 36 }}>
