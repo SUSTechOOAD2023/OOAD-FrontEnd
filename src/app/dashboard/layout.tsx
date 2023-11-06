@@ -15,10 +15,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Copyright from "../Copyright";
+import ProfileTip, { ProfileToolTip } from "./ProfileTip";
 import Link from 'next/link';
 
 const drawerWidth = 240
-
 
 export default function MainLayout({
   children
@@ -35,9 +35,11 @@ export default function MainLayout({
             </Typography>
           </Button>
           <Typography sx={{ flexGrow: 1 }}/>
-          <IconButton component={Link} href="/dashboard/profile" color="inherit" aria-label="profile">
-            <PersonIcon />
-          </IconButton>
+          <ProfileToolTip title={<ProfileTip />}>
+            <IconButton component={Link} href="/dashboard/profile" color="inherit" aria-label="profile">
+              <PersonIcon />
+            </IconButton>
+          </ProfileToolTip>
         </Toolbar>
       </AppBar>
       <Drawer
