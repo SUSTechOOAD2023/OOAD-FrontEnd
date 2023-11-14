@@ -14,6 +14,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from '@mui/material/styles';
 import Link from "next/link"
+import { useRouter } from 'next/navigation'
 
 export const ProfileToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -25,6 +26,7 @@ export const ProfileToolTip = styled(({ className, ...props }: TooltipProps) => 
 }));
 
 export default function ProfileTip() {
+  const router = useRouter()
   return (
     <Stack>
       <List sx={{ paddingTop: 0 }}>
@@ -41,7 +43,7 @@ export default function ProfileTip() {
             <ListItemIcon sx={{ minWidth: 36 }}>
               <FaceIcon />
             </ListItemIcon>
-            <ListItemText primary="Account" />
+            <ListItemText onClick={() => router.push('/dashboard/profile')} primary="Account" />
           </ListItemButton>
         </ListItem>
       </List>
