@@ -12,6 +12,9 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Copyright from '../Copyright';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -46,12 +49,12 @@ export default function RegisterPage() {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
-                autoComplete="given-name"
-                name="firstName"
+                autoComplete="invitation-code"
+                name="invitationCode"
                 required
                 fullWidth
-                id="firstName"
-                label="First Name"
+                id="invitationCode"
+                label="Invitation Code"
                 autoFocus
               />
             </Grid>
@@ -59,11 +62,17 @@ export default function RegisterPage() {
               <TextField
                 required
                 fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="family-name"
-              />
+                select
+                id="identity"
+                label="Identity"
+                name="identity"
+                autoComplete="off"
+              >
+                <MenuItem value={1}>Student</MenuItem>
+                <MenuItem value={2}>Teacher</MenuItem>
+                <MenuItem value={3}>Student Assistant</MenuItem>
+                <MenuItem value={4}>Administrator</MenuItem>
+              </TextField>
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -103,7 +112,7 @@ export default function RegisterPage() {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Typography variant="body2" sx={{ color: "blue", textDecoration: "underline"}}>
+              <Typography variant="body2" component={Link} href="/login">
                 Already have an account? Sign in
               </Typography>
             </Grid>
