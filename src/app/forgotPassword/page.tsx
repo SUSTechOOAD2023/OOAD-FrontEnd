@@ -14,7 +14,7 @@ import Copyright from '../Copyright';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const router = useRouter()
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -22,9 +22,8 @@ export default function LoginPage() {
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
-      password: data.get('password'),
     });
-    router.push("/dashboard")
+    router.push("/login")
   };
 
   return (
@@ -40,8 +39,11 @@ export default function LoginPage() {
         <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
           <LockOutlinedIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">
-          Log in
+        <Typography component="h1" variant="h5" gutterBottom>
+          Recover Password
+        </Typography>
+        <Typography component="h1" variant="caption">
+          Enter your email address and we'll send you a recovery link.
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
@@ -49,24 +51,10 @@ export default function LoginPage() {
             required
             fullWidth
             id="email"
-            label="Email Address/ID"
+            label="Email Address"
             name="email"
             autoComplete="email"
             autoFocus
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
           />
           <Button
             type="submit"
@@ -74,20 +62,8 @@ export default function LoginPage() {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Log In
+            Send recovery email
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Typography variant="body2" component={Link} href="/forgotPassword">
-                Forgot password?
-              </Typography>
-            </Grid>
-            <Grid item>
-              <Typography variant="body2" component={Link} href="/register">
-                Don't have an account? Sign Up
-              </Typography>
-            </Grid>
-          </Grid>
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
