@@ -49,7 +49,7 @@ export default function LoginPage() {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Email Address/ID"
             name="email"
             autoComplete="email"
             autoFocus
