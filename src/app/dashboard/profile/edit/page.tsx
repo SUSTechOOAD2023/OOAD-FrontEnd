@@ -9,7 +9,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
-
+import EditIcon from '@mui/icons-material/Edit';
 
 
 const EditProfile = () => {
@@ -45,11 +45,36 @@ const EditProfile = () => {
         setUserProfile({ ...userProfile, techStack: newTechStack });
     };
 
+    const [isEditing, setIsEditing] = useState(false);
+    const [name, setName] = useState(userProfile.name);
+
+    const handleEditClick = () => {
+        setIsEditing(!isEditing);
+    };
+
+    const handleNameChange = (e) => {
+        setName(e.target.value);
+    };
+
     return (
         <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
-            <Typography variant="h4" marginTop={2}>
-                {userProfile.name}
+                <Box display="flex" alignItems="center">
+        {isEditing ? (
+            <TextField
+            variant="outlined"
+            value={name}
+            onChange={handleNameChange}
+            />
+        ) : (
+            <Typography variant="h4" marginTop={2} marginRight={1}>
+            {name}
             </Typography>
+        )}
+
+        <IconButton onClick={handleEditClick} style={{ marginTop: '15px' }}>
+            <EditIcon />
+        </IconButton>
+        </Box>
             <Typography variant="subtitle1" color="textSecondary" marginTop={1}>
                 {userProfile.email}
             </Typography>

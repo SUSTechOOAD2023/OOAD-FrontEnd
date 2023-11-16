@@ -23,7 +23,7 @@ const userProfile: UserProfile = {
     email: "hutao@genshin.com",
     joinedDate: "2023-07-15",
     sign: "The 77th generation master of the \"Wangsheng Funeral Parlor\" in Liyue, a crucial figure in charge of Liyue's funeral affairs.",
-    techStack: ['C++', 'Java', 'Python']
+    techStack: ['C++', 'Java', 'Python', 'C#', 'C+++++++++++++++++++++++++++++++++++++++++++++++++++++++']
 };
 
 const events = [
@@ -63,8 +63,8 @@ return (
     </Typography>
     <Divider style={{ width: '60%', marginTop: 2, marginBottom: 2 }} />
 
-    <Grid container spacing={6} justifyContent="center">
-    <Grid item>
+    <Grid container spacing={6} justifyContent="center" style={{minWidth: '100%'}}>
+    <Grid item style={{maxWidth: '60%'}}>
     <Typography variant="h6" marginTop={2}>
         Enrolled Classes
     </Typography>
@@ -82,7 +82,7 @@ return (
                         }}
                         onClick={() => {}}
                     >
-                        <Typography variant="body1">{event.eventName}</Typography>
+                        <Typography variant="body1" style={{ textAlign: 'left' }}>{event.eventName}</Typography>
                     </button>
                     <Typography variant="body2" color="textSecondary">{event.eventTime}</Typography>
                     <Typography variant="caption">{event.role}</Typography>
@@ -92,7 +92,7 @@ return (
         ))}
     </List>
     </Grid>
-    <Grid item>
+    <Grid item style={{maxWidth: '40%'}}>
         <Typography variant="h6" marginTop={2}>
         Technical Stack
     </Typography>
@@ -102,20 +102,12 @@ return (
                 <ListItemIcon>
                     <CodeIcon />
                 </ListItemIcon>
-                <ListItemText primary={tech} />
+                <ListItemText primary={tech} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }} />
             </ListItem>
         ))}
     </List>
     </Grid>
     </Grid>
-
-    <Button component={Link}
-            href="/dashboard/profile/edit"
-            variant="contained"
-            color="primary"
-            startIcon={<Edit />}>
-        Edit Profile
-    </Button>
 </Box>
 );
 }

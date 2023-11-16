@@ -43,7 +43,7 @@ export default function ProfileTip() {
             <ListItemIcon sx={{ minWidth: 36 }}>
               <FaceIcon />
             </ListItemIcon>
-            <ListItemText onClick={() => router.push('/dashboard/profile')} primary="Account" />
+            <ListItemText onClick={() => router.push('/dashboard/profile/edit')} primary="Account" />
           </ListItemButton>
         </ListItem>
       </List>
