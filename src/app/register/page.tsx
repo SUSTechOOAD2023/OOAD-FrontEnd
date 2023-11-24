@@ -78,6 +78,16 @@ export default function RegisterPage() {
               <TextField
                 required
                 fullWidth
+                id="id"
+                label="ID"
+                name="id"
+                autoComplete="no"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
                 id="email"
                 label="Email Address"
                 name="email"
