@@ -136,7 +136,7 @@ function InformationBox({
                     size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{GroupSize}
                   </Typography>
                   <Typography variant="body2">
-                    endtime: {GroupDeadline.toLocaleDateString()}
+                    endtime: {GroupDeadline.toLocaleDateString("zh-CN")}
                   </Typography>
                 </Box>
                 <Box
