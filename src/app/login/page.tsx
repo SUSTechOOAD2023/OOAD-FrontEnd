@@ -89,7 +89,7 @@ export default function LoginPage() {
             </Grid>
             <Grid item>
               <Typography variant="body2" component={Link} href="/register">
-                Don't have an account? Sign Up
+                Don&apos;t have an account? Sign Up
               </Typography>
             </Grid>
           </Grid>

@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
           Recover Password
         </Typography>
         <Typography component="h1" variant="caption">
-          Enter your email address and we'll send you a recovery link.
+          Enter your email address and we&apos;ll send you a recovery link.
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
