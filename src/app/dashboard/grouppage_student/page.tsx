@@ -4,21 +4,12 @@ import React, { useState } from "react";
 import {
   Paper,
   Box,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
   Grid,
   Container,
   Typography,
-  IconButton,
   Tabs,
   Tab,
 } from "@mui/material";
-
-import CloseIcon from "@mui/icons-material/Close";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,44 +60,7 @@ function InformationBox({
   ) => void;
   onDelete: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const [editedName, setEditedName] = useState(GroupName);
-  const [editedGroupId, setEditedGroupId] = useState(GroupId);
-  const [editedGroupSize, setEditedGroupSize] = useState(GroupSize);
-  const [editedGroupDeadline, setEditedGroupDeadline] = useState(GroupDeadline);
-
-  const handleEditClick = () => {
-    setOpen(true);
-  };
-
-  const handleSaveClick = () => {
-    onEdit(editedName, editedGroupId, editedGroupSize, editedGroupDeadline);
-    setOpen(false);
-  };
-  const handleDelete = () => {
-    onDelete();
-    setOpen(false);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const handleRedirect = () => {};
-
-  const handleGroupDeadlineChange = (e: {
-    target: { name: any; value: any };
-  }) => {
-    const { name, value } = e.target;
-    const updatedDate = new Date(editedGroupDeadline); 
-    if (name === "year") {
-      updatedDate.setFullYear(value);
-    } else if (name === "month") {
-      updatedDate.setMonth(value - 1); 
-    } else if (name === "day") {
-      updatedDate.setDate(value);
-    }
-    setEditedGroupDeadline(updatedDate);
-  };
 
   return (
     <Container component="main" maxWidth="xs" sx={{ minHeight: "2vh" }}>
@@ -146,13 +100,6 @@ function InformationBox({
                     left: "260px",
                   }}
                 >
-                  <IconButton
-                    aria-label="fingerprint"
-                    onClick={handleDelete}
-                    size="small"
-                  >
-                    <CloseIcon />
-                  </IconButton>
                 </Box>
                 <Box
                   sx={{
@@ -161,86 +108,11 @@ function InformationBox({
                     left: "235px",
                   }}
                 >
-                  <Button variant="text" onClick={handleEditClick}>
-                    Edit
-                  </Button>
                 </Box>
               </Paper>
             </Box>
           </Grid>
         </Grid>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Edit Information</DialogTitle>
-          <DialogContent>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group Name"
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group ID"
-                value={editedGroupId}
-                onChange={(e) => setEditedGroupId(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group Size"
-                value={editedGroupSize}
-                onChange={(e) => setEditedGroupSize(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid
-              container
-              item
-              xs={12}
-              spacing={1}
-              style={{ marginTop: "10px" }}
-            >
-              <Grid item xs={4}>
-                <TextField
-                  label="Year"
-                  name="year"
-                  value={editedGroupDeadline.getFullYear().toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  label="Month"
-                  name="month"
-                  value={(editedGroupDeadline.getMonth() + 1).toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  label="Day"
-                  name="day"
-                  value={editedGroupDeadline.getDate().toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" onClick={handleSaveClick}>
-              Save
-            </Button>
-            <Button variant="contained" onClick={handleClose}>
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
       </Box>
     </Container>
   );
@@ -313,13 +185,6 @@ function InformationBoxesContainer() {
           justifyContent: "flex-start",
         }}
       >
-        <Button
-          variant="contained"
-          sx={{ position: "absolute", top: 120, right: 80 }}
-          onClick={() => addInformationBox(tabindex)}
-        >
-          New
-        </Button>
         {informationBoxes.map((informationBox, index) => {
           if (informationBox.GroupTab === tabindex) {
             return (
