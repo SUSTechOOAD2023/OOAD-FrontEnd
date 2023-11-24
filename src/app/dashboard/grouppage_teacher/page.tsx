@@ -16,9 +16,15 @@ import {
   IconButton,
   Tabs,
   Tab,
+  Pagination,
+  Stack,
 } from "@mui/material";
 
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DemoItem } from "@mui/x-date-pickers/internals/demo";
 import CloseIcon from "@mui/icons-material/Close";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,7 +54,6 @@ function a11yProps(index: number) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-
 function InformationBox({
   GroupName,
   GroupId,
@@ -59,13 +64,13 @@ function InformationBox({
 }: {
   GroupName: string;
   GroupId: string;
-  GroupSize: string;
-  GroupDeadline: Date;
+  GroupSize: number;
+  GroupDeadline: any;
   onEdit: (
     editedName: string,
     editedGroupId: string,
-    editedGroupSize: string,
-    editedGroupDeadline: Date
+    editedGroupSize: number,
+    editedGroupDeadline: any
   ) => void;
   onDelete: () => void;
 }) {
@@ -93,19 +98,9 @@ function InformationBox({
 
   const handleRedirect = () => {};
 
-  const handleGroupDeadlineChange = (e: {
-    target: { name: any; value: any };
-  }) => {
-    const { name, value } = e.target;
-    const updatedDate = new Date(editedGroupDeadline); 
-    if (name === "year") {
-      updatedDate.setFullYear(value);
-    } else if (name === "month") {
-      updatedDate.setMonth(value - 1); 
-    } else if (name === "day") {
-      updatedDate.setDate(value);
-    }
-    setEditedGroupDeadline(updatedDate);
+  const handleDateChange = (date: any) => {
+    setEditedGroupDeadline(date);
+    console.log("Selected date:", date);
   };
 
   return (
@@ -130,13 +125,16 @@ function InformationBox({
                     {GroupName}
                   </Typography>
                   <Typography variant="body2">
-                    id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{GroupId}
+                    Id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {GroupId}
                   </Typography>
                   <Typography variant="body2">
-                    size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{GroupSize}
+                    Size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    {GroupSize}
                   </Typography>
                   <Typography variant="body2">
-                    endtime: {GroupDeadline.toLocaleDateString()}
+                    Deadline:
+                    {GroupDeadline.format("YYYY-MM-DD")}
                   </Typography>
                 </Box>
                 <Box
@@ -176,7 +174,9 @@ function InformationBox({
               <TextField
                 label="Group Name"
                 value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEditedName(e.target.value)}
                 fullWidth
               />
             </Grid>
@@ -184,7 +184,9 @@ function InformationBox({
               <TextField
                 label="Group ID"
                 value={editedGroupId}
-                onChange={(e) => setEditedGroupId(e.target.value)}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEditedGroupId(e.target.value)}
                 fullWidth
               />
             </Grid>
@@ -192,45 +194,22 @@ function InformationBox({
               <TextField
                 label="Group Size"
                 value={editedGroupSize}
-                onChange={(e) => setEditedGroupSize(e.target.value)}
+                onChange={(e: { target: { value: string } }) =>
+                  setEditedGroupSize(parseInt(e.target.value))
+                }
                 fullWidth
               />
             </Grid>
-            <Grid
-              container
-              item
-              xs={12}
-              spacing={1}
-              style={{ marginTop: "10px" }}
-            >
-              <Grid item xs={4}>
-                <TextField
-                  label="Year"
-                  name="year"
-                  value={editedGroupDeadline.getFullYear().toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoItem label="Deadline">
+                <DatePicker
+                  defaultValue={editedGroupDeadline}
+                  minDate={editedGroupDeadline}
+                  views={["year", "month", "day"]}
+                  onChange={handleDateChange}
                 />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  label="Month"
-                  name="month"
-                  value={(editedGroupDeadline.getMonth() + 1).toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={4}>
-                <TextField
-                  label="Day"
-                  name="day"
-                  value={editedGroupDeadline.getDate().toString()}
-                  onChange={handleGroupDeadlineChange}
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
+              </DemoItem>
+            </LocalizationProvider>
           </DialogContent>
           <DialogActions>
             <Button variant="contained" onClick={handleSaveClick}>
@@ -251,15 +230,15 @@ function InformationBoxesContainer() {
     {
       GroupName: "Group1",
       GroupId: "12110924",
-      GroupSize: "5",
-      GroupDeadline: new Date(2020, 2, 30),
+      GroupSize: 5,
+      GroupDeadline: dayjs(),
       GroupTab: 0,
     },
     {
       GroupName: "Group2",
       GroupId: "12110924",
-      GroupSize: "3",
-      GroupDeadline: new Date(2000, 2, 31),
+      GroupSize: 3,
+      GroupDeadline: dayjs().add(1, "day"),
       GroupTab: 1,
     },
   ]);
@@ -268,8 +247,8 @@ function InformationBoxesContainer() {
     const newInformationBox = {
       GroupName: "NewGroup",
       GroupId: "NewId",
-      GroupSize: "0",
-      GroupDeadline: new Date(),
+      GroupSize: 0,
+      GroupDeadline: dayjs(),
       GroupTab: tabindex,
     };
     setInformationBoxes([...informationBoxes, newInformationBox]);
@@ -279,8 +258,8 @@ function InformationBoxesContainer() {
     index: number,
     GroupName: string,
     GroupId: string,
-    GroupSize: string,
-    GroupDeadline: Date
+    GroupSize: number,
+    GroupDeadline: any
   ) => {
     const updatedInformationBoxes = [...informationBoxes];
     updatedInformationBoxes[index].GroupName = GroupName;
@@ -302,7 +281,9 @@ function InformationBoxesContainer() {
     setValue(newValue);
   };
 
-  const tabspage = (tabindex: number) => {
+  const tabspage = (tabindex: number, pageindex: number) => {
+    //单个tab
+    let count = 0;
     return (
       <Box
         sx={{
@@ -322,26 +303,29 @@ function InformationBoxesContainer() {
         </Button>
         {informationBoxes.map((informationBox, index) => {
           if (informationBox.GroupTab === tabindex) {
-            return (
-              <div key={index} style={{ width: "350px", height: "160px" }}>
-                <InformationBox
-                  GroupName={informationBox.GroupName}
-                  GroupId={informationBox.GroupId}
-                  GroupSize={informationBox.GroupSize}
-                  GroupDeadline={informationBox.GroupDeadline}
-                  onEdit={(GroupName, GroupId, GroupSize, GroupDeadline) =>
-                    handleInformationBoxEdit(
-                      index,
-                      GroupName,
-                      GroupId,
-                      GroupSize,
-                      GroupDeadline
-                    )
-                  }
-                  onDelete={() => handleDelete(index)}
-                />
-              </div>
-            );
+            count = count + 1;
+            if (count >= pageindex * 9 - 8 && count <= pageindex * 9) {
+              return (
+                <div key={index} style={{ width: "350px", height: "160px" }}>
+                  <InformationBox
+                    GroupName={informationBox.GroupName}
+                    GroupId={informationBox.GroupId}
+                    GroupSize={informationBox.GroupSize}
+                    GroupDeadline={informationBox.GroupDeadline}
+                    onEdit={(GroupName, GroupId, GroupSize, GroupDeadline) =>
+                      handleInformationBoxEdit(
+                        index,
+                        GroupName,
+                        GroupId,
+                        GroupSize,
+                        GroupDeadline
+                      )
+                    }
+                    onDelete={() => handleDelete(index)}
+                  />
+                </div>
+              );
+            }
           }
           return null;
         })}
@@ -349,7 +333,15 @@ function InformationBoxesContainer() {
     );
   };
 
+  const [page, setPage] = React.useState(1);
+  const handleChangePage = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+  };
   return (
+    //tab
     <Container component="main" sx={{ minHeight: "100vh" }}>
       <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -364,13 +356,27 @@ function InformationBoxesContainer() {
           </Tabs>
         </Box>
         <CustomTabPanel value={value} index={0}>
-          {tabspage(0)}
+          <Stack spacing={2}>
+            {tabspage(0, page)}
+            <Pagination
+              count={10}
+              page={page}
+              onChange={handleChangePage}
+              style={{
+                position: "fixed",
+                bottom: "10px",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: "999",
+              }}
+            />
+          </Stack>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
-          {tabspage(1)}
+          {1}
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          {tabspage(2)}
+          {2}
         </CustomTabPanel>
       </Box>
     </Container>
