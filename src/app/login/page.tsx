@@ -13,18 +13,23 @@ import Container from '@mui/material/Container';
 import Copyright from '../Copyright';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import postLogin from './loginHandler';
 
 export default function LoginPage() {
   const router = useRouter()
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+      email: data.get("email"),
+      password: data.get("password"),
     });
-    router.push("/dashboard")
+    const email = data.get("email")?.toString()
+    const password = data.get("password")?.toString()
+    if (email && password && await postLogin({ email: email, password: password })) {
+      router.push("/dashboard")
+    }
   };
 
   return (

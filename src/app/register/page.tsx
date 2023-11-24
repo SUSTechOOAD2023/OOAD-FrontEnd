@@ -15,18 +15,39 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import postRegister from './registerHandler';
 
 export default function RegisterPage() {
   const router = useRouter()
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+      invitationCode: data.get("invitationCode"),
+      identity: data.get("identity"),
+      id: data.get("id"), 
+      email: data.get("email"), 
+      password: data.get("password")
     });
-    router.push("/dashboard")
+    const invitationCode = data.get("invitationCode")?.toString()
+    const identity = data.get("identity")?.toString()
+    const id = data.get("id")?.toString()
+    const email = data.get("email")?.toString()
+    const password = data.get("password")?.toString()
+    if (invitationCode && identity && id && email && password) {
+      const res = await postRegister({
+        invitationCode: invitationCode, 
+        identity: parseInt(identity), 
+        id: id, 
+        email: email, 
+        password: password
+      })
+
+      if (res === "Success") {
+        router.push("/dashboard")
+      }
+    }
   };
 
   return (

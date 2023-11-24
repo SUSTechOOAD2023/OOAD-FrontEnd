@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Container from '@mui/material/Container';
@@ -5,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Copyright from './Copyright';
+import landingRedirect from './landing';
 
 
 const SUSTechLogoStyle = {
@@ -16,6 +20,10 @@ const iconStyle = {
 }
 
 export default function LandingPage() {
+  useEffect(() => {
+    landingRedirect()
+  }, [])
+
   return (
     <Container component="main">
       <Stack alignItems="center" marginTop={12} marginBottom={12} spacing={4}>
