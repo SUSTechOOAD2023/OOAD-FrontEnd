@@ -12,7 +12,14 @@ const AssignmentCard = ({ assignment }) => {
   };
 
   return (
-    <Paper elevation={3} style={cardStyle}>
+    <Paper
+      elevation={3}
+      sx={{
+        padding: "20px",
+        position: "relative", // 保证这里的值是有效的CSS position属性值
+        backgroundColor: isDeadlinePassed ? "#00aa00" : "white",
+      }}
+    >
       <Typography variant="h5" component="h2">
         {name} -- {courseName}
       </Typography>
