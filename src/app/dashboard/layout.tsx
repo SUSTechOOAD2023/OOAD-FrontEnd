@@ -1,7 +1,9 @@
+'use client'
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
+import { useRouter } from 'next/navigation';
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -25,6 +27,7 @@ export default function MainLayout({
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter();
   return (
     <Box display="flex">
       <AppBar position="fixed" color="primary" sx={{ zIndex: 1500 }}>
@@ -57,7 +60,7 @@ export default function MainLayout({
         <Toolbar />
         <List sx={{ flexGrow: 1 }}>
           <ListItem key="Course" disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={() => router.push('/dashboard/course')}>
               <ListItemIcon>
                 <SchoolIcon />
               </ListItemIcon>
@@ -65,7 +68,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Group" disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={() => router.push('/dashboard/group')}>
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
@@ -73,7 +76,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Assignment" disablePadding>
-            <ListItemButton>
+            <ListItemButton onClick={() => router.push('/dashboard/homework')}>
               <ListItemIcon>
                 <AssignmentIcon />
               </ListItemIcon>
