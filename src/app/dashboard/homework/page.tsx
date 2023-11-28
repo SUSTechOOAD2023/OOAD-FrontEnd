@@ -20,7 +20,7 @@ const AssignmentCard = ({ assignment }) => {
         Score: {score || "Not Available"}
       </Typography>
       <Typography variant="body2">
-        Teacher's Comment: {comment || "No comment"}
+        Teacher&apos;s Comment: {comment || "No comment"}
       </Typography>
       <Typography variant="body2">
         Deadline: {deadline.toLocaleString()} 
