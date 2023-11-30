@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 const AssignmentCard = ({ assignment }) => {
   const { name, score, comment, deadline, submit, courseName } = assignment;
@@ -43,6 +44,7 @@ const AssignmentCard = ({ assignment }) => {
 
 export default function AssignmentPage({ assignments = [], courseName = "Introduction to Genshin Impact" }) {
     // 示例数据
+    const router = useRouter();
     const exampleAssignments = assignments.length === 0 ? [
       {
         name: "Assignment 1",
@@ -64,7 +66,7 @@ export default function AssignmentPage({ assignments = [], courseName = "Introdu
     ] : assignments;
   
     return (
-      <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
+      <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }} onClick={() => router.push('/dashboard/homework/submit')}>
         <Box
           sx={{
             marginTop: 8,
