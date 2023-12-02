@@ -49,7 +49,7 @@ export default function AssignmentPage({ assignments = [], courseName = "Introdu
         name: "Assignment 1",
         score: "Not Available",
         comment: "",
-        deadline: new Date('2023-11-31T23:59:59'),
+        deadline: new Date('2023-11-30T23:59:59'),
         submit: false,
         courseName: "Data Structure and Analysis"
       },
