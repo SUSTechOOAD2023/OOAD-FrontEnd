@@ -14,9 +14,13 @@ import Copyright from '../Copyright';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
 import postLogin from './loginHandler';
+import Alert from '@mui/material/Alert';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter()
+  const [alertDisplay, setAlertDisplay] = useState("none")
+  const [alertText, setAlertText] = useState("")
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,8 +31,17 @@ export default function LoginPage() {
     });
     const email = data.get("email")?.toString()
     const password = data.get("password")?.toString()
-    if (email && password && await postLogin({ email: email, password: password })) {
-      router.push("/dashboard")
+    if (email && password) {
+      const responseText = await postLogin({ email: email, password: password })
+      if (responseText == "success!") {
+        router.push("/dashboard")
+      } else {
+        setAlertText(responseText)
+        setAlertDisplay("flex")
+      }
+    } else {
+      setAlertText("ID or password should not be empty!")
+      setAlertDisplay("flex")
     }
   };
 
@@ -68,16 +81,26 @@ export default function LoginPage() {
             type="password"
             id="password"
             autoComplete="current-password"
+            sx={{ mb: 2 }}
           />
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
-          />
+          /> */}
+          <Alert 
+            variant="outlined" 
+            severity="error" 
+            onClose={() => { setAlertDisplay("none") }}
+            sx={{
+              display: alertDisplay
+            }}>
+            {alertText}
+          </Alert>
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 1, mb: 2 }}
           >
             Log In
           </Button>

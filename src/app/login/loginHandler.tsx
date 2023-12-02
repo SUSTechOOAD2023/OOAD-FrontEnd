@@ -10,16 +10,27 @@ interface loginInformation {
 
 export default async function postLogin(param: loginInformation) {
   if (debug === "true") {
-    return true
+    return "success!"
   }
 
-  const res = await fetch(`${path}/...`, {
+  const isEmailSignIn = param.email.includes("@")
+
+  const api = isEmailSignIn ? "emailSignIn" : "signin"
+  const body =  isEmailSignIn
+    ? { email: param.email, accountPassword: param.password }
+    : { accountName: param.email, accountPassword: param.password }
+
+  const res = await fetch(`${path}/account/${api}`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(param)
+    body: JSON.stringify(body)
   })
 
-  return res.ok
+  if (res.ok) {
+    return await res.text()
+  } else {
+    return "Unknown error!"
+  }
 }
