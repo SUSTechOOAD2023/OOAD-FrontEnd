@@ -42,8 +42,7 @@ const AssignmentCard = ({ assignment }) => {
   );
 };
 
-export default function AssignmentPage({ assignments = [], courseName = "Introduction to Genshin Impact" }) {
-    // 示例数据
+export default function AssignmentPage({ assignments = [], courseName = "Introduction to Genshin Impact" }: { assignments: { name: string, score: string, comment: string, deadline: Date, submit: boolean, courseName: string }[], courseName?: string }) {
     const router = useRouter();
     const exampleAssignments = assignments.length === 0 ? [
       {
