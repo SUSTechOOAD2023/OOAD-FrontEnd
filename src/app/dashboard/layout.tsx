@@ -57,7 +57,7 @@ export default function MainLayout({
         <Toolbar />
         <List sx={{ flexGrow: 1 }}>
           <ListItem key="Course" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/course'>
               <ListItemIcon>
                 <SchoolIcon />
               </ListItemIcon>
@@ -65,7 +65,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Group" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/group'>
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
@@ -73,7 +73,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Assignment" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/homework'>
               <ListItemIcon>
                 <AssignmentIcon />
               </ListItemIcon>
