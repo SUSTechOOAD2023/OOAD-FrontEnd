@@ -16,6 +16,7 @@ import Link from 'next/link'
 import postLogin from './loginHandler';
 import Alert from '@mui/material/Alert';
 import { useState } from 'react';
+import MenuItem from '@mui/material/MenuItem';
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,11 +29,17 @@ export default function LoginPage() {
     console.log({
       email: data.get("email"),
       password: data.get("password"),
+      identity: data.get("identity"), 
     });
     const email = data.get("email")?.toString()
     const password = data.get("password")?.toString()
-    if (email && password) {
-      const responseText = await postLogin({ email: email, password: password })
+    const identity = data.get("identity")?.toString()
+    if (email && password && identity) {
+      const responseText = await postLogin({ 
+        email: email, 
+        password: password, 
+        identity: identity
+      })
       if (responseText == "success!") {
         router.push("/dashboard")
       } else {
@@ -40,7 +47,7 @@ export default function LoginPage() {
         setAlertDisplay("flex")
       }
     } else {
-      setAlertText("ID or password should not be empty!")
+      setAlertText("All fields should not be empty!")
       setAlertDisplay("flex")
     }
   };
@@ -81,8 +88,22 @@ export default function LoginPage() {
             type="password"
             id="password"
             autoComplete="current-password"
-            sx={{ mb: 2 }}
           />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            select
+            id="identity"
+            label="Identity"
+            name="identity"
+            autoComplete="off"
+            sx={{ mb: 2 }}
+          >
+            <MenuItem value="student">Student</MenuItem>
+            <MenuItem value="teacher">Teacher</MenuItem>
+            <MenuItem value="SA">Student Assistant</MenuItem>
+          </TextField>
           {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"

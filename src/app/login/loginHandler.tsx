@@ -5,7 +5,8 @@ const path = process.env.path
 
 interface loginInformation {
   email: string, 
-  password: string
+  password: string, 
+  identity: string
 }
 
 export default async function postLogin(param: loginInformation) {
@@ -20,7 +21,7 @@ export default async function postLogin(param: loginInformation) {
     ? { email: param.email, accountPassword: param.password }
     : { accountName: param.email, accountPassword: param.password }
 
-  const res = await fetch(`${path}/account/${api}`, {
+  const res = await fetch(`${path}/account/${api}?identity=${param.identity}`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
