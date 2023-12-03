@@ -40,7 +40,7 @@ export default function LoginPage() {
         password: password, 
         identity: identity
       })
-      if (responseText == "success!") {
+      if (responseText === "success!") {
         router.push("/dashboard")
       } else {
         setAlertText(responseText)
@@ -97,6 +97,7 @@ export default function LoginPage() {
             id="identity"
             label="Identity"
             name="identity"
+            defaultValue=""
             autoComplete="off"
             sx={{ mb: 2 }}
           >

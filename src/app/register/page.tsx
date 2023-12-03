@@ -49,7 +49,7 @@ export default function RegisterPage() {
       })
 
       if (res === "Success!") {
-        router.push("/dashboard")
+        router.push("/login")
       } else {
         setAlertText(res)
         setAlertDisplay("flex")
@@ -97,6 +97,7 @@ export default function RegisterPage() {
                 id="identity"
                 label="Identity"
                 name="identity"
+                defaultValue=""
                 autoComplete="off"
               >
                 <MenuItem value="student">Student</MenuItem>

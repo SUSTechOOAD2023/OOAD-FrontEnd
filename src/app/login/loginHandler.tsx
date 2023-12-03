@@ -1,5 +1,7 @@
 'use server'
 
+import { getCookie, setCookie } from "../cookie"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -21,16 +23,21 @@ export default async function postLogin(param: loginInformation) {
     ? { email: param.email, accountPassword: param.password }
     : { accountName: param.email, accountPassword: param.password }
 
-  const res = await fetch(`${path}/account/${api}?identity=${param.identity}`, {
+  const request = new Request(`${path}/account/${api}?identity=${param.identity}`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
     body: JSON.stringify(body)
   })
+  const res = await fetch(await getCookie(request))
 
   if (res.ok) {
-    return await res.text()
+    const resText = await res.text()
+    if (resText == "success!") {
+      setCookie(res)
+    }
+    return resText
   } else {
     return "Unknown error!"
   }
