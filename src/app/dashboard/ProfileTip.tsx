@@ -15,6 +15,8 @@ import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import { styled } from '@mui/material/styles';
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
+import logout from "./logoutHandler";
+import { testCookie } from "../cookie";
 
 export const ProfileToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -48,7 +50,7 @@ export default function ProfileTip() {
         </ListItem>
       </List>
       <Divider />
-      <Button component={Link} href="/" color="inherit" startIcon={<LogoutIcon />}>
+      <Button component={Link} href="/" onClick={() => logout()} color="inherit" startIcon={<LogoutIcon />}>
         Log out
       </Button>
     </Stack>

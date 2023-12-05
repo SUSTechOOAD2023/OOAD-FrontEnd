@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -15,18 +16,48 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import postRegister from './registerHandler';
+import Alert from '@mui/material/Alert';
 
 export default function RegisterPage() {
   const router = useRouter()
+  const [alertDisplay, setAlertDisplay] = useState("none")
+  const [alertText, setAlertText] = useState("")
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+      invitationCode: data.get("invitationCode"),
+      identity: data.get("identity"),
+      id: data.get("id"), 
+      email: data.get("email"), 
+      password: data.get("password")
     });
-    router.push("/dashboard")
+    const invitationCode = data.get("invitationCode")?.toString()
+    const identity = data.get("identity")?.toString()
+    const id = data.get("id")?.toString()
+    const email = data.get("email")?.toString()
+    const password = data.get("password")?.toString()
+    if (invitationCode && identity && id && email && password) {
+      const res = await postRegister({
+        invitationCode: invitationCode, 
+        identity: identity, 
+        id: id, 
+        email: email, 
+        password: password
+      })
+
+      if (res === "Success!") {
+        router.push("/login")
+      } else {
+        setAlertText(res)
+        setAlertDisplay("flex")
+      }
+    } else {
+      setAlertText("All fields should not be empty!")
+      setAlertDisplay("flex")
+    }
   };
 
   return (
@@ -66,12 +97,12 @@ export default function RegisterPage() {
                 id="identity"
                 label="Identity"
                 name="identity"
+                defaultValue=""
                 autoComplete="off"
               >
-                <MenuItem value={1}>Student</MenuItem>
-                <MenuItem value={2}>Teacher</MenuItem>
-                <MenuItem value={3}>Student Assistant</MenuItem>
-                <MenuItem value={4}>Administrator</MenuItem>
+                <MenuItem value="student">Student</MenuItem>
+                <MenuItem value="teacher">Teacher</MenuItem>
+                <MenuItem value="SA">Student Assistant</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
@@ -103,20 +134,32 @@ export default function RegisterPage() {
                 type="password"
                 id="password"
                 autoComplete="new-password"
+                sx={{
+                  mb: 2
+                }}
               />
             </Grid>
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox value="allowExtraEmails" color="primary" />}
                 label="I accept to share all my personal information with the website owners."
               />
-            </Grid>
+            </Grid> */}
           </Grid>
+          <Alert 
+            variant="outlined" 
+            severity="error" 
+            onClose={() => { setAlertDisplay("none") }}
+            sx={{
+              display: alertDisplay
+            }}>
+            {alertText}
+          </Alert>
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 1, mb: 2 }}
           >
             Register
           </Button>
