@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
-    debug: "true", 
+    debug: "false", 
     path: "http://10.27.26.94:9190"
   }
 }

@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Copyright from './Copyright';
-import landingRedirect from './landing';
+import { landingRedirect } from './landing';
 
 
 const SUSTechLogoStyle = {

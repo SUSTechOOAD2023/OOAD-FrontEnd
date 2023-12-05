@@ -1,6 +1,6 @@
 'use server'
 
-import { addCookie, getCookie, setCookie, testCookie } from "../cookie"
+import { getCookie, setCookie, testCookie } from "../cookie"
 
 const debug = process.env.debug
 const path = process.env.path
@@ -14,7 +14,6 @@ interface loginInformation {
 export default async function postLogin(param: loginInformation) {
   if (debug === "true") {
     console.log(6);
-    addCookie()
     return "success!"
   }
 

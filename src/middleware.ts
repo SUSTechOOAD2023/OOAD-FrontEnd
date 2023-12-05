@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { testCookie } from './app/cookie';
+import { isLogin } from './app/landing';
 
 export async function middleware(req: NextRequest) {
-  const isAuthenticated = await checkAuthentication(req); // 替换为你的鉴权检查逻辑
-  console.log(isAuthenticated)
+  const isAuthenticated = await isLogin(); // 替换为你的鉴权检查逻辑
+  console.log(isAuthenticated);
+  
   if (!isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
