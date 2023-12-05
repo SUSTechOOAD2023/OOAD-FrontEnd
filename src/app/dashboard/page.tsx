@@ -4,8 +4,12 @@ import Typography from "@mui/material/Typography"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import Paper from "@mui/material/Paper"
+import { testCookie } from "../cookie"
+
+
 
 export default function MainPage() {
+
   return (
     <Container 
       sx={{
@@ -29,4 +33,4 @@ export default function MainPage() {
       </Grid>
     </Container>
   )
-}
+};

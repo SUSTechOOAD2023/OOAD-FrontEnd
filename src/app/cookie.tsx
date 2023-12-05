@@ -25,5 +25,11 @@ export async function clearCookie() {
 } 
 
 export async function testCookie() {
-  return cookies
+  console.log(cookies);
+  return cookies.length !== 0;
+}
+export async function addCookie() {
+  // console.log(6);
+  cookies.push("6")
+  console.log(cookies);
 }
