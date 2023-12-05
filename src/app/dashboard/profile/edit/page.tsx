@@ -71,7 +71,7 @@ const EditProfile = () => {
             </Typography>
         )}
 
-        <IconButton onClick={handleEditClick} style={{ marginTop: '15px' }}>
+        <IconButton onClick={handleEditClick} style={{ marginTop: '15px' }} className='icon-container'>
             <EditIcon />
         </IconButton>
         </Box>

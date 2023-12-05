@@ -17,6 +17,8 @@ import Button from "@mui/material/Button";
 import Copyright from "../Copyright";
 import ProfileTip, { ProfileToolTip } from "./ProfileTip";
 import Link from 'next/link';
+import ButtonBase from "@mui/material/ButtonBase";
+import Image from 'next/image';
 
 const drawerWidth = 240
 
@@ -36,9 +38,16 @@ export default function MainLayout({
           </Button>
           <Typography sx={{ flexGrow: 1 }}/>
           <ProfileToolTip title={<ProfileTip />}>
-            <IconButton component={Link} href="/dashboard/profile" color="inherit" aria-label="profile">
-              <PersonIcon />
-            </IconButton>
+            <ButtonBase component={Link} href="/dashboard/profile" color="inherit" aria-label="profile" disableTouchRipple>
+              <Image
+                src="/paimon.png"
+                alt="Genshin Impact"
+                width={40}
+                height={40}
+                style={{ borderRadius: '50%' }}
+                priority
+              />
+            </ButtonBase>
           </ProfileToolTip>
         </Toolbar>
       </AppBar>
@@ -57,7 +66,7 @@ export default function MainLayout({
         <Toolbar />
         <List sx={{ flexGrow: 1 }}>
           <ListItem key="Course" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/course'>
               <ListItemIcon>
                 <SchoolIcon />
               </ListItemIcon>
@@ -65,7 +74,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Group" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/group'>
               <ListItemIcon>
                 <GroupsIcon />
               </ListItemIcon>
@@ -73,7 +82,7 @@ export default function MainLayout({
             </ListItemButton>
           </ListItem>
           <ListItem key="Assignment" disablePadding>
-            <ListItemButton>
+            <ListItemButton component={Link} href='/dashboard/homework'>
               <ListItemIcon>
                 <AssignmentIcon />
               </ListItemIcon>

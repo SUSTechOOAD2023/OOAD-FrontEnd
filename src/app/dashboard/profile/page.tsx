@@ -13,10 +13,15 @@ import ListItemText from "@mui/material/ListItemText";
 import CodeIcon from '@mui/icons-material/Code';
 import Grid from "@mui/material/Grid";
 
-class UserProfile {
-    // name, email, bio, joinedData;
-}
 
+type UserProfile = {
+    prefix: string;
+    name: string;
+    email: string;
+    joinedDate: string;
+    sign: string;
+    techStack: string[];
+};
 const userProfile: UserProfile = {
     prefix: "HT",
     name: "Hu Tao",
