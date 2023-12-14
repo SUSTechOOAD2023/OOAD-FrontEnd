@@ -4,7 +4,7 @@ const debug = process.env.debug
 const path = process.env.path
 
 import { redirect } from 'next/navigation'
-import { getCookie, setCookie } from './cookie'
+import { getCookie, setCookie, testCookie } from '../cookie'
 
 export async function landingRedirect() {
   if (debug === "true") {
@@ -22,11 +22,12 @@ export async function landingRedirect() {
 }
 export async function isLogin() {
   if (debug === "true") {
-    return true
+    return testCookie();
   }
 
   const request = new Request(`${path}/account/checkLogin`)
   const res = await fetch(await getCookie(request))
+  // console.log(await testCookie())
 
   if (!res.ok) {
     if (await res.text() === "存在") {

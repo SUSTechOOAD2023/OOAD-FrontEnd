@@ -41,6 +41,7 @@ export default function LoginPage() {
         identity: identity
       })
       if (responseText === "success!") {
+        console.log("route!")
         router.push("/dashboard")
       } else {
         setAlertText(responseText)

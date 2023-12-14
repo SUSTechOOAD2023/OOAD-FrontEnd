@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { testCookie } from './app/cookie';
+import { testCookie } from './cookie';
 import { isLogin } from './app/landing';
 
 export async function middleware(req: NextRequest) {

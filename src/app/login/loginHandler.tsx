@@ -1,6 +1,7 @@
 'use server'
 
-import { getCookie, setCookie, testCookie } from "../cookie"
+import { getCookie, setCookie, testCookie } from "../../cookie"
+import { cookies } from "next/headers"
 
 const debug = process.env.debug
 const path = process.env.path
@@ -14,6 +15,7 @@ interface loginInformation {
 export default async function postLogin(param: loginInformation) {
   if (debug === "true") {
     console.log(6);
+    cookies().set("6", "6")
     return "success!"
   }
 
@@ -32,10 +34,12 @@ export default async function postLogin(param: loginInformation) {
     body: JSON.stringify(body)
   })
   const res = await fetch(await getCookie(request))
+  // console.log(await testCookie())
 
   if (res.ok) {
     const resText = await res.text()
-    if (resText == "success!") {
+    if (resText === "success!") {
+      // console.log("Login!")
       setCookie(res)
     }
     return resText
