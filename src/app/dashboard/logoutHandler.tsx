@@ -1,6 +1,6 @@
 'use server'
 
-import { clearCookie } from "../cookie"
+import { clearCookie } from "../../cookie"
 
 const debug = process.env.debug
 const path = process.env.path

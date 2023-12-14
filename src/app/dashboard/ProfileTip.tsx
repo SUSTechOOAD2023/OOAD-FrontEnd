@@ -16,7 +16,7 @@ import { styled } from '@mui/material/styles';
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
 import logout from "./logoutHandler";
-import { testCookie } from "../cookie";
+import { testCookie } from "../../cookie";
 
 export const ProfileToolTip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />

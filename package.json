@@ -21,7 +21,7 @@
     "react-dom": "latest"
   },
   "devDependencies": {
-    "@types/node": "latest",
+    "@types/node": "^20.10.3",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "autoprefixer": "latest",
