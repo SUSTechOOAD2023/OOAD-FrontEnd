@@ -33,7 +33,5 @@ export async function clearCookie() {
 } 
 
 export async function testCookie() {
-  // console.log(cookies);
-  console.log(7)
   return cookies().getAll().length !== 0;
 }
