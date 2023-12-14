@@ -41,6 +41,7 @@ export default async function postLogin(param: loginInformation) {
     if (resText === "success!") {
       // console.log("Login!")
       setCookie(res)
+      // console.log(res)
     }
     return resText
   } else {
