@@ -16,6 +16,7 @@ export async function landingRedirect() {
 
   if (res.ok) {
     if (await res.text() === "存在") {
+      setCookie(res)
       redirect("/dashboard")
     }
   }
@@ -27,9 +28,11 @@ export async function isLogin() {
 
   const request = new Request(`${path}/account/checkLogin`)
   const res = await fetch(await getCookie(request))
+  // console.log(res.text())
   // console.log(await testCookie())
+  // console.log(await getCookie(request))
 
-  if (!res.ok) {
+  if (res.ok) {
     if (await res.text() === "存在") {
       return true
     }

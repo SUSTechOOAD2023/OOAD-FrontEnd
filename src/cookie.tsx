@@ -4,24 +4,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers"
 
-export async function getCookie(request: Request) {
+export async function getCookie(request: Request) { // get cookie from next.js server, then set the cookie in req
   // await readCookie();
   const req = new NextRequest(request)
   const cookiesAll = cookies().getAll()
+  console.log(cookies().getAll())
+  console.log(5666)
   for (const cookie of cookiesAll) {
     req.cookies.set(cookie.name, cookie.value)
   }
   return req as Request
 }
 
-export async function setCookie(response: Response) {
+export async function setCookie(response: Response) { // get cookie from springboot server
   const res = new NextResponse(null, response)
   const cookiesStore = cookies()
   for (const cookie of res.cookies.getAll()) {
     cookiesStore.set(cookie.name, cookie.value)
   }
-  console.log(cookies)
-  // await writeCookie()
   return res
 }
 
@@ -30,16 +30,8 @@ export async function clearCookie() {
   for (const cookie of cookiesAll) {
     cookies().delete(cookie.name)
   }
-  // await writeCookie();
 } 
 
 export async function testCookie() {
-  // console.log(cookies);
-  console.log(cookies().getAll())
   return cookies().getAll().length !== 0;
 }
-// export async function addCookie() {
-//   // console.log(6);
-//   cookies.push("6")
-//   console.log(cookies);
-// }
