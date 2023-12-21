@@ -17,3 +17,16 @@ export async function downloadAvatar(id: string)  {
     return null
   }
 }
+
+export async function uploadAvatar(id: string, data: FormData) {
+  if (debug === "true") {
+    return true
+  }
+
+  const res = await fetch(`${path}/upload/userimg?accountID=${id}`, {
+    method: "POST", 
+    body: data
+  })
+
+  return res.ok
+}
