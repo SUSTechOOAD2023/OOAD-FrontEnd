@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import { Box, Typography, TextField, Button } from "@mui/material";
@@ -9,11 +9,71 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
+import { getId } from '../../accountIdHandler';
 import EditIcon from '@mui/icons-material/Edit';
 import UserAvatar from '../../UserAvatar';
+import { uploadAvatar } from '../../avatarHandler';
 
+
+  
 
 const EditProfile = () => {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+    useEffect(() => {
+        if (selectedFile) {
+            console.log(selectedFile);
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            const func =async () => {
+                console.log(uploadAvatar(await getId(), formData));
+            }
+            func();
+        }
+    }, [selectedFile]);
+
+    useEffect(() => {
+        const uploadFile = () => {
+            if (fileInputRef.current) {
+                var file = fileInputRef.current.files?.[0];
+
+                if (file) {
+                    var allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                    if (allowedTypes.includes(file.type)) {
+                        setSelectedFile(file);
+                        console.log('ok');
+                    } else {
+                        alert('Only jpg, jpeg, or png files are allowed.');
+                    }
+                } else {
+                    alert('Please choose a file.');
+                }
+            }
+            return file;
+        };
+
+        // Adding event listener to the file input
+        const fileInput = fileInputRef.current;
+        if (fileInput) {
+            fileInput.addEventListener('change', uploadFile);
+        }
+
+        // Clean up the event listener
+        return () => {
+            if (fileInput) {
+                fileInput.removeEventListener('change', uploadFile);
+            }
+        };
+    }, []);
+
+    const handleAvatarChange = () => {
+        console.log(fileInputRef)
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+
+    };
     const [userProfile, setUserProfile] = useState({
         prefix: "HT",
         name: "Hu Tao",
@@ -58,6 +118,7 @@ const EditProfile = () => {
     };
 
     return (
+        
         <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
                 <Box display="flex" alignItems="center">
         {isEditing ? (
@@ -84,7 +145,7 @@ const EditProfile = () => {
                 <Avatar sx={{ width: 100, height: 100 }}>
                     <UserAvatar width={100} height={100}/>
                 </Avatar>
-                    <Edit style={{
+                    <Edit onClick={handleAvatarChange} style={{
                         position: 'absolute',
                         bottom: 5,
                         right: 5,
@@ -148,6 +209,7 @@ const EditProfile = () => {
             >
                 Save Profile
             </Button>
+            <input type="file" ref={fileInputRef} style={{display: 'none'}} />
         </Box>
     );
 }
