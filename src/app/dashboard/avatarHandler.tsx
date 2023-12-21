@@ -1,5 +1,7 @@
 'use server'
 
+import { revalidateTag } from "next/cache"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -8,7 +10,11 @@ export async function downloadAvatar(id: string)  {
     return null
   }
 
-  const res = await fetch(`${path}/download/userimg?accountID=${id}`)
+  const res = await fetch(`${path}/download/userimg?accountID=${id}`, {
+    next: {
+      tags: ["avatar" + id]
+    }
+  })
 
   if (res.ok) {
     return await res.text().then(t => JSON.parse(t).data.body)
@@ -27,6 +33,8 @@ export async function uploadAvatar(id: string, data: FormData) {
     method: "POST", 
     body: data
   })
+
+  revalidateTag("avatar" + id)
 
   return res.ok
 }
