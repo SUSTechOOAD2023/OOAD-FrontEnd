@@ -19,6 +19,8 @@ import ProfileTip, { ProfileToolTip } from "./ProfileTip";
 import Link from 'next/link';
 import ButtonBase from "@mui/material/ButtonBase";
 import Image from 'next/image';
+import Avatar from "@mui/material/Avatar";
+import UserAvatar from "./UserAvatar";
 
 const drawerWidth = 240
 
@@ -38,16 +40,9 @@ export default function MainLayout({
           </Button>
           <Typography sx={{ flexGrow: 1 }}/>
           <ProfileToolTip title={<ProfileTip />}>
-            <ButtonBase component={Link} href="/dashboard/profile" color="inherit" aria-label="profile" disableTouchRipple>
-              <Image
-                src="/paimon.png"
-                alt="Genshin Impact"
-                width={40}
-                height={40}
-                style={{ borderRadius: '50%' }}
-                priority
-              />
-            </ButtonBase>
+            <Avatar component={Link} href="/dashboard/profile">
+              <UserAvatar width={40} height={40}/>
+            </Avatar>
           </ProfileToolTip>
         </Toolbar>
       </AppBar>

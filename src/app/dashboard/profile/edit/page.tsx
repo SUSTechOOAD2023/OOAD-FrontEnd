@@ -10,6 +10,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Grid from "@mui/material/Grid";
 import Link from "next/link";
 import EditIcon from '@mui/icons-material/Edit';
+import UserAvatar from '../../UserAvatar';
 
 
 const EditProfile = () => {
@@ -80,17 +81,9 @@ const EditProfile = () => {
             </Typography>
             <Grid container justifyContent="center" alignItems="center">
                 <Box position="relative" display="inline-block">
-                    <Avatar style={{ width: 100, height: 100 }}>
-                        <img
-                            src="/hutao1.png"
-                            alt="User Profile"
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                            }}
-                        />
-                    </Avatar>
+                <Avatar sx={{ width: 100, height: 100 }}>
+                    <UserAvatar width={100} height={100}/>
+                </Avatar>
                     <Edit style={{
                         position: 'absolute',
                         bottom: 5,

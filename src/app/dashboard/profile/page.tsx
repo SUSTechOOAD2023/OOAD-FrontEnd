@@ -12,6 +12,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import CodeIcon from '@mui/icons-material/Code';
 import Grid from "@mui/material/Grid";
+import Image from 'next/image';
+import UserAvatar from '../UserAvatar';
 
 
 type UserProfile = {
@@ -43,16 +45,8 @@ const router = useRouter();
 
 return (
 <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
-    <Avatar style={{ width: 100, height: 100 }}>
-        <img
-            src="/hutao1.png"
-            alt="User Profile"
-            style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover', // 使用 objectFit 以适应容器并保持图像比例
-            }}
-        />
+    <Avatar sx={{ width: 100, height: 100 }}>
+        <UserAvatar width={100} height={100}/>
     </Avatar>
     <Typography variant="h4" marginTop={2}>
         {userProfile.name}
