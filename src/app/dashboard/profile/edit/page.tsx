@@ -20,16 +20,19 @@ import { uploadAvatar } from '../../avatarHandler';
 const EditProfile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [cnt, setCnt] = useState(0);
 
     useEffect(() => {
         if (selectedFile) {
-            console.log(selectedFile);
+            // console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
             const func =async () => {
-                console.log(uploadAvatar(await getId(), formData));
+                uploadAvatar(await getId(), formData);
             }
             func();
+            setCnt(cnt + 1);
+            console.log(cnt);
         }
     }, [selectedFile]);
 
@@ -143,7 +146,7 @@ const EditProfile = () => {
             <Grid container justifyContent="center" alignItems="center">
                 <Box position="relative" display="inline-block">
                 <Avatar sx={{ width: 100, height: 100 }}>
-                    <UserAvatar width={100} height={100}/>
+                    <UserAvatar key={cnt} width={100} height={100}/>
                 </Avatar>
                     <Edit onClick={handleAvatarChange} style={{
                         position: 'absolute',
@@ -166,15 +169,6 @@ const EditProfile = () => {
             />
 
             </Grid>
-            {/*<TextField*/}
-            {/*    variant="outlined"*/}
-            {/*    margin="normal"*/}
-            {/*    fullWidth*/}
-            {/*    label="Email"*/}
-            {/*    name="email"*/}
-            {/*    value={userProfile.email}*/}
-            {/*    onChange={handleInputChange}*/}
-            {/*/>*/}
             <Box display="flex" alignItems="center" justifyContent="center">
             <Typography variant="h6">
                 Technology Stack

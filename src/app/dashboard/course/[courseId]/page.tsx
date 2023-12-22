@@ -8,6 +8,7 @@ interface Course {
     description: string;
     materials: string[];
     announcements: Announcement[];
+    name: String;
 }
 
 interface Announcement {
@@ -17,28 +18,26 @@ interface Announcement {
 }
 
 const coursesData:  { [key: string]: Course } = {
-    "Data%20Structure%20and%20Analysis": {
+    "CS666": {
+        name: "Data Structure and Analysis",
         description: "This course provides an in-depth understanding of data structures...",
         materials: [
             "Lecture Slides - Week 1",
             "Reading Material - Chapter 2",
-            // 更多资料...
         ],
         announcements: [
             {
                 id: "announcement1",
                 title: "Assignment 1 Released",
-                content: "The first assignment has been released and is due by next Monday.",
+                content: "The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday.",
             },
             {
                 id: "announcement2",
                 title: "Guest Lecture on Algorithms",
                 content: "There will be a guest lecture on advanced algorithms next week.",
             },
-            // 更多公告...
         ],
     },
-    // 其他课程数据...
 };
 
 export default function CoursePage({ params }: { params: { courseId: string } }) {
@@ -53,7 +52,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
         <Container component="main" maxWidth="md" sx={{ marginTop: 4 }}>
             <Paper sx={{ padding: 2, marginBottom: 2 }}>
                 <Typography variant="h4" component="h1">
-                    {courseId}
+                    {courseId} {course.name}
                 </Typography>
                 <Typography variant="body1" sx={{ marginTop: 1 }}>
                     {course.description}
