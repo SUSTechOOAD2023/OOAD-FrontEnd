@@ -21,11 +21,11 @@ import {
 } from "@mui/material";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { DemoItem } from "@mui/x-date-pickers/internals/demo";
-import CloseIcon from "@mui/icons-material/Close";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-
+import groupNew from "./groupHandler";
+import InformationBox from "./InformationBox";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -54,225 +54,45 @@ function a11yProps(index: number) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-function InformationBox({
-  GroupName,
-  GroupId,
-  GroupSize,
-  GroupDeadline,
-  onEdit,
-  onDelete,
-  cookie,
-}: {
-  GroupName: string;
-  GroupId: string;
-  GroupSize: number;
-  GroupDeadline: any;
-  onEdit: (
-    editedName: string,
-    editedGroupId: string,
-    editedGroupSize: number,
-    editedGroupDeadline: any
-  ) => void;
-  onDelete: () => void;
-  cookie: number;
-}) {
-  const [open, setOpen] = useState(false);
-  const [editedName, setEditedName] = useState(GroupName);
-  const [editedGroupId, setEditedGroupId] = useState(GroupId);
-  const [editedGroupSize, setEditedGroupSize] = useState(GroupSize);
-  const [editedGroupDeadline, setEditedGroupDeadline] = useState(GroupDeadline);
-
-  const handleEditClick = () => {
-    setOpen(true);
-  };
-
-  const handleSaveClick = () => {
-    onEdit(editedName, editedGroupId, editedGroupSize, editedGroupDeadline);
-    setOpen(false);
-  };
-  const handleDelete = () => {
-    onDelete();
-    setOpen(false);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleDateChange = (date: any) => {
-    setEditedGroupDeadline(date);
-  };
-
-  return (
-    <Container component="main" maxWidth="xs" sx={{ minHeight: "2vh" }}>
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12}>
-            <Box
-              component={Link}
-              href={`/dashboard/group/${GroupId}`}
-              sx={{ cursor: "pointer", textDecoration: "none" }}
-            >
-              <Paper
-                elevation={3}
-                style={{ padding: "20px", position: "relative" }}
-              >
-                <Box>
-                  <Typography variant="h5" component="h2">
-                    {GroupName}
-                  </Typography>
-                  <Typography variant="body2">
-                    Id:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    {GroupId}
-                  </Typography>
-                  <Typography variant="body2">
-                    Size:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    {GroupSize}
-                  </Typography>
-                  <Typography variant="body2">
-                    Deadline:
-                    {GroupDeadline.format("YYYY-MM-DD")}
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    bottom: "95px",
-                    left: "260px",
-                  }}
-                >
-                  {cookie === 1 && (
-                    <IconButton
-                      aria-label="fingerprint"
-                      onClick={handleDelete}
-                      size="small"
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  )}
-                </Box>
-                <Box
-                  sx={{
-                    position: "absolute",
-                    bottom: "5px",
-                    left: "235px",
-                  }}
-                >
-                  {cookie === 1 && (
-                    <Button variant="text" onClick={handleEditClick}>
-                      Edit
-                    </Button>
-                  )}
-                </Box>
-              </Paper>
-            </Box>
-          </Grid>
-        </Grid>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Edit Information</DialogTitle>
-          <DialogContent>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group Name"
-                value={editedName}
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setEditedName(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group ID"
-                value={editedGroupId}
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setEditedGroupId(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group Size"
-                value={editedGroupSize}
-                onChange={(e: { target: { value: string } }) =>
-                  setEditedGroupSize(parseInt(e.target.value))
-                }
-                fullWidth
-              />
-            </Grid>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoItem label="Deadline">
-                <DatePicker
-                  defaultValue={editedGroupDeadline}
-                  minDate={dayjs()}
-                  views={["year", "month", "day"]}
-                  onChange={handleDateChange}
-                />
-              </DemoItem>
-            </LocalizationProvider>
-          </DialogContent>
-          <DialogActions>
-            <Button variant="contained" onClick={handleSaveClick}>
-              Save
-            </Button>
-            <Button variant="contained" onClick={handleClose}>
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </Container>
-  );
-}
 
 function InformationBoxesContainer() {
   const [informationBoxes, setInformationBoxes] = useState([
     {
       GroupName: "Group1",
-      GroupId: "12110924",
+      GroupId: 12110924,
       GroupSize: 5,
       GroupDeadline: dayjs(),
       GroupTab: 0,
+      GroupTeacher: "LHY",
     },
     {
       GroupName: "Group2",
-      GroupId: "12110924",
+      GroupId: 12110924,
       GroupSize: 3,
       GroupDeadline: dayjs().add(1, "day"),
       GroupTab: 1,
+      GroupTeacher: "LHY",
     },
   ]);
 
-  const addInformationBox = (tabindex: number) => {
-    const newInformationBox = {
-      GroupName: "NewGroup",
-      GroupId: "NewId",
-      GroupSize: 0,
-      GroupDeadline: dayjs(),
-      GroupTab: tabindex,
-    };
-    setInformationBoxes([...informationBoxes, newInformationBox]);
+  const addInformationBox = () => {
+    setOpen(true);
   };
 
   const handleInformationBoxEdit = (
     index: number,
     GroupName: string,
-    GroupId: string,
+    GroupId: number,
     GroupSize: number,
-    GroupDeadline: any
+    GroupDeadline: any,
+    GroupTeacher: string
   ) => {
     const updatedInformationBoxes = [...informationBoxes];
     updatedInformationBoxes[index].GroupName = GroupName;
     updatedInformationBoxes[index].GroupId = GroupId;
     updatedInformationBoxes[index].GroupSize = GroupSize;
     updatedInformationBoxes[index].GroupDeadline = GroupDeadline;
+    updatedInformationBoxes[index].GroupTeacher = GroupTeacher;
     setInformationBoxes(updatedInformationBoxes);
   };
 
@@ -288,57 +108,192 @@ function InformationBoxesContainer() {
     setValue(newValue);
   };
 
+  //
+  const [open, setOpen] = useState(false);
+  const [editedName, setEditedName] = useState("GroupName");
+  const [editedGroupId, setEditedGroupId] = useState(0);
+  const [editedGroupSize, setEditedGroupSize] = useState(0);
+  const [editedGroupDeadline, setEditedGroupDeadline] = useState(dayjs());
+  const [editedGroupTeacher, setEditedGroupTeacher] = useState("GroupTeacher");
+
+  const handleSaveClick = async (tabindex: number) => {
+    const responseText = await groupNew({
+      groupDeadline: dayjs(),
+      groupName: editedName,
+      groupNumber: editedGroupId,
+      groupSize: editedGroupSize,
+      groupTask: "",
+      teacherId: 0,
+    });
+    if (responseText === "success!") {
+      const newInformationBox = {
+        GroupName: editedName,
+        GroupId: editedGroupId,
+        GroupSize: editedGroupSize,
+        GroupDeadline: editedGroupDeadline,
+        GroupTab: tabindex,
+        GroupTeacher: editedGroupTeacher,
+      };
+      setInformationBoxes([...informationBoxes, newInformationBox]);
+    } else {
+      console.log("404");
+    }
+    setOpen(false);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleDateChange = (date: any) => {
+    setEditedGroupDeadline(date);
+  };
+
   const tabspage = (tabindex: number, pageindex: number) => {
     //单个page
     let count = 0;
+
     return (
       <Box
         sx={{
-          marginTop: 4,
+          marginTop: 0,
           display: "flex",
           flexWrap: "wrap",
           flexDirection: "row",
           justifyContent: "flex-start",
         }}
       >
-        {cookie === 1 && (
-          <Button
-            variant="contained"
-            sx={{ position: "absolute", top: 120, right: 80 }}
-            onClick={() => addInformationBox(tabindex)}
+        {identity === 1 && (
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "10px",
+              left: "1400px",
+            }}
           >
-            New
-          </Button>
+            <IconButton
+              aria-label="fingerprint"
+              onClick={() => addInformationBox()}
+              color="primary"
+            >
+              <AddCircleIcon style={{ fontSize: '50px' }}/>
+            </IconButton>
+          </Box>
         )}
         {informationBoxes.map((informationBox, index) => {
           if (informationBox.GroupTab === tabindex) {
             count = count + 1;
             if (count >= pageindex * 9 - 8 && count <= pageindex * 9) {
               return (
-                <div key={index} style={{ width: "350px", height: "160px" }}>
+                <Box key={index} style={{ width: "350px", height: "180px" }}>
                   <InformationBox
                     GroupName={informationBox.GroupName}
                     GroupId={informationBox.GroupId}
                     GroupSize={informationBox.GroupSize}
                     GroupDeadline={informationBox.GroupDeadline}
-                    onEdit={(GroupName, GroupId, GroupSize, GroupDeadline) =>
+                    GroupTeacher={informationBox.GroupTeacher}
+                    onEdit={(
+                      GroupName,
+                      GroupId,
+                      GroupSize,
+                      GroupDeadline,
+                      GroupTeacher
+                    ) =>
                       handleInformationBoxEdit(
                         index,
                         GroupName,
                         GroupId,
                         GroupSize,
-                        GroupDeadline
+                        GroupDeadline,
+                        GroupTeacher
                       )
                     }
                     onDelete={() => handleDelete(index)}
-                    cookie={cookie}
+                    identity={identity}
                   />
-                </div>
+                </Box>
               );
             }
           }
           return null;
         })}
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>New Group</DialogTitle>
+          <DialogContent>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <TextField
+                label="New Name"
+                value={editedName}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEditedName(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <TextField
+                label="Group ID"
+                value={editedGroupId}
+                onChange={(e: { target: { value: string } }) => {
+                  const inputValue = parseInt(e.target.value);
+
+                  if (!isNaN(inputValue)) {
+                    setEditedGroupId(inputValue);
+                  } else {
+                    setEditedGroupId(0);
+                  }
+                }}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <TextField
+                label="Teacher"
+                value={editedGroupTeacher}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEditedGroupTeacher(e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <TextField
+                label="Group Size"
+                value={editedGroupSize}
+                onChange={(e: { target: { value: string } }) => {
+                  const inputValue = parseInt(e.target.value);
+
+                  if (!isNaN(inputValue)) {
+                    setEditedGroupSize(inputValue);
+                  } else {
+                    setEditedGroupSize(0);
+                  }
+                }}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Deadline"
+                  defaultValue={editedGroupDeadline}
+                  minDate={dayjs()}
+                  views={["year", "month", "day"]}
+                  onChange={handleDateChange}
+                />
+              </LocalizationProvider>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="contained"
+              onClick={() => handleSaveClick(tabindex)}
+            >
+              Save
+            </Button>
+            <Button variant="contained" onClick={handleClose}>
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
   };
@@ -353,15 +308,15 @@ function InformationBoxesContainer() {
           style={{
             position: "fixed",
             bottom: "10px",
-            left: "50%",
-            transform: "translateX(-50%)",
+            left: "55%",
+            transform: "translateX(-55%)",
             zIndex: "999",
           }}
         />
       </Stack>
     );
   };
-  const cookie = 1; //0 student   1 teacher
+  const identity = 1; //0 student   1 teacher
   const [page, setPage] = React.useState(1);
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
