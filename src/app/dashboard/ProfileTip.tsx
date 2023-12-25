@@ -41,11 +41,11 @@ export default function ProfileTip() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton>
+          <ListItemButton component={Link} href={'/dashboard/profile/edit'}>
             <ListItemIcon sx={{ minWidth: 36 }}>
               <FaceIcon />
             </ListItemIcon>
-            <ListItemText onClick={() => router.push('/dashboard/profile/edit')} primary="Account" />
+            <ListItemText primary="Account" />
           </ListItemButton>
         </ListItem>
       </List>
