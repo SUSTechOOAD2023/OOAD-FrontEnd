@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Box, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Link from "next/link";
 
 
 interface Course {
@@ -85,6 +88,17 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                     </Accordion>
                 ))}
             </Paper>
+            <Grid container maxWidth="md" justifyContent="center" sx={{marginTop: 4}}>
+                <Grid item xs={4}>
+                    <Button component={Link}
+                            href={"/dashboard/homework?course="+courseId}
+                            variant="contained" color="primary"
+                            sx={{ width: '100%', height: '50px', borderRadius: '20' }}>
+                        Homework List
+                    </Button>
+                </Grid>
+            </Grid>
+
         </Container>
     );
 }

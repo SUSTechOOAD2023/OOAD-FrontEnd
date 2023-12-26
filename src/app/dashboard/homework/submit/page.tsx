@@ -9,21 +9,28 @@ export default function SubmitHomework() {
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
   const [description, setDescription] = useState('');
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
+  const handleDelete = (index) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
+  };
   const assignmentInfo = {
     dueDate: new Date('2023-12-01T23:59:59'),
     maxPoint: 100,
     description: "Play Genshin for 3 hours"
   };
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+    const handleFileChange = (event) => {
+        const newFiles = Array.from(event.target.files);
+        setFiles([...files, ...newFiles]);
+    };
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // 处理提交逻辑
-    console.log({ dueDate, points, description, file });
+      console.log(files)
+    // console.log({ dueDate, points, description, files });
   };
 
   return (
@@ -100,6 +107,14 @@ export default function SubmitHomework() {
         <Grid item>
         </Grid>
       </Grid>
+        <ul>
+            {files.map((file, index) => (
+                <li key={index}>
+                    <span>{file.name} - {file.size} bytes</span>
+                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">删除</Button>
+                </li>
+            ))}
+        </ul>
       <Box display="flex" minWidth="120%" alignContent="center" justifyContent="space-around">
         <Button
           variant="contained"

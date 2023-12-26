@@ -2,6 +2,8 @@
 import React from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import {useLocation} from "react-router";
+import * as querystring from "querystring";
 
 const AssignmentCard = ({ assignment }) => {
   const { name, score, comment, deadline, submit, courseName } = assignment;
@@ -45,8 +47,11 @@ const AssignmentCard = ({ assignment }) => {
 export default function AssignmentPage() {
     const router = useRouter();
     const assignments = [];
+    const queryParams = new URLSearchParams(window.location.search);
+    const courseParam = queryParams.get('course'); // 获取 'xx' 参数的值
     const exampleAssignments = assignments.length === 0 ? [
       {
+        id: "CS666",
         name: "Assignment 1",
         score: "Not Available",
         comment: "",
@@ -55,6 +60,7 @@ export default function AssignmentPage() {
         courseName: "Data Structure and Analysis"
       },
       {
+        id: "CS888",
         name: "Assignment 2",
         score: "85/100",
         comment: "Q1 -10  Q3 -5",
@@ -64,7 +70,6 @@ export default function AssignmentPage() {
       },
       // 添加更多作业信息
     ] : assignments;
-  
     return (
       <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }} onClick={() => router.push('/dashboard/homework/submit')}>
         <Box
@@ -78,15 +83,24 @@ export default function AssignmentPage() {
             {/* <Typography variant="h4" component="h1" marginBottom={4}>
           Course: {courseName}
         </Typography> */}
-          <Grid container spacing={2} alignItems="center">
-            {exampleAssignments.map((assignment, index) => (
-              <Grid item xs={12} key={index}>
-                <Box onClick={() => {/* handle click event */}} sx={{ cursor: "pointer" }}>
-                  <AssignmentCard assignment={assignment} />
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
+            <Grid container spacing={2} alignItems="center">
+                {exampleAssignments
+                    .filter(assignment => assignment.id === courseParam || courseParam == null)
+                    .map((assignment, index) => (
+                        <Grid item xs={12} key={index}>
+                            <Box onClick={() => {/* 处理点击事件 */}} sx={{ cursor: "pointer" }}>
+                                <AssignmentCard assignment={assignment} />
+                            </Box>
+                        </Grid>
+                    ))}
+                {exampleAssignments.filter(assignment => assignment.id === courseParam).length === 0 &&
+                    courseParam != null &&
+                    (
+                    <Grid item xs={12}>
+                        <Typography>No Assignment</Typography>
+                    </Grid>
+                )}
+            </Grid>
         </Box>
       </Container>
     );
