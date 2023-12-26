@@ -4,7 +4,7 @@ import { isLogin } from './app/landing';
 
 export async function middleware(req: NextRequest) {
   const isAuthenticated = await isLogin(); // 替换为你的鉴权检查逻辑
-  console.log(isAuthenticated);
+  // console.log(isAuthenticated);
   
   if (!isAuthenticated) {
     return NextResponse.redirect(new URL('/login', req.url));

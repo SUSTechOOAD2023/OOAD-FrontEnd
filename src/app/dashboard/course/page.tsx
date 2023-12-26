@@ -1,55 +1,76 @@
 'use client'
-import React from 'react';
-import { Container, Box, Grid, Paper, Typography } from '@mui/material';
-import { useRouter } from 'next/navigation'; // Corrected import statement
+
+import { useEffect, useState } from 'react'
+import { Container, Box, Grid, Paper, Typography, IconButton, Button } from '@mui/material';
 import Link from 'next/link';
+import getCourseOverview, { CourseOverview } from './courseOverviewHandler';
+import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from '@mui/icons-material/Edit';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import { getId } from '../accountIdHandler';
+import { getIdentity } from '../identityHandler';
 
-const CourseCard = ({ course }) => {
-  const { courseName, teacher, group } = course;
-
-  const cardStyle = {
-    padding: "20px",
-    backgroundColor: "white"
-  };
+const CourseCard = ({ course, identity }: { course: CourseOverview, identity: string }) => {
+  const { name, title, teacher, group } = course;
 
   return (
-    <Paper elevation={3} sx={cardStyle}>
-      <Typography variant="h5" component="h2">
-        {courseName}
-      </Typography>
-      <Typography variant="body2">
-        Teacher: {teacher}
-      </Typography>
-      <Typography variant="body2">
-        {`${AdaptComponent(group)}`}
-      </Typography>
+    <Paper elevation={3} sx={{ padding: 2.5 }}>
+      <Box display="flex" justifyContent="space-between">
+        <Box
+          component={Link} 
+          href={"course/" + course.id}
+          color="text.primary"
+          sx={{ 
+            cursor: "pointer", 
+            textDecoration: "none", 
+          }}
+        >
+          <Typography variant="h4" component="h2" paddingBottom={1}>
+            {title}
+          </Typography>
+          <Typography variant="body2">
+            <b>Teacher: </b>{teacher.join(", ")}
+          </Typography>
+          {identity === "student" && (group ? 
+            <Typography variant="body2">
+              <b>Group: </b>{group}
+            </Typography> :
+            <Typography variant="body2">
+              <b>No Group</b>
+            </Typography>
+          )}
+        </Box>
+        {identity === "admin" &&
+          <Box 
+            display="flex" 
+            flexDirection="column" 
+            justifyContent="space-between" 
+            alignItems="end"
+          >
+            <IconButton size="small">
+              <CloseIcon />
+            </IconButton>
+            <Button startIcon={<EditIcon />}>
+              Edit
+            </Button>
+          </Box>
+        }
+      </Box>
     </Paper>
   );
 };
 
 export default function CoursePage() {
-  const router = useRouter();
-  const courses = [
-    {
-      courseId: "CS666",
-      courseName: "Data Structure and Analysis",
-      teacher: "Sangonomiya Kokomi",
-      group: "group 1"
-    },
-    {
-      courseId: "CS777",
-      courseName: "Object Oriented Analysis Design",
-      teacher: "Hu Tao",
-      group: null
-    },
-    {
-        courseId: "CS888",
-        courseName: "C/C++ Programme Design",
-        teacher: "Paimon",
-        group: "Genshin Group"
-      },
-    // Add more courses here
-  ];
+  const [identity, setIdentity] = useState<string>("")
+  const [courses, setCourses] = useState<CourseOverview[]>([])
+
+  useEffect(() => {
+    getId()
+      .then(id => getCourseOverview(id))
+      .then(courses => setCourses(courses))
+    getIdentity()
+      .then(identity => setIdentity(identity))
+  }, [])
 
   return (
     <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
@@ -61,21 +82,21 @@ export default function CoursePage() {
           alignItems: "center",
         }}
       >
-        <Grid container spacing={2} alignItems="center">
+        <Grid container spacing={3} alignItems="center">
           {courses.map((course, index) => (
             <Grid item xs={12} key={index}>
-              <Box component={Link} href={"course/"+course.courseId}
-              sx={{ cursor: "pointer", textDecoration: "none" }}>
-                <CourseCard course={course} />
-              </Box>
+              <CourseCard course={course} identity={identity}/>
             </Grid>
           ))}
+          {identity === "admin" && 
+            <Grid item xs={12} display="flex" justifyContent="center">
+              <Button variant="contained" startIcon={<PostAddIcon />}>
+                Add Class
+              </Button>
+            </Grid>
+          }
         </Grid>
       </Box>
     </Container>
   );
 }
-
-function AdaptComponent(group: string): string {
-    return (group === null ? 'No Group' : `Group: ${group}`);
-  }
