@@ -1,89 +1,204 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Paper, Typography, Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
+import { 
+    Container, 
+    Box, 
+    Paper, 
+    Typography, 
+    Accordion, 
+    AccordionSummary, 
+    AccordionDetails, 
+    Divider, 
+    IconButton, 
+    TextField, 
+    Button,
+    ButtonGroup
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-import Link from "next/link";
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from "@mui/icons-material/Close";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import GroupsIcon from '@mui/icons-material/Groups';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { notFound } from 'next/navigation';
+import { getCourse, Course, Notice } from './courseHandler'
+import { getIdentity } from '../../identityHandler';
+import Link from "next/link"
 
-
-interface Course {
-    description: string;
-    materials: string[];
-    announcements: Announcement[];
-    name: String;
+const defaultCourse: Course = {
+    name: "",
+    title: "",
+    teacher: [],
+    groupLow: 0,
+    groupHigh: 0,
+    notice: []
 }
-
-interface Announcement {
-    id: string;
-    title: string;
-    content: string;
-}
-
-const coursesData:  { [key: string]: Course } = {
-    "CS666": {
-        name: "Data Structure and Analysis",
-        description: "This course provides an in-depth understanding of data structures...",
-        materials: [
-            "Lecture Slides - Week 1",
-            "Reading Material - Chapter 2",
-        ],
-        announcements: [
-            {
-                id: "announcement1",
-                title: "Assignment 1 Released",
-                content: "The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday. The first assignment has been released and is due by next Monday.",
-            },
-            {
-                id: "announcement2",
-                title: "Guest Lecture on Algorithms",
-                content: "There will be a guest lecture on advanced algorithms next week.",
-            },
-        ],
-    },
-};
 
 export default function CoursePage({ params }: { params: { courseId: string } }) {
-    const courseId = decodeURIComponent(params.courseId);
-    console.log(params.courseId)
-    const [course, setCourse] = useState<Course | null>(coursesData[courseId] || null);
+    const { courseId } = params;
 
-    if (!course) {
-        return <h2>404 Not Found</h2>;
+    const [identity, setIdentity] = useState<string>("");
+    const [course, setCourse] = useState<Course>(defaultCourse);
+    const [modifyGroupSize, setModifyGroupSize] = useState<boolean>(false);
+
+    useEffect(() => {
+        const func = async () => {
+            getCourse(courseId)
+                .then(course => {
+                    if (course) {
+                        setCourse(course)
+                    } else {
+                        notFound()
+                    }
+                })
+            getIdentity()
+                .then(identity => setIdentity(identity))
+        }
+        func()
+    }, [])
+
+    const courseChange = async () => {
+        // TODO: fill course change
     }
+
     return (
         <Container component="main" maxWidth="md" sx={{ marginTop: 4 }}>
             <Paper sx={{ padding: 2, marginBottom: 2 }}>
-                <Typography variant="h4" component="h1">
-                    {courseId} {course.name}
+                <Box display="flex" alignItems="flex-end" sx={{ mb: 1 }}> 
+                    <Typography variant="h4" component="h1">
+                        {course.title}
+                    </Typography>
+                    <Typography variant="subtitle2" color="text.secondary" sx={{ marginLeft: 1 }}>
+                        {course.name}
+                    </Typography>
+                </Box>
+                <Typography variant="subtitle1">
+                    {course.teacher.join(", ")}
                 </Typography>
-                <Typography variant="body1" sx={{ marginTop: 1 }}>
-                    {course.description}
-                </Typography>
-            </Paper>
-
-            <Paper sx={{ padding: 2, marginBottom: 2 }}>
-                <Typography variant="h5">Course Materials</Typography>
-                <Divider sx={{ my: 1 }} />
-                <ul>
-                    {course.materials.map((material, index) => (
-                        <li key={index}>
-                            <Typography variant="body1">{material}</Typography>
-                        </li>
-                    ))}
-                </ul>
+                {(identity === "admin" || identity === "teacher") &&
+                    // FIXME
+                    <Box display="flex" alignItems="end" marginBottom={1}>
+                        <Typography variant="body1">
+                            Group size limit:&nbsp;
+                        </Typography>
+                        {modifyGroupSize ?
+                            <>
+                                <TextField
+                                    id="group-low"
+                                    label="Low"
+                                    variant="standard"
+                                    size="small"
+                                    value={course.groupLow}
+                                    onChange={(event) => {
+                                        // TODO: validation
+                                        setCourse({
+                                            ...course, 
+                                            groupLow: parseInt(event.target.value)
+                                        })
+                                    }}
+                                />
+                                <Typography variant="body1">
+                                    &nbsp;&nbsp;to&nbsp;&nbsp;
+                                </Typography>
+                                <TextField
+                                    id="group-high"
+                                    label="High"
+                                    variant="standard"
+                                    size="small"
+                                    value={course.groupHigh}
+                                    onChange={(event) => {
+                                        setCourse({
+                                            ...course, 
+                                            groupHigh: parseInt(event.target.value)
+                                        })
+                                    }}
+                                />
+                                <IconButton 
+                                    size="small" 
+                                    onClick={() => {
+                                        setModifyGroupSize(false)
+                                        courseChange()
+                                    }}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </> :
+                            <>
+                                <Typography variant="body1">
+                                    {`${course.groupLow} to ${course.groupHigh}`}
+                                </Typography>
+                                <IconButton 
+                                    size="small"
+                                    onClick={() => {
+                                        setModifyGroupSize(true)
+                                    }}
+                                >
+                                    <EditIcon />
+                                </IconButton>
+                            </>
+                        }
+                    </Box>
+                }
+                {(identity === "admin" || identity === "teacher") &&
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Button startIcon={<PersonSearchIcon />}>
+                            { /* TODO: add student view */ }
+                            Student
+                        </Button>
+                        <Button 
+                          component={Link}
+                          href={`/dashboard/group?course=${courseId}`}
+                          startIcon={<GroupsIcon />} 
+                        >
+                            Group
+                        </Button>
+                        <Button 
+                          component={Link}
+                          href={`/dashboard/homework?course=${courseId}`}
+                          startIcon={<AssignmentIcon />} 
+                        >
+                            Homework
+                        </Button>
+                    </Box>
+                }
             </Paper>
 
             <Paper sx={{ padding: 2 }}>
                 <Typography variant="h5">Announcements</Typography>
                 <Divider sx={{ my: 1 }} />
-                {course.announcements.map((announcement, index) => (
+                {course.notice.map((announcement, index) => (
                     <Accordion key={announcement.id}>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography>{announcement.title}</Typography>
+                            <Typography variant="body1">
+                                {announcement.title}
+                            </Typography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography>{announcement.content}</Typography>
+                            <Box 
+                                display="flex" 
+                                justifyContent="space-between"
+                                alignItems="center"
+                            >
+                                <Typography variant="body2">
+                                    {announcement.description}
+                                </Typography>
+                                {(identity === "admin" || identity === "teacher") && 
+                                    // TODO: notice edit
+                                    <ButtonGroup 
+                                        variant="text" 
+                                        size="small" 
+                                        aria-label="notice-group"
+                                    >
+                                        <IconButton color="primary">
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton color="primary">
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </ButtonGroup>
+                                }
+                            </Box>
                         </AccordionDetails>
                     </Accordion>
                 ))}
