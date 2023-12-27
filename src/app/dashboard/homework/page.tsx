@@ -1,9 +1,14 @@
 'use client'
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import {useLocation} from "react-router";
 import * as querystring from "querystring";
+import {getIdentity} from "@/app/dashboard/identityHandler";
+import getCourseOverview, {CourseOverview} from "@/app/dashboard/course/courseOverviewHandler";
+import getHomeworkOverview, {HomeworkOverview} from "@/app/dashboard/homework/homeworkOverView";
+import {getId} from "@/app/dashboard/accountIdHandler";
+import Button from "@mui/material/Button";
 
 const AssignmentCard = ({ assignment }) => {
   const { name, score, comment, deadline, submit, courseName } = assignment;
@@ -44,34 +49,23 @@ const AssignmentCard = ({ assignment }) => {
   );
 };
 
-export default function AssignmentPage() {
+export default function AssignmentPage({params, searchParams,}: {
+    params: { slug: string }
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
     const router = useRouter();
-    const assignments = [];
-    const queryParams = new URLSearchParams(window.location.search);
-    const courseParam = queryParams.get('course'); // 获取 'xx' 参数的值
-    const exampleAssignments = assignments.length === 0 ? [
-      {
-        id: "CS666",
-        name: "Assignment 1",
-        score: "Not Available",
-        comment: "",
-        deadline: new Date('2023-11-30T23:59:59'),
-        submit: false,
-        courseName: "Data Structure and Analysis"
-      },
-      {
-        id: "CS888",
-        name: "Assignment 2",
-        score: "85/100",
-        comment: "Q1 -10  Q3 -5",
-        deadline: new Date('2023-11-17T23:59:59'),
-        submit: true,
-        courseName: "Object Oriented Analysis Design"
-      },
-      // 添加更多作业信息
-    ] : assignments;
+    const [assignments, setAssignments] = useState<HomeworkOverview[]>([])
+    const [identity, setIdentity] = useState<string>("")
+    useEffect(() => {
+        getId()
+            .then(id => getHomeworkOverview(id))
+            .then(homework => setAssignments(homework))
+        getIdentity()
+            .then(identity => setIdentity(identity))
+    }, [])
+    const courseParam = searchParams['course']; // 获取 'xx' 参数的值
     return (
-      <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }} onClick={() => router.push('/dashboard/homework/submit')}>
+      <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
         <Box
           sx={{
             marginTop: 8,
@@ -84,23 +78,34 @@ export default function AssignmentPage() {
           Course: {courseName}
         </Typography> */}
             <Grid container spacing={2} alignItems="center">
-                {exampleAssignments
+                {assignments
                     .filter(assignment => assignment.id === courseParam || courseParam == null)
                     .map((assignment, index) => (
                         <Grid item xs={12} key={index}>
-                            <Box onClick={() => {/* 处理点击事件 */}} sx={{ cursor: "pointer" }}>
+                            <Box
+                                onClick={() => router.push(identity === "student" ?
+                                    '/dashboard/homework/submit' : '/dashboard/homework/detail')}
+                                sx={{ cursor: "pointer" }}>
                                 <AssignmentCard assignment={assignment} />
                             </Box>
                         </Grid>
                     ))}
-                {exampleAssignments.filter(assignment => assignment.id === courseParam).length === 0 &&
+                {assignments.filter(assignment => assignment.id === courseParam).length === 0 &&
                     courseParam != null &&
                     (
                     <Grid item xs={12}>
                         <Typography>No Assignment</Typography>
                     </Grid>
                 )}
+
             </Grid>
+            {identity === 'teacher' && (
+                <Grid item xs={12} sx={{ mt: 3}}>
+                    <Button variant="outlined" onClick={() => {router.push('/dashboard/homework/detail?add=true')}}>
+                        Add Homework
+                    </Button>
+                </Grid>
+            )}
         </Box>
       </Container>
     );

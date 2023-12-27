@@ -25,6 +25,7 @@ import { notFound } from 'next/navigation';
 import { getCourse, Course, Notice } from './courseHandler'
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
+import Grid from "@mui/material/Grid";
 
 const defaultCourse: Course = {
     name: "",

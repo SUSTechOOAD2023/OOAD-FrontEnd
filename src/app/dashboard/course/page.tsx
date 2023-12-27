@@ -63,6 +63,7 @@ const CourseCard = ({ course, identity }: { course: CourseOverview, identity: st
 export default function CoursePage() {
   const [identity, setIdentity] = useState<string>("")
   const [courses, setCourses] = useState<CourseOverview[]>([])
+    console.log(courses)
 
   useEffect(() => {
     getId()

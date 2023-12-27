@@ -18,7 +18,7 @@ export default function UserAvatar({ width, height }: UserAvatarParam) {
       .then(id => downloadAvatar(id))
       .then(t => {
         if (t !== null) {
-          console.log("t is : " + t)
+          // console.log("t is : " + t)
           const binData = atob(t)
           const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)))
           const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }))
