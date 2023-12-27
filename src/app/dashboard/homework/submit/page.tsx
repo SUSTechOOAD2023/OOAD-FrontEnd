@@ -3,28 +3,44 @@ import React, { useState } from 'react';
 import { Button, TextField, Typography, Box, TextareaAutosize, CardContent, Card, Grid } from '@mui/material';
 import { BorderAll, Input } from '@mui/icons-material';
 import PublishIcon from '@mui/icons-material/Publish';
+import {uploadFile, uploadFiles} from "@/app/dashboard/fileHandler";
+import {id} from "postcss-selector-parser";
+import {getId} from "@/app/dashboard/accountIdHandler";
 
 
 export default function SubmitHomework() {
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
   const [description, setDescription] = useState('');
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
+  const handleDelete = (index) => {
+    const newFiles = [...files];
+    newFiles.splice(index, 1);
+    setFiles(newFiles);
+  };
   const assignmentInfo = {
     dueDate: new Date('2023-12-01T23:59:59'),
     maxPoint: 100,
     description: "Play Genshin for 3 hours"
   };
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
+    const handleFileChange = (event) => {
+        const newFiles = Array.from(event.target.files);
+        setFiles([...files, ...newFiles]);
+    };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // 处理提交逻辑
-    console.log({ dueDate, points, description, file });
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        // 处理提交逻辑
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('file', files[i]);
+            const success = await uploadFile(await getId(), formData);
+            console.log(success);
+            formData.delete('file');
+        }
+    };
 
   return (
     <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
@@ -100,6 +116,14 @@ export default function SubmitHomework() {
         <Grid item>
         </Grid>
       </Grid>
+        <ul>
+            {files.map((file, index) => (
+                <li key={index}>
+                    <span>{file.name} - {file.size} bytes</span>
+                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">Delete</Button>
+                </li>
+            ))}
+        </ul>
       <Box display="flex" minWidth="120%" alignContent="center" justifyContent="space-around">
         <Button
           variant="contained"
