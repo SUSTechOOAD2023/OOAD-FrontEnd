@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { Button, TextField, Typography, Box, TextareaAutosize, CardContent, Card, Grid } from '@mui/material';
 import { BorderAll, Input } from '@mui/icons-material';
 import PublishIcon from '@mui/icons-material/Publish';
+import {uploadFile, uploadFiles} from "@/app/dashboard/fileHandler";
+import {id} from "postcss-selector-parser";
+import {getId} from "@/app/dashboard/accountIdHandler";
 
 
 export default function SubmitHomework() {
@@ -26,12 +29,18 @@ export default function SubmitHomework() {
         setFiles([...files, ...newFiles]);
     };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // 处理提交逻辑
-      console.log(files)
-    // console.log({ dueDate, points, description, files });
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        // 处理提交逻辑
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('file', files[i]);
+            const success = await uploadFile(await getId(), formData);
+            console.log(success);
+            formData.delete('file');
+        }
+    };
 
   return (
     <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
@@ -111,7 +120,7 @@ export default function SubmitHomework() {
             {files.map((file, index) => (
                 <li key={index}>
                     <span>{file.name} - {file.size} bytes</span>
-                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">删除</Button>
+                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">Delete</Button>
                 </li>
             ))}
         </ul>
