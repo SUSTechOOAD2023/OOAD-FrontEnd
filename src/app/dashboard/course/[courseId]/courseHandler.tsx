@@ -255,6 +255,12 @@ export async function getStudents(id?: string): Promise<Student[]> {
   }
 }
 
+// TODO: complete sets
+
+export async function setCourseStudents(courseId: string, studentId: string[]) {
+
+}
+
 export async function getTeachers(id?: string): Promise<Teacher[]> {
   if (debug === "true") {
     return [
@@ -281,4 +287,8 @@ export async function getTeachers(id?: string): Promise<Teacher[]> {
   } else {
     return []
   }
+}
+
+export async function setCourseTeachers(courseId: string, teacherId: string[]) {
+  
 }

@@ -61,7 +61,6 @@ export default function CourseCard({ course, identity, onEdit, onDelete }: {
     setTeacher(allTeacher.filter((x, index) => checked[index]))
   }
 
-  // TODO: edit and add course
   return (
     <Paper elevation={3} sx={{ padding: 2.5 }}>
       <Box display="flex" justifyContent="space-between">

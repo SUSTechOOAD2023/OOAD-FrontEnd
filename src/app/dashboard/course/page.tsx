@@ -10,7 +10,12 @@ import getCourseOverview, { CourseOverview } from './courseOverviewHandler';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import { getId } from '../accountIdHandler';
 import { getIdentity } from '../identityHandler';
-import { addCourse, deleteCourse, editCourse } from './[courseId]/courseHandler';
+import { 
+  addCourse, 
+  deleteCourse, 
+  editCourse, 
+  setCourseTeachers 
+} from './[courseId]/courseHandler';
 import CourseCard from './CourseCard';
 import { ErrorSnackBar } from './ErrorSnackBar';
 
@@ -48,6 +53,7 @@ export default function CoursePage() {
           setSnackBarOpen(true)
         }
       })
+    setCourseTeachers(course.id, course.teacher.map(item => item.id))
   }
 
   const handleDelete = (course: CourseOverview) => {

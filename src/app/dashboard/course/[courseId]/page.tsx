@@ -26,7 +26,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AddIcon from '@mui/icons-material/Add';
 import { notFound } from 'next/navigation';
-import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice, addNotice } from './courseHandler'
+import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice, addNotice, editCourse, setCourseStudents } from './courseHandler'
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
 import Grid from "@mui/material/Grid";
@@ -104,15 +104,15 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     }
 
     const reflectChecked = () => {
-        setStudents(allStudents.filter((x, index) => checked[index]))
-        // TODO: send request to change students
+        const resultStudents = allStudents.filter((x, index) => checked[index])
+        setStudents(resultStudents)
+        setCourseStudents(courseId, resultStudents.map(student => student.id))
     }
 
-    const courseChange = async () => {
-        // TODO: fill course change
+    const courseChange = () => {
+        editCourse(courseId)
     }
 
-    // TODO: add notice
     return (
         <Container component="main" maxWidth="md" sx={{ marginTop: 4 }}>
             <Paper sx={{ padding: 2, marginBottom: 2 }}>
