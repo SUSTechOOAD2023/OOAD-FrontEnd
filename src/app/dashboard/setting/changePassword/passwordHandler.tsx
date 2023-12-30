@@ -20,9 +20,9 @@ export default async function postChange(param: changePasswordInfo) {
     // console.log(333)
     const res = await fetch(await getCookie(request))
     if (res.ok) {
-      const resText = res.text()
-      console.log(resText)
-    console.log("ok")
+      const resText = await res.text()
+      // console.log(resText)
+    // console.log("ok")
       return resText
     } else {
         console.log(res)

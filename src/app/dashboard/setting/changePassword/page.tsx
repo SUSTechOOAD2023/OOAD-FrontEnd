@@ -20,6 +20,7 @@ import postChange from './passwordHandler';
 export default function LoginPage() {
   const router = useRouter()
   const [alertDisplay, setAlertDisplay] = useState("none")
+  const [alertDisplay2, setAlertDisplay2] = useState("none")
   const [alertText, setAlertText] = useState("")
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -39,10 +40,20 @@ export default function LoginPage() {
         setAlertDisplay("flex")
         }
         else {
-            await postChange({
+            const res = await postChange({
                 "old": old,
                 "new": new2
             })
+            if (res === "Wrong password!") {
+              setAlertText("The old password is wrong!")
+              setAlertDisplay("flex")
+            }
+            else {
+              setAlertText("Change successfully, routing to main page...")
+              setAlertDisplay("none")
+              setAlertDisplay2("flex")
+              router.push("/dashboard")
+            }
         }
     }
     else {
@@ -99,6 +110,15 @@ export default function LoginPage() {
             onClose={() => { setAlertDisplay("none") }}
             sx={{
               display: alertDisplay
+            }}>
+            {alertText}
+          </Alert>
+          <Alert 
+            variant="outlined" 
+            severity="success" 
+            onClose={() => { setAlertDisplay("none") }}
+            sx={{
+              display: alertDisplay2
             }}>
             {alertText}
           </Alert>
