@@ -1,69 +1,25 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Container, Box, Grid, Paper, Typography, IconButton, Button } from '@mui/material';
-import Link from 'next/link';
+import { 
+  Container, 
+  Box, 
+  Grid, 
+  Button, 
+  Snackbar,
+  Alert
+} from '@mui/material';
 import getCourseOverview, { CourseOverview } from './courseOverviewHandler';
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from '@mui/icons-material/Edit';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import { getId } from '../accountIdHandler';
 import { getIdentity } from '../identityHandler';
-
-const CourseCard = ({ course, identity }: { course: CourseOverview, identity: string }) => {
-  const { name, title, teacher, group } = course;
-
-  return (
-    <Paper elevation={3} sx={{ padding: 2.5 }}>
-      <Box display="flex" justifyContent="space-between">
-        <Box
-          component={Link} 
-          href={"course/" + course.id}
-          color="text.primary"
-          sx={{ 
-            cursor: "pointer", 
-            textDecoration: "none", 
-          }}
-        >
-          <Typography variant="h4" component="h2" paddingBottom={1}>
-            {title}
-          </Typography>
-          <Typography variant="body2">
-            <b>Teacher: </b>{teacher.join(", ")}
-          </Typography>
-          {identity === "student" && (group ? 
-            <Typography variant="body2">
-              <b>Group: </b>{group}
-            </Typography> :
-            <Typography variant="body2">
-              <b>No Group</b>
-            </Typography>
-          )}
-        </Box>
-        {identity === "admin" &&
-          <Box 
-            display="flex" 
-            flexDirection="column" 
-            justifyContent="space-between" 
-            alignItems="end"
-          >
-            <IconButton size="small">
-              <CloseIcon />
-            </IconButton>
-            <Button startIcon={<EditIcon />}>
-              Edit
-            </Button>
-          </Box>
-        }
-      </Box>
-    </Paper>
-  );
-};
+import { deleteCourse } from './[courseId]/courseHandler';
+import CourseCard from './CourseCard';
 
 export default function CoursePage() {
+  const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
   const [identity, setIdentity] = useState<string>("")
   const [courses, setCourses] = useState<CourseOverview[]>([])
-    console.log(courses)
 
   useEffect(() => {
     getId()
@@ -72,6 +28,17 @@ export default function CoursePage() {
     getIdentity()
       .then(identity => setIdentity(identity))
   }, [])
+
+  const handleDelete = (course: CourseOverview) => {
+    deleteCourse(course.id).
+      then((ok) => {
+        if (ok) {
+          setCourses(courses.filter(item => item !== course))
+        } else {
+          setSnackBarOpen(true)
+        }
+      })
+  }
 
   return (
     <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
@@ -86,7 +53,11 @@ export default function CoursePage() {
         <Grid container spacing={3} alignItems="center">
           {courses.map((course, index) => (
             <Grid item xs={12} key={index}>
-              <CourseCard course={course} identity={identity}/>
+              <CourseCard 
+                course={course} 
+                identity={identity} 
+                onDelete={() => handleDelete(course)}
+              />
             </Grid>
           ))}
           {identity === "admin" && 
@@ -98,6 +69,20 @@ export default function CoursePage() {
           }
         </Grid>
       </Box>
+      <Snackbar 
+        open={snackBarOpen} 
+        autoHideDuration={6000} 
+        onClose={() => setSnackBarOpen(false)}
+      >
+        <Alert 
+          onClose={() => setSnackBarOpen(false)} 
+          severity="error" 
+          variant="filled"
+          elevation={6}
+        >
+          Error!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
     Container, 
     Box, 
@@ -12,7 +12,11 @@ import {
     IconButton, 
     TextField, 
     Button,
-    ButtonGroup
+    ButtonGroup,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EditIcon from '@mui/icons-material/Edit';
@@ -22,10 +26,14 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { notFound } from 'next/navigation';
-import { getCourse, Course, Notice } from './courseHandler'
+import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice } from './courseHandler'
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
 import Grid from "@mui/material/Grid";
+import ViewList from './ViewList';
+import NoticePage from './Notice';
+import { getId } from '../../accountIdHandler';
+import { getStudentId } from '../../identityIdHandler';
 
 const defaultCourse: Course = {
     name: "",
@@ -42,27 +50,69 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     const [identity, setIdentity] = useState<string>("");
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [modifyGroupSize, setModifyGroupSize] = useState<boolean>(false);
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [students, setStudents] = useState<Student[]>([]);
+    const [allStudents, setAllStudents] = useState<Student[]>([]);
+    const [checked, setChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
-        const func = async () => {
-            getCourse(courseId)
-                .then(course => {
-                    if (course) {
-                        setCourse(course)
-                    } else {
-                        notFound()
-                    }
-                })
-            getIdentity()
-                .then(identity => setIdentity(identity))
-        }
-        func()
+        getCourse(courseId)
+            .then(course => {
+                if (course) {
+                    setCourse(course)
+                    getIdentity()
+                        .then(identity => {
+                            setIdentity(identity)
+                            if (identity === "admin") {
+                                getStudents()
+                                    .then(students => setAllStudents(students))
+                            }
+                            if (identity === "student") {
+                                getId()
+                                    .then(id => getStudentId(id))
+                                    .then(id => getNotice(courseId, id))
+                                    .then(notice => setCourse({
+                                        ...course, 
+                                        notice
+                                    }))
+                            } else {
+                                getNotice(courseId)
+                                    .then(notice => setCourse({
+                                        ...course, 
+                                        notice
+                                    }))
+                            }
+                        })
+                    getStudents(courseId)
+                        .then(students => setStudents(students))
+                } else {
+                    notFound()
+                }
+            })
     }, [])
+
+    const generateChecked = () => {
+        const t = {}
+        students.forEach(student => {
+            t[student.id] = true
+        })
+        setChecked(allStudents.map(student => !!t[student.id]))
+    }
+
+    const toggleChecked = (index: number) => {
+        setChecked(checked.map((x, curIndex) => curIndex === index ? !x : x))
+    }
+
+    const reflectChecked = () => {
+        setStudents(allStudents.filter((x, index) => checked[index]))
+        // TODO: send request to change students
+    }
 
     const courseChange = async () => {
         // TODO: fill course change
     }
 
+    // TODO: add notice
     return (
         <Container component="main" maxWidth="md" sx={{ marginTop: 4 }}>
             <Paper sx={{ padding: 2, marginBottom: 2 }}>
@@ -80,7 +130,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                 {(identity === "admin" || identity === "teacher") &&
                     // FIXME
                     <Box display="flex" alignItems="end" marginBottom={1}>
-                        <Typography variant="body1">
+                        <Typography variant="body1" marginBottom={0.25}>
                             Group size limit:&nbsp;
                         </Typography>
                         {modifyGroupSize ?
@@ -88,7 +138,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                 <TextField
                                     id="group-low"
                                     label="Low"
-                                    variant="standard"
+                                    variant="filled"
                                     size="small"
                                     value={course.groupLow}
                                     onChange={(event) => {
@@ -99,13 +149,13 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                         })
                                     }}
                                 />
-                                <Typography variant="body1">
+                                <Typography variant="body1" marginBottom={0.25}>
                                     &nbsp;&nbsp;to&nbsp;&nbsp;
                                 </Typography>
                                 <TextField
                                     id="group-high"
                                     label="High"
-                                    variant="standard"
+                                    variant="filled"
                                     size="small"
                                     value={course.groupHigh}
                                     onChange={(event) => {
@@ -126,7 +176,7 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                 </IconButton>
                             </> :
                             <>
-                                <Typography variant="body1">
+                                <Typography variant="body1" marginBottom={0.25}>
                                     {`${course.groupLow} to ${course.groupHigh}`}
                                 </Typography>
                                 <IconButton 
@@ -143,8 +193,15 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                 }
                 {(identity === "admin" || identity === "teacher") &&
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Button startIcon={<PersonSearchIcon />}>
-                            { /* TODO: add student view */ }
+                        <Button 
+                            startIcon={<PersonSearchIcon />}
+                            onClick={() => {
+                                setDialogOpen(true)
+                                if (identity === "admin") {
+                                    generateChecked()
+                                }
+                            }}
+                        >
                             Student
                         </Button>
                         <Button 
@@ -168,43 +225,80 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             <Paper sx={{ padding: 2 }}>
                 <Typography variant="h5">Announcements</Typography>
                 <Divider sx={{ my: 1 }} />
-                {course.notice.map((announcement, index) => (
-                    <Accordion key={announcement.id}>
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                            <Typography variant="body1">
-                                {announcement.title}
-                            </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <Box 
-                                display="flex" 
-                                justifyContent="space-between"
-                                alignItems="center"
-                            >
-                                <Typography variant="body2">
-                                    {announcement.description}
-                                </Typography>
-                                {(identity === "admin" || identity === "teacher") && 
-                                    // TODO: notice edit
-                                    <ButtonGroup 
-                                        variant="text" 
-                                        size="small" 
-                                        aria-label="notice-group"
-                                    >
-                                        <IconButton color="primary">
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton color="primary">
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </ButtonGroup>
+                {course.notice.map(announcement => (
+                    <NoticePage 
+                        key={announcement.id}
+                        notice={announcement}
+                        identity={identity}
+                        students={students}
+                        onEdit={(notice) => {
+                            editNotice({
+                                noticeId: notice.id,
+                                classId: courseId,
+                                noticeTitle: notice.title,
+                                noticeContent: notice.description,
+                                listStudentId: notice.studentVis
+                            }).then(ok => {
+                                if (ok) {
+                                    setCourse({
+                                        ...course, 
+                                        notice: course.notice.map(cur =>
+                                            notice.id === cur.id ? notice : cur
+                                        )
+                                    })
                                 }
-                            </Box>
-                        </AccordionDetails>
-                    </Accordion>
+                            })
+                        }}
+                        onDelete={() => {
+                            deleteNotice(announcement.id)
+                                .then(ok => {
+                                    if (ok) {
+                                        setCourse({
+                                            ...course, 
+                                            notice: course.notice.filter(cur =>
+                                                cur.id !== announcement.id
+                                            )
+                                        })
+                                    }
+                                })
+                        }}
+                    />
                 ))}
             </Paper>
-
+            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+                <DialogTitle>
+                    Students
+                </DialogTitle>
+                <DialogContent>
+                    {identity === "teacher" ? 
+                        <ViewList 
+                            name="Search students" 
+                            items={students.map(student => student.name)}
+                            refs={students.map(student => `/dashboard/profile/${student.id}`)}
+                        /> :
+                        <ViewList 
+                            name="Search students"
+                            items={allStudents.map(student => student.name)}
+                            refs={allStudents.map(student => `/dashboard/profile/${student.id}`)}
+                            check={checked}
+                            onCheckChange={toggleChecked}
+                        />
+                    }
+                </DialogContent>
+                <DialogActions>
+                    {identity === "admin" &&
+                        <Button onClick={() => {
+                            setDialogOpen(false);
+                            reflectChecked()
+                        }}>
+                            Confirm
+                        </Button>
+                    }
+                    <Button onClick={() => setDialogOpen(false)}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }
