@@ -15,6 +15,18 @@ export default async function getInviteOverview(id: string): Promise<InviteOverv
               identity: "teacher"
             },
             {
+                inviteCode: "AAA1",
+                identity: "teacher"
+              },
+              {
+                inviteCode: "AAA2",
+                identity: "teacher"
+              },
+              {
+                inviteCode: "AAA3",
+                identity: "teacher"
+              },
+            {
                 inviteCode: "BBB",
                 identity: "admin"
               },
