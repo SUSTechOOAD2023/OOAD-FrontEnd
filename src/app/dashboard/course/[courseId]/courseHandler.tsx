@@ -1,5 +1,7 @@
 'use server'
 
+import { Teacher } from "../courseOverviewHandler"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -53,7 +55,43 @@ export async function getCourse(id: string): Promise<Course | null> {
   }
 }
 
+export async function addCourse(name: string, title: string): Promise<string> {
+  if (debug === "true") {
+    return "7"
+  }
+
+  const res = await fetch(`${path}/addCourse`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify({ name, title })
+  })
+  
+  if (res.ok) {
+    return res.text()
+  } else {
+    console.log(`Error on adding course, status code ${res.status}`)
+    return "7"
+  }
+
+}
+
 export async function deleteCourse(id: string): Promise<boolean> {
+  if (debug === "true") {
+    return true
+  }
+
+  const res = await fetch(`${path}/dC?courseID=${id}`, {
+    method: "POST"
+  })
+
+  return res.ok
+}
+
+// TODO: correct the handler
+
+export async function editCourse(id: string): Promise<boolean> {
   if (debug === "true") {
     return true
   }
@@ -138,6 +176,36 @@ export async function editNotice(payload: NoticeEditInfo): Promise<boolean> {
   return res.ok
 }
 
+interface NoticeAddInfo {
+  teacherId?: string, 
+  classId: string, 
+  noticeTitle: string, 
+  noticeContent: string, 
+  listStudentId: string[]
+}
+
+export async function addNotice(payload: NoticeAddInfo): Promise<string> {
+  if (debug === "true") {
+    return "8"
+  }
+
+  const res = await fetch(`${path}/notice/new`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify(payload)
+  })
+
+  if (res.ok) {
+    return res.text()
+  } else {
+    console.log(`Error on adding notice, status code ${res.status}`)
+    return ""
+  }
+
+}
+
 export async function getVisibleStudents(id: string): Promise<string[]> {
   if (debug === "true") {
     return ["0", "1", "2", "3"]
@@ -173,6 +241,34 @@ export async function getStudents(id?: string): Promise<Student[]> {
       {
         id: "4", 
         name: "Deng Qingwen"
+      }
+    ]
+  }
+  
+  const url = id === undefined ? `${path}/dC` : `${path}/dC?courseID=${id}`
+  const res = await fetch(url)
+
+  if (res.ok) {
+    return res.json()
+  } else {
+    return []
+  }
+}
+
+export async function getTeachers(id?: string): Promise<Teacher[]> {
+  if (debug === "true") {
+    return [
+      {
+        id: "1", 
+        name: "Amiya"
+      }, 
+      {
+        id: "2", 
+        name: "Bo Tang"
+      }, 
+      {
+        id: "3", 
+        name: "Paimon"
       }
     ]
   }

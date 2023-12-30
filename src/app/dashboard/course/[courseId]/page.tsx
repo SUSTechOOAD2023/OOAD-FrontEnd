@@ -24,9 +24,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { notFound } from 'next/navigation';
-import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice } from './courseHandler'
+import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice, addNotice } from './courseHandler'
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
 import Grid from "@mui/material/Grid";
@@ -223,7 +223,36 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             </Paper>
 
             <Paper sx={{ padding: 2 }}>
-                <Typography variant="h5">Announcements</Typography>
+                <Box display="flex" alignItems="center">
+                    <Typography variant="h5">Announcements</Typography>
+                    {(identity === "admin" || identity === "teacher") &&
+                        <IconButton color="primary" onClick={() => {
+                            const newNotice: Notice = {
+                                id: "",
+                                title: "New announcement",
+                                description: "New announcement",
+                                studentVis: students.map(student => student.id)
+                            }
+
+                            addNotice({
+                                classId: courseId,
+                                noticeTitle: newNotice.title,
+                                noticeContent: newNotice.description,
+                                listStudentId: students.map(student => student.id)
+                            }).then(id => {
+                                if (id) {
+                                    newNotice.id = id
+                                    setCourse({
+                                        ...course, 
+                                        notice: [...course.notice, newNotice]
+                                    })
+                                }
+                            })
+                        }}>
+                            <AddIcon />
+                        </IconButton>
+                    }
+                </Box>
                 <Divider sx={{ my: 1 }} />
                 {course.notice.map(announcement => (
                     <NoticePage 
