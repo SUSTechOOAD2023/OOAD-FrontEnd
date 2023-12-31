@@ -19,6 +19,8 @@ import MenuItem from '@mui/material/MenuItem';
 import postRegister from './registerHandler';
 import Alert from '@mui/material/Alert';
 
+const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+
 export default function RegisterPage() {
   const router = useRouter()
   const [alertDisplay, setAlertDisplay] = useState("none")
@@ -32,14 +34,40 @@ export default function RegisterPage() {
       identity: data.get("identity"),
       id: data.get("id"), 
       email: data.get("email"), 
-      password: data.get("password")
+      password: data.get("password"), 
+      repeatPassword: data.get("repeat-password")
     });
     const invitationCode = data.get("invitationCode")?.toString()
     const identity = data.get("identity")?.toString()
     const id = data.get("id")?.toString()
     const email = data.get("email")?.toString()
     const password = data.get("password")?.toString()
+    const repeatPassword = data.get("repeat-password")?.toString()
     if (invitationCode && identity && id && email && password) {
+      if (password !== repeatPassword) {
+        setAlertText("Passwords do not match.")
+        setAlertDisplay("flex")
+        return
+      }
+
+      if (password.length < 6 || password.length > 20) {
+        setAlertText("Password must be between 6 and 20 characters.")
+        setAlertDisplay("flex")
+        return
+      }
+
+      if (!/^[a-zA-Z0-9]+$/.test(id)) {
+        setAlertText("Id can only contain letters and numbers.")
+        setAlertDisplay("flex")
+        return
+      }
+
+      if (!emailRegex.test(email)) {
+        setAlertText("Email address must be valid.")
+        setAlertDisplay("flex")
+        return
+      }
+
       const res = await postRegister({
         invitationCode: invitationCode, 
         identity: identity, 
@@ -133,6 +161,17 @@ export default function RegisterPage() {
                 label="Password"
                 type="password"
                 id="password"
+                autoComplete="new-password"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                required
+                fullWidth
+                name="repeat-password"
+                label="Repeat Password"
+                type="password"
+                id="repeat-password"
                 autoComplete="new-password"
                 sx={{
                   mb: 2
