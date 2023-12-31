@@ -1,5 +1,7 @@
 'use server'
 
+import { User } from "./[courseId]/User"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -7,13 +9,9 @@ export interface CourseOverview {
   id: string, 
   name: string, 
   title: string, 
-  teacher: Teacher[], 
+  teacher: User[], 
+  sa: User[], 
   group?: string
-}
-
-export interface Teacher {
-  id: string, 
-  name: string
 }
 
 export default async function getCourseOverview(id: string): Promise<CourseOverview[]> {
@@ -27,6 +25,9 @@ export default async function getCourseOverview(id: string): Promise<CourseOverv
           { id: "1", name: "Amiya" }, 
           { id: "2", name: "Bo Tang"}
         ], 
+        sa: [
+          { id: "7", name: "Chen Kangrui"}
+        ]
       }, 
       {
         id: "2", 
@@ -35,6 +36,7 @@ export default async function getCourseOverview(id: string): Promise<CourseOverv
         teacher: [
           { id: "3", name: "Bo Tang"}
         ], 
+        sa: [], 
         group: "Liyue"
       }
     ]
