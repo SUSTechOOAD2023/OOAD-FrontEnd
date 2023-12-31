@@ -16,11 +16,12 @@ import Alert from '@mui/material/Alert';
 import { useState } from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import postChange from './passwordHandler';
+import { Snackbar } from '@mui/material';
 
 export default function LoginPage() {
   const router = useRouter()
   const [alertDisplay, setAlertDisplay] = useState("none")
-  const [alertDisplay2, setAlertDisplay2] = useState("none")
+  const [alertDisplay2, setAlertDisplay2] = useState(false)
   const [alertText, setAlertText] = useState("")
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -51,7 +52,7 @@ export default function LoginPage() {
             else {
               setAlertText("Change successfully, routing to main page...")
               setAlertDisplay("none")
-              setAlertDisplay2("flex")
+              setAlertDisplay2(true)
               router.push("/dashboard")
             }
         }
@@ -113,15 +114,14 @@ export default function LoginPage() {
             }}>
             {alertText}
           </Alert>
-          <Alert 
-            variant="outlined" 
-            severity="success" 
-            onClose={() => { setAlertDisplay("none") }}
-            sx={{
-              display: alertDisplay2
-            }}>
+          <Snackbar 
+            autoHideDuration={6000}
+            onClose={() => { setAlertDisplay2("none") }}
+            open={alertDisplay2}>
+              <Alert severity="success" sx={{ width: '100%' }}>
             {alertText}
-          </Alert>
+            </Alert>
+          </Snackbar>
           <Button
             type="submit"
             fullWidth
