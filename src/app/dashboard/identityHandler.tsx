@@ -7,7 +7,7 @@ const path = process.env.path
 
 export async function getIdentity() {
   if (debug === "true") {
-    return "admin"
+    return "teacher"
   }
 
   const request = new Request(`${path}/account/getIdentity`)

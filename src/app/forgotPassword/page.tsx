@@ -19,6 +19,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import MenuItem from '@mui/material/MenuItem';
 import { checkCaptcha, getCaptcha } from './forgotPasswordHandler';
+import { ErrorSnackBar } from '../dashboard/course/ErrorSnackBar';
 
 export default function ForgotPasswordPage() {
   const [sendTime, setSendTime] = useState<Dayjs>(dayjs("1970-01-01"))
@@ -175,20 +176,11 @@ export default function ForgotPasswordPage() {
         </Box>
       </Box>
       <Copyright sx={{ mt: 8, mb: 4 }} />
-      <Snackbar 
+      <ErrorSnackBar 
         open={snackBarOpen} 
-        autoHideDuration={6000} 
-        onClose={() => setSnackBarOpen(false)}
-      >
-        <Alert 
-          onClose={() => setSnackBarOpen(false)} 
-          severity="error" 
-          variant="filled"
-          elevation={6}
-        >
-          {errorMsg}
-        </Alert>
-      </Snackbar>
+        msg={errorMsg} 
+        onClose={() => setSnackBarOpen(false)} 
+      />
     </Container>
   )
 }

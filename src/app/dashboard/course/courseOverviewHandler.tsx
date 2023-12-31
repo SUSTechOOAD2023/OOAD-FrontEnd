@@ -7,8 +7,13 @@ export interface CourseOverview {
   id: string, 
   name: string, 
   title: string, 
-  teacher: string[], 
+  teacher: Teacher[], 
   group?: string
+}
+
+export interface Teacher {
+  id: string, 
+  name: string
 }
 
 export default async function getCourseOverview(id: string): Promise<CourseOverview[]> {
@@ -19,8 +24,8 @@ export default async function getCourseOverview(id: string): Promise<CourseOverv
         name: "CS666", 
         title: "Data Structure and Analysis", 
         teacher: [
-          "Amiya", 
-          "Bo Tang"
+          { id: "1", name: "Amiya" }, 
+          { id: "2", name: "Bo Tang"}
         ], 
       }, 
       {
@@ -28,7 +33,7 @@ export default async function getCourseOverview(id: string): Promise<CourseOverv
         name: "CS123", 
         title: "Genshin Impact", 
         teacher: [
-          "Paimon"
+          { id: "3", name: "Bo Tang"}
         ], 
         group: "Liyue"
       }

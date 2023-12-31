@@ -1,69 +1,28 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Container, Box, Grid, Paper, Typography, IconButton, Button } from '@mui/material';
-import Link from 'next/link';
+import { 
+  Container, 
+  Box, 
+  Grid, 
+  Button} from '@mui/material';
 import getCourseOverview, { CourseOverview } from './courseOverviewHandler';
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from '@mui/icons-material/Edit';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import { getId } from '../accountIdHandler';
 import { getIdentity } from '../identityHandler';
-
-const CourseCard = ({ course, identity }: { course: CourseOverview, identity: string }) => {
-  const { name, title, teacher, group } = course;
-
-  return (
-    <Paper elevation={3} sx={{ padding: 2.5 }}>
-      <Box display="flex" justifyContent="space-between">
-        <Box
-          component={Link} 
-          href={"course/" + course.id}
-          color="text.primary"
-          sx={{ 
-            cursor: "pointer", 
-            textDecoration: "none", 
-          }}
-        >
-          <Typography variant="h4" component="h2" paddingBottom={1}>
-            {title}
-          </Typography>
-          <Typography variant="body2">
-            <b>Teacher: </b>{teacher.join(", ")}
-          </Typography>
-          {identity === "student" && (group ? 
-            <Typography variant="body2">
-              <b>Group: </b>{group}
-            </Typography> :
-            <Typography variant="body2">
-              <b>No Group</b>
-            </Typography>
-          )}
-        </Box>
-        {identity === "admin" &&
-          <Box 
-            display="flex" 
-            flexDirection="column" 
-            justifyContent="space-between" 
-            alignItems="end"
-          >
-            <IconButton size="small">
-              <CloseIcon />
-            </IconButton>
-            <Button startIcon={<EditIcon />}>
-              Edit
-            </Button>
-          </Box>
-        }
-      </Box>
-    </Paper>
-  );
-};
+import { 
+  addCourse, 
+  deleteCourse, 
+  editCourse, 
+  setCourseTeachers 
+} from './[courseId]/courseHandler';
+import CourseCard from './CourseCard';
+import { ErrorSnackBar } from './ErrorSnackBar';
 
 export default function CoursePage() {
+  const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
   const [identity, setIdentity] = useState<string>("")
   const [courses, setCourses] = useState<CourseOverview[]>([])
-    console.log(courses)
 
   useEffect(() => {
     getId()
@@ -72,6 +31,41 @@ export default function CoursePage() {
     getIdentity()
       .then(identity => setIdentity(identity))
   }, [])
+
+  const handleAdd = (name: string, title: string) => {
+    addCourse(name, title)
+      .then((id) => {    
+        setCourses([...courses, {
+          id: id, 
+          name: name, 
+          title: title, 
+          teacher: []
+        }])
+      })
+  }
+
+  const handleEdit = (course: CourseOverview) => {
+    editCourse(course.id)
+      .then((ok) => {
+        if (ok) {
+          setCourses(courses.map(item => item.id === course.id ? course : item))
+        } else {
+          setSnackBarOpen(true)
+        }
+      })
+    setCourseTeachers(course.id, course.teacher.map(item => item.id))
+  }
+
+  const handleDelete = (course: CourseOverview) => {
+    deleteCourse(course.id)
+      .then((ok) => {
+        if (ok) {
+          setCourses(courses.filter(item => item !== course))
+        } else {
+          setSnackBarOpen(true)
+        }
+      })
+  }
 
   return (
     <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
@@ -86,18 +80,30 @@ export default function CoursePage() {
         <Grid container spacing={3} alignItems="center">
           {courses.map((course, index) => (
             <Grid item xs={12} key={index}>
-              <CourseCard course={course} identity={identity}/>
+              <CourseCard 
+                course={course} 
+                identity={identity} 
+                onEdit={(newCourse) => handleEdit(newCourse)}
+                onDelete={() => handleDelete(course)}
+              />
             </Grid>
           ))}
           {identity === "admin" && 
             <Grid item xs={12} display="flex" justifyContent="center">
-              <Button variant="contained" startIcon={<PostAddIcon />}>
+              <Button 
+                variant="contained" 
+                startIcon={<PostAddIcon />} 
+                onClick={() => handleAdd("CS000", "New Course")}
+              >
                 Add Class
               </Button>
             </Grid>
           }
         </Grid>
       </Box>
+      <ErrorSnackBar open={snackBarOpen} msg="Error!" onClose={() => setSnackBarOpen(false)}/>
     </Container>
   );
 }
+
+
