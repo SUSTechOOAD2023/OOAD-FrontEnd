@@ -1,7 +1,8 @@
 'use client'
 
 import Accordion from "@mui/material/Accordion";
-import { Notice, Student, getVisibleStudents } from "./courseHandler";
+import { Notice, getVisibleStudents } from "./courseHandler";
+import { User } from "./User";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -24,7 +25,7 @@ import TextField from "@mui/material/TextField";
 export default function NoticePage({ notice, identity, students, onEdit, onDelete } : {
   notice: Notice, 
   identity: string, 
-  students: Student[], 
+  students: User[], 
   onEdit: (newNotice: Notice) => void, 
   onDelete: () => void, 
 }) {

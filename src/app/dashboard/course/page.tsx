@@ -39,13 +39,14 @@ export default function CoursePage() {
           id: id, 
           name: name, 
           title: title, 
-          teacher: []
+          teacher: [], 
+          sa: []
         }])
       })
   }
 
   const handleEdit = (course: CourseOverview) => {
-    editCourse(course.id)
+    editCourse({ id: course.id, name: course.name, title: course.title })
       .then((ok) => {
         if (ok) {
           setCourses(courses.map(item => item.id === course.id ? course : item))
