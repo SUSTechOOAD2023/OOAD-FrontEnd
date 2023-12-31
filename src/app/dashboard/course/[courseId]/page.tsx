@@ -26,7 +26,8 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AddIcon from '@mui/icons-material/Add';
 import { notFound } from 'next/navigation';
-import { getCourse, Course, Notice, Student, getStudents, editNotice, deleteNotice, getNotice, addNotice, editCourse, setCourseStudents } from './courseHandler'
+import { getCourse, Course, Notice, getStudents, editNotice, deleteNotice, getNotice, addNotice, editCourse, setCourseStudents } from './courseHandler'
+import { User } from "./User";
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
 import Grid from "@mui/material/Grid";
@@ -51,8 +52,8 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [modifyGroupSize, setModifyGroupSize] = useState<boolean>(false);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
-    const [students, setStudents] = useState<Student[]>([]);
-    const [allStudents, setAllStudents] = useState<Student[]>([]);
+    const [students, setStudents] = useState<User[]>([]);
+    const [allStudents, setAllStudents] = useState<User[]>([]);
     const [checked, setChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
@@ -110,7 +111,8 @@ export default function CoursePage({ params }: { params: { courseId: string } })
     }
 
     const courseChange = () => {
-        editCourse(courseId)
+        editCourse({ id: courseId, groupLow: course.groupLow, groupHigh: course.groupHigh })
+            .then(ok => console.log("Edit course group limit: " + ok))
     }
 
     return (
