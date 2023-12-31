@@ -33,7 +33,7 @@ export default function ProfileTip() {
     <Stack>
       <List sx={{ paddingTop: 0 }}>
         <ListItem disablePadding>
-          <ListItemButton>
+          <ListItemButton component={Link} href={'/dashboard/setting'}>
             <ListItemIcon sx={{ minWidth: 36 }}>
               <SettingsIcon />
             </ListItemIcon>
