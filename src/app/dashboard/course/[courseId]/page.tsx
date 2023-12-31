@@ -61,9 +61,10 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             .then(course => {
                 if (course) {
                     setCourse(course)
-                    getIdentity()
-                        .then(identity => {
+                    Promise.all([getIdentity(), getStudents(courseId)])
+                        .then(([identity, students]) => {
                             setIdentity(identity)
+                            setStudents(students)
                             if (identity === "admin") {
                                 getStudents()
                                     .then(students => setAllStudents(students))
@@ -84,8 +85,6 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                     }))
                             }
                         })
-                    getStudents(courseId)
-                        .then(students => setStudents(students))
                 } else {
                     notFound()
                 }

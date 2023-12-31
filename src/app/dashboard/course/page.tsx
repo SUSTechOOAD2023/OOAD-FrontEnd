@@ -25,11 +25,12 @@ export default function CoursePage() {
   const [courses, setCourses] = useState<CourseOverview[]>([])
 
   useEffect(() => {
-    getId()
-      .then(id => getCourseOverview(id))
-      .then(courses => setCourses(courses))
-    getIdentity()
-      .then(identity => setIdentity(identity))
+    Promise.all([getId(), getIdentity()])
+      .then(([id, identity]) => {
+        getCourseOverview(id)
+          .then(courses => setCourses(courses))
+        setIdentity(identity)
+      })
   }, [])
 
   const handleAdd = (name: string, title: string) => {
