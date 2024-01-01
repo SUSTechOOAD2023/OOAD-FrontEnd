@@ -21,6 +21,7 @@
     "papaparse": "^5.4.1",
     "react": "latest",
     "react-dom": "latest",
+    "react-router": "^6.21.1",
     "react-window": "^1.8.10"
   },
   "devDependencies": {
