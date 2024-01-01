@@ -61,9 +61,10 @@ export default function CoursePage({ params }: { params: { courseId: string } })
             .then(course => {
                 if (course) {
                     setCourse(course)
-                    getIdentity()
-                        .then(identity => {
+                    Promise.all([getIdentity(), getStudents(courseId)])
+                        .then(([identity, students]) => {
                             setIdentity(identity)
+                            setStudents(students)
                             if (identity === "admin") {
                                 getStudents()
                                     .then(students => setAllStudents(students))
@@ -84,8 +85,6 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                     }))
                             }
                         })
-                    getStudents(courseId)
-                        .then(students => setStudents(students))
                 } else {
                     notFound()
                 }
@@ -144,11 +143,22 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                     size="small"
                                     value={course.groupLow}
                                     onChange={(event) => {
-                                        // TODO: validation
-                                        setCourse({
-                                            ...course, 
-                                            groupLow: parseInt(event.target.value)
-                                        })
+                                        if (event.target.value.length === 0) {
+                                            setCourse({
+                                                ...course, 
+                                                groupLow: 0
+                                            })
+                                            return
+                                        }
+                                        const value = event.target.value.replace(/^0+/, "")
+                                        const high = Math.max(1, course.groupHigh)
+                                        const reg = new RegExp(`^([1-${high}])$`)
+                                        if (reg.test(value)) {
+                                            setCourse({
+                                                ...course, 
+                                                groupLow: parseInt(value)
+                                            })
+                                        }
                                     }}
                                 />
                                 <Typography variant="body1" marginBottom={0.25}>
@@ -161,16 +171,40 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                     size="small"
                                     value={course.groupHigh}
                                     onChange={(event) => {
-                                        setCourse({
-                                            ...course, 
-                                            groupHigh: parseInt(event.target.value)
-                                        })
+                                        if (event.target.value.length === 0) {
+                                            setCourse({
+                                                ...course, 
+                                                groupHigh: 0
+                                            })
+                                            return
+                                        }
+                                        const value = event.target.value.replace(/^0+/, "")
+                                        const low = Math.max(1, course.groupLow)
+                                        const reg = new RegExp(`^([${low}-9])$`)
+                                        if (reg.test(value)) {
+                                            setCourse({
+                                                ...course, 
+                                                groupHigh: parseInt(value)
+                                            })
+                                        }
                                     }}
                                 />
                                 <IconButton 
                                     size="small" 
                                     onClick={() => {
                                         setModifyGroupSize(false)
+                                        setCourse({
+                                            ...course, 
+                                            groupLow: Math.max(
+                                                1, 
+                                                course.groupLow
+                                            ), 
+                                            groupHigh: Math.max(
+                                                1, 
+                                                course.groupLow, 
+                                                course.groupHigh
+                                            )
+                                        })
                                         courseChange()
                                     }}
                                 >

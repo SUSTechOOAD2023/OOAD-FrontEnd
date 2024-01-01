@@ -105,6 +105,7 @@ export default function LoginPage() {
             <MenuItem value="student">Student</MenuItem>
             <MenuItem value="teacher">Teacher</MenuItem>
             <MenuItem value="SA">Student Assistant</MenuItem>
+            <MenuItem value="admin">Administrator</MenuItem>
           </TextField>
           {/* <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}

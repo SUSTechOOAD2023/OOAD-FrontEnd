@@ -45,8 +45,11 @@ export default function CourseCard({ course, identity, onEdit, onDelete }: {
 
   useEffect(() => {
     if (identity === "admin") {
-      getTeachers(course.id).then(teachers => setAllTeacher(teachers))
-      getSAs(course.id).then(sas => setAllSA(sas))
+      Promise.all([getTeachers(course.id), getSAs(course.id)])
+        .then(([teachers, sas]) => {
+          setAllTeacher(teachers)
+          setAllSA(sas)
+        })
     }
   }, [])
 
@@ -89,7 +92,7 @@ export default function CourseCard({ course, identity, onEdit, onDelete }: {
                   onChange={(event) => setTitle(event.target.value)}
                 /> :
                 <TextField
-                  label="Shortame"
+                  label="Shortname"
                   variant="filled"
                   fullWidth
                   value={name}

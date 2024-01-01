@@ -10,9 +10,9 @@ import { hidden } from "next/dist/lib/picocolors";
 import { handleDownload, updateJsonFromCsv } from './utils';
 
 export default function TeacherInterface({
-    params,
-    searchParams,
-}) {
+                                             params,
+                                             searchParams,
+                                         }) {
     const isAdding = searchParams['add'] === 'true'
     const dueDate = new Date()
     const resubmission = 5
@@ -128,11 +128,11 @@ export default function TeacherInterface({
                                     sx={{ mt: 2, mr: 2 }}
                                 />
                                 <TextField multiline={true}
-                                    label="Comment"
-                                    type="text"
-                                    value={submission.comment}
-                                    onChange={(e) => handleSubmitChange(index, e.target.value, "comment")}
-                                    sx={{ mt: 2, mr: 2, width: '300px' }}
+                                           label="Comment"
+                                           type="text"
+                                           value={submission.comment}
+                                           onChange={(e) => handleSubmitChange(index, e.target.value, "comment")}
+                                           sx={{ mt: 2, mr: 2, width: '300px' }}
                                 />
                             </AccordionDetails>
                         </Accordion>
