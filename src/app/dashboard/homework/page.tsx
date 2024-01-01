@@ -2,7 +2,6 @@
 import React, {useEffect, useState} from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {useLocation} from "react-router";
 import * as querystring from "querystring";
 import {getIdentity} from "@/app/dashboard/identityHandler";
 import getCourseOverview, {CourseOverview} from "@/app/dashboard/course/courseOverviewHandler";
@@ -84,13 +83,13 @@ export default function AssignmentPage({params, searchParams,}: {
                         <Grid item xs={12} key={index}>
                             <Box
                                 onClick={() => router.push(identity === "student" ?
-                                    '/dashboard/homework/submit' : '/dashboard/homework/detail')}
+                                    '/dashboard/homework/submit' : `/dashboard/homework/${assignment.uid}`)}
                                 sx={{ cursor: "pointer" }}>
                                 <AssignmentCard assignment={assignment} />
                             </Box>
                         </Grid>
                     ))}
-                {assignments.filter(assignment => assignment.id === courseParam).length === 0 &&
+                {assignments.filter(assignment => assignment.uid === courseParam).length === 0 &&
                     courseParam != null &&
                     (
                     <Grid item xs={12}>

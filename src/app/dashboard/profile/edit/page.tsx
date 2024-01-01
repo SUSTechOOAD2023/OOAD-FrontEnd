@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
 import { Box, Typography, TextField, Button } from "@mui/material";
-import {Edit, Save} from "@mui/icons-material";
+import { Edit, Save } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
@@ -13,9 +13,10 @@ import { getId } from '../../accountIdHandler';
 import EditIcon from '@mui/icons-material/Edit';
 import UserAvatar from '../../UserAvatar';
 import { uploadAvatar } from '../../avatarHandler';
+import { getIdentity } from '../../identityHandler';
 
 
-  
+
 
 const EditProfile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -27,7 +28,7 @@ const EditProfile = () => {
             // console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
-            const func =async () => {
+            const func = async () => {
                 uploadAvatar(await getId(), formData);
             }
             func();
@@ -119,78 +120,98 @@ const EditProfile = () => {
     const handleNameChange = (e) => {
         setName(e.target.value);
     };
+    const [isStudent, setIsStudent] = useState(false);
+
+    useEffect(() => {
+        getIdentity().then(t => setIsStudent(t === 'student'))
+    }, [])
 
     return (
-        
-        <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
-                <Box display="flex" alignItems="center">
-        {isEditing ? (
-            <TextField
-            variant="outlined"
-            value={name}
-            onChange={handleNameChange}
-            />
-        ) : (
-            <Typography variant="h4" marginTop={2} marginRight={1}>
-            {name}
-            </Typography>
-        )}
 
-        <IconButton onClick={handleEditClick} style={{ marginTop: '15px' }} className='icon-container'>
-            <EditIcon />
-        </IconButton>
-        </Box>
+        <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
+            {!isStudent && <><Avatar sx={{ width: 100, height: 100 }}>
+                <UserAvatar key={cnt} width={100} height={100} />
+            </Avatar>
+                <Edit onClick={handleAvatarChange} style={{
+                    position: 'absolute',
+                    bottom: 5,
+                    right: 5,
+                    transform: 'translate(50%, 50%)'
+                }}
+                /></>}
+            <Box display="flex" alignItems="center">
+                {isEditing ? (
+                    <TextField
+                        variant="outlined"
+                        value={name}
+                        onChange={handleNameChange}
+                    />
+                ) : (
+                    <Typography variant="h4" marginTop={2} marginRight={1}>
+                        {name}
+                    </Typography>
+                )}
+
+                <IconButton onClick={handleEditClick} style={{ marginTop: '15px' }} className='icon-container'>
+                    <EditIcon />
+                </IconButton>
+            </Box>
             <Typography variant="subtitle1" color="textSecondary" marginTop={1}>
                 {userProfile.email}
             </Typography>
-            <Grid container justifyContent="center" alignItems="center">
-                <Box position="relative" display="inline-block">
-                <Avatar sx={{ width: 100, height: 100 }}>
-                    <UserAvatar key={cnt} width={100} height={100}/>
-                </Avatar>
-                    <Edit onClick={handleAvatarChange} style={{
-                        position: 'absolute',
-                        bottom: 5,
-                        right: 5,
-                        transform: 'translate(50%, 50%)'
-                    }}
-                    />
-                </Box>
-            <TextField
-                variant="outlined"
-                margin="normal"
-                style={{width: '70%', marginLeft: '20px'}}
-                label="Sign"
-                name="sign"
-                value={userProfile.sign}
-                multiline
-                rows={4}
-                onChange={handleInputChange}
-            />
+            {isStudent && (
+                <>
+                    <Grid container justifyContent="center" alignItems="center">
+                        <Box position="relative" display="inline-block">
+                            <Avatar sx={{ width: 100, height: 100 }}>
+                                <UserAvatar key={cnt} width={100} height={100} />
+                            </Avatar>
+                            <Edit onClick={handleAvatarChange} style={{
+                                position: 'absolute',
+                                bottom: 5,
+                                right: 5,
+                                transform: 'translate(50%, 50%)'
+                            }}
+                            />
+                        </Box>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            style={{ width: '70%', marginLeft: '20px' }}
+                            label="Sign"
+                            name="sign"
+                            value={userProfile.sign}
+                            multiline
+                            rows={4}
+                            onChange={handleInputChange}
+                        />
 
-            </Grid>
-            <Box display="flex" alignItems="center" justifyContent="center">
-            <Typography variant="h6">
-                Technology Stack
-            </Typography>
-            <IconButton onClick={() => addTech()}>
-                <AddCircleOutlineIcon />
-            </IconButton>
-            </Box>
-            {userProfile.techStack.map((tech, index) => (
-                <Box key={index} display="flex" alignItems="center" marginBottom={2}>
-                    <TextField
-                        variant="outlined"
-                        label={`Technology #${index + 1}`}
-                        value={tech}
-                        onChange={(event) => handleTechStackChange(event, index)}
-                        style={{ marginRight: 8, minWidth: '90%'}}
-                    />
-                    <IconButton onClick={() => removeTech(index)}>
-                        <RemoveCircleOutlineIcon />
-                    </IconButton>
-                </Box>
-            ))}
+                    </Grid>
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                        <Typography variant="h6">
+                            Technology Stack
+                        </Typography>
+                        <IconButton onClick={() => addTech()}>
+                            <AddCircleOutlineIcon />
+                        </IconButton>
+                    </Box>
+                    {userProfile.techStack.map((tech, index) => (
+                        <Box key={index} display="flex" alignItems="center" marginBottom={2}>
+                            <TextField
+                                variant="outlined"
+                                label={`Technology #${index + 1}`}
+                                value={tech}
+                                onChange={(event) => handleTechStackChange(event, index)}
+                                style={{ marginRight: 8, minWidth: '90%' }}
+                            />
+                            <IconButton onClick={() => removeTech(index)}>
+                                <RemoveCircleOutlineIcon />
+                            </IconButton>
+                        </Box>
+                    ))}
+                </>
+            )}
+
             <Divider style={{ width: '80%', marginTop: 2, marginBottom: 2 }} />
             <Typography variant="body2" color="textSecondary">
                 Joined: {userProfile.joinedDate}
@@ -203,7 +224,7 @@ const EditProfile = () => {
             >
                 Save Profile
             </Button>
-            <input type="file" ref={fileInputRef} style={{display: 'none'}} />
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
         </Box>
     );
 }
