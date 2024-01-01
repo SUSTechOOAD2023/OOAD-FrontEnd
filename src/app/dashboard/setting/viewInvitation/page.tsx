@@ -1,8 +1,24 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Button, List, ListItem, ListItemText, TextField, Box, Typography, Paper, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import {
+    Button,
+    List,
+    ListItem,
+    ListItemText,
+    TextField,
+    Box,
+    Typography,
+    Paper,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    SelectChangeEvent,
+    Snackbar
+} from '@mui/material';
 import { getId } from '../../accountIdHandler';
 import getInviteOverview from './InviteOverview';
+import Alert from "@mui/material/Alert";
 
 export interface InviteOverview {
     inviteCode: string,
@@ -11,34 +27,21 @@ export interface InviteOverview {
 
 
 export default function InviteManager() {
-    const [inviteOverviews, setInviteOverviews] = useState<InviteOverview[]>([]);
     const [newInviteCode, setNewInviteCode] = useState(0);
     const [newIdentity, setNewIdentity] = useState('');
     const [inviteDisplay, setInviteDisplay] = useState<InviteOverview[]>([]);
+    const [alertDisplay, setAlertDisplay] = useState(false)
     const filterAndSetInviteDisplay = () => {
-        const filteredInviteOverviews = inviteOverviews.filter(
-          (overview) =>
-            overview.identity === newIdentity
-        );
-      
-        const limitedInviteDisplay = filteredInviteOverviews.slice(0, newInviteCode);
-      
-        setInviteDisplay(limitedInviteDisplay);
-      };
-    useEffect(() => {
         const fetchData = async () => {
             const id = await getId();
-            const overview = await getInviteOverview(id);
-            setInviteOverviews(overview);
+            const overview = await getInviteOverview(id, newInviteCode, newIdentity);
+            if (overview == null) {
+                setAlertDisplay(true);
+            }
+            else setInviteDisplay(overview);
         };
         fetchData();
-    }, []);
-
-    const handleSearchInviteCode = async () => {
-        // Add logic to submit newInviteCode
-        // After adding, fetch and update the inviteOverviews list
-    };
-
+      };
     return (
         <Box sx={{ margin: 'auto', maxWidth: 500 }}>
             <Typography variant="h4" sx={{ mb: 2, ml: 4 }}>
@@ -54,14 +57,18 @@ export default function InviteManager() {
                     ))}
                 </List>
             </Paper>
-            <Box component="form" onSubmit={handleSearchInviteCode}>
+            <Box component="form">
                 <TextField
                     type="number"
                     label="Codes need"
                     variant="outlined"
                     fullWidth
                     value={newInviteCode}
-                    onChange={(e) => {setNewInviteCode(Number(e.target.value));}}
+                    onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const sanitizedValue = inputValue.replace(/[^0-9]/g, '');
+                        setNewInviteCode(Number(sanitizedValue));
+                    }}
                     sx={{ mb: 2 }}
                 />
 
@@ -72,16 +79,25 @@ export default function InviteManager() {
                         label="Identity"
                         value={newIdentity}
                     onChange={(e: SelectChangeEvent) => setNewIdentity(e.target.value)}
+                        sx={{minWidth: "19vw"}}
                     >
                         <MenuItem value="student">Student</MenuItem>
                         <MenuItem value="teacher">Teacher</MenuItem>
-                        <MenuItem value="admin">Admin</MenuItem>
+                        <MenuItem value="SA">Student Assistant</MenuItem>
                     </Select>
                 </FormControl>
                 <Button variant="contained" color="primary" onClick={filterAndSetInviteDisplay}>
                     search
                 </Button>
             </Box>
+            <Snackbar
+                autoHideDuration={4000}
+                onClose={() => { setAlertDisplay(false) }}
+                open={alertDisplay}>
+                <Alert severity="error" sx={{ width: '100%' }}>
+                    Input Error!
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }
