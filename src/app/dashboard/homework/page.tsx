@@ -2,7 +2,6 @@
 import React, {useEffect, useState} from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import {useLocation} from "react-router";
 import * as querystring from "querystring";
 import {getIdentity} from "@/app/dashboard/identityHandler";
 import getCourseOverview, {CourseOverview} from "@/app/dashboard/course/courseOverviewHandler";

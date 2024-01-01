@@ -36,10 +36,10 @@ export const updateJsonFromCsv = (csvFile, jsondata) => {
         complete: (results) => {
           const csvData = results.data;
           for (let csvRow of csvData) {
-            let jsonRecord = newSubmitList.find(record => record.studentName === csvRow.studentName);
+            let jsonRecord = newSubmitList.find(record => record.studentName === csvRow?.studentName);
             if (jsonRecord) {
-              jsonRecord.comment = csvRow.comment;
-              jsonRecord.score = csvRow.score;
+              jsonRecord.comment = csvRow?.comment;
+              jsonRecord.score = csvRow?.score;
             }
           }
         //   console.log('Updated JSON:', newSubmitList);

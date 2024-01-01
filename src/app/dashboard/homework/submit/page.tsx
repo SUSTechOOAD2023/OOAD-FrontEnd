@@ -12,8 +12,9 @@ export default function SubmitHomework() {
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
   const [description, setDescription] = useState('');
-  const [files, setFiles] = useState([]);
-  const handleDelete = (index) => {
+  const [files, setFiles] = useState<File[]>([]);
+
+    const handleDelete = (index) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
     setFiles(newFiles);
@@ -24,10 +25,13 @@ export default function SubmitHomework() {
     description: "Play Genshin for 3 hours"
   };
 
-    const handleFileChange = (event) => {
-        const newFiles = Array.from(event.target.files);
-        setFiles([...files, ...newFiles]);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const newFiles = Array.from(event.target.files) as File[];
+            setFiles([...files, ...newFiles]);
+        }
     };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -120,7 +124,7 @@ export default function SubmitHomework() {
             {files.map((file, index) => (
                 <li key={index}>
                     <span>{file.name} - {file.size} bytes</span>
-                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">Delete</Button>
+                    <Button onClick={() => handleDelete(index)} size="small">Delete</Button>
                 </li>
             ))}
         </ul>
