@@ -10,9 +10,9 @@ import { hidden } from "next/dist/lib/picocolors";
 import { handleDownload, updateJsonFromCsv } from './utils';
 
 export default function TeacherInterface({
-    params,
-    searchParams,
-}) {
+                                             params,
+                                             searchParams,
+                                         }) {
     const isAdding = searchParams['add'] === 'true'
     const dueDate = new Date()
     const resubmission = 5
@@ -27,7 +27,7 @@ export default function TeacherInterface({
         description: '',
     });
     const [submitList, setSubmitList] = useState<SubmitOverView[]>([])
-    const fileInput = useRef(null);
+    const fileInput = useRef<HTMLInputElement>(null);
     useEffect(() => {
         const fetchData = async () => {
             setSubmitList(await getSubmitOverview(parseInt(await getId())));
@@ -67,7 +67,6 @@ export default function TeacherInterface({
             // await addHomework
         }
     }
-
     return (
         <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
             <Typography variant="h4" gutterBottom>
@@ -129,11 +128,11 @@ export default function TeacherInterface({
                                     sx={{ mt: 2, mr: 2 }}
                                 />
                                 <TextField multiline={true}
-                                    label="Comment"
-                                    type="text"
-                                    value={submission.comment}
-                                    onChange={(e) => handleSubmitChange(index, e.target.value, "comment")}
-                                    sx={{ mt: 2, mr: 2, width: '300px' }}
+                                           label="Comment"
+                                           type="text"
+                                           value={submission.comment}
+                                           onChange={(e) => handleSubmitChange(index, e.target.value, "comment")}
+                                           sx={{ mt: 2, mr: 2, width: '300px' }}
                                 />
                             </AccordionDetails>
                         </Accordion>
@@ -153,7 +152,7 @@ export default function TeacherInterface({
                     <Button
                         variant="outlined"
                         color="secondary"
-                        onClick={event => { fileInput.current.click() }}
+                        onClick={event => { if (fileInput.current) fileInput.current.click() }}
                         sx={{ width: '100%', height: '50px', borderRadius: '20', ml: 2 }}
                     >
                         Upload csv
@@ -171,16 +170,23 @@ export default function TeacherInterface({
                             return
                         }
                         const fileInput = e.target;
+                        if (!fileInput.files) return;
                         const file = fileInput.files[0];
                         const allowedFormats = ['csv'];
-                        const fileExtension = file.name.split('.').pop().toLowerCase();
-                        console.log(fileExtension)
+                        if (!file) return;
+                        const fileNameParts = file.name.split('.');
+                        const part0 = fileNameParts.pop();
+                        if (!part0) {
+                            setAlertDisplay(true);
+                            return;
+                        }
+                        const fileExtension = part0.toLowerCase();
                         if (!allowedFormats.includes(fileExtension)) {
                             setAlertDisplay(true);
                             return;
                         }
                         updateJsonFromCsv(e.target.files[0], submitList).then(
-                            f => setSubmitList(f)
+                            (f) => setSubmitList(f as SubmitOverView[])
                         )
                         e.target.value = ''
                     }
@@ -201,7 +207,7 @@ export default function TeacherInterface({
             <Snackbar
                 autoHideDuration={3000}
                 open={alertDisplay}
-                onClose={() => setAlertDisplay(false)}  
+                onClose={() => setAlertDisplay(false)}
             >
                 <Alert severity="error" sx={{ width: '100%' }}>
                     The uploaded type is wrong!

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 interface UserAvatarParam {
   width: number, 
   height: number,
-  id: string
+  id?: string
 }
 
 export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam) {
@@ -18,7 +18,7 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
     let idCurrent = id;
     const fetchData = async () => {
       console.log(id);
-      idCurrent = (id === "-1") ? await getId() : id
+      idCurrent = (!id || id === "-1") ? await getId() : id
       const t = await downloadAvatar(idCurrent);
       if (t !== null) {
         const binData = atob(t);
