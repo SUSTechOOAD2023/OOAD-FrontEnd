@@ -6,6 +6,7 @@ const debug = process.env.debug
 const path = process.env.path
 
 export async function getId() {
+  console.log("getid")
   if (debug === "true") {
     return "1"
   }

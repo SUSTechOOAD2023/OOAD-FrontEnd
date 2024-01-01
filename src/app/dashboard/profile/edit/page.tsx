@@ -14,7 +14,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import UserAvatar from '../../UserAvatar';
 import { uploadAvatar } from '../../avatarHandler';
 import { getIdentity } from '../../identityHandler';
-
+import getAccountInfo, { AccountInfo } from '../../accountInfo';
+const debug = process.env.debug
 
 
 
@@ -22,6 +23,14 @@ const EditProfile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [cnt, setCnt] = useState(0);
+    useEffect(() => {
+        const setProfile = async () => {
+            setUserProfile(await getAccountInfo(await getId()))
+        }
+        if (debug !== "true") {
+            setProfile()
+        }
+    }, [])
 
     useEffect(() => {
         if (selectedFile) {
@@ -33,7 +42,6 @@ const EditProfile = () => {
             }
             func();
             setCnt(cnt + 1);
-            console.log(cnt);
         }
     }, [selectedFile]);
 
@@ -78,13 +86,12 @@ const EditProfile = () => {
         }
 
     };
-    const [userProfile, setUserProfile] = useState({
-        prefix: "HT",
+    const [userProfile, setUserProfile] = useState<AccountInfo>({
         name: "Hu Tao",
         email: "hutao@genshin.com",
         joinedDate: "2023-07-15",
         sign: "The 77th generation master of the \"Wangsheng Funeral Parlor\" in Liyue, a crucial figure in charge of Liyue's funeral affairs.",
-        techStack: ['C++', 'Java', 'Python']
+        techStack: ['C++', 'Java', 'Python', 'C#', 'C+++++++++++++++++++++++++++++++++++++++++++++++++++++++']
     });
 
     const handleInputChange = (event) => {
@@ -129,7 +136,9 @@ const EditProfile = () => {
     return (
 
         <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
-            {!isStudent && <><Avatar sx={{ width: 100, height: 100 }}>
+            {!isStudent && <><Box position="relative" display="inline-block"><Avatar sx={{ width: 100, height: 100 }}>
+
+
                 <UserAvatar key={cnt} width={100} height={100} />
             </Avatar>
                 <Edit onClick={handleAvatarChange} style={{
@@ -138,17 +147,19 @@ const EditProfile = () => {
                     right: 5,
                     transform: 'translate(50%, 50%)'
                 }}
-                /></>}
+                />
+            </Box>
+            </>}
             <Box display="flex" alignItems="center">
                 {isEditing ? (
                     <TextField
                         variant="outlined"
-                        value={name}
+                        value={userProfile.name}
                         onChange={handleNameChange}
                     />
                 ) : (
                     <Typography variant="h4" marginTop={2} marginRight={1}>
-                        {name}
+                        {userProfile.name}
                     </Typography>
                 )}
 

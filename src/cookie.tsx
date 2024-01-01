@@ -8,8 +8,8 @@ export async function getCookie(request: Request) { // get cookie from next.js s
   // await readCookie();
   const req = new NextRequest(request)
   const cookiesAll = cookies().getAll()
-  console.log(cookies().getAll())
-  console.log(5666)
+  // console.log(cookies().getAll())
+  // console.log(5666)
   for (const cookie of cookiesAll) {
     req.cookies.set(cookie.name, cookie.value)
   }

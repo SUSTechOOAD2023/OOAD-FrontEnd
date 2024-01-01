@@ -17,8 +17,9 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
   useEffect(() => {
     let idCurrent = id;
     const fetchData = async () => {
-      console.log(id);
-      idCurrent = (!id || id === "-1") ? await getId() : id
+      // console.log(id);
+      if ((!id || id === "-1")) getId().then(id => idCurrent = id)
+      else idCurrent = id
       const t = await downloadAvatar(idCurrent);
       if (t !== null) {
         const binData = atob(t);

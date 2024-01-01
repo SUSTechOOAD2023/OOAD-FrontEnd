@@ -5,7 +5,7 @@ const path = process.env.path
 
 export interface HomeworkOverview {
     id: string,
-    uid: string,
+    uid?: string,
     name: string,
     deadline: Date,
     courseName?: string,
