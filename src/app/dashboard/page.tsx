@@ -8,8 +8,20 @@ import Grid from "@mui/material/Grid"
 import Paper from "@mui/material/Paper"
 import DeadlineCalendar from "./DeadlineCalendar"
 import DailyNew from "./DailyNew"
+import { useContext, useEffect, useState } from "react"
+import { UserContext } from "./userContext"
+import { getStudentId } from "./identityIdHandler"
 
 export default function MainPage() {
+  const { id, identity } = useContext(UserContext)
+  const [studentId, setStudentId] = useState<string>("")
+  
+  useEffect(() => {
+    if (identity === "student") {
+      getStudentId(id).then(id => setStudentId(id))
+    }
+  }, [])
+
   return (
     <Container 
       sx={{
@@ -24,10 +36,9 @@ export default function MainPage() {
               p: 2, 
               display: "flex", 
               flexDirection: "column", 
-              height: 350
             }}
           >
-            <NoticeBoard />
+            <NoticeBoard id={studentId}/>
           </Paper>
         </Grid>
         <Grid item xs={12} md={7} lg={4.5}>
