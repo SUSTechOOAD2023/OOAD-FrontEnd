@@ -1,8 +1,6 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Paper,
   Box,
   Button,
   Dialog,
@@ -12,20 +10,31 @@ import {
   TextField,
   Grid,
   Container,
-  Typography,
   IconButton,
   Tabs,
   Tab,
   Pagination,
   Stack,
+  MenuItem,
 } from "@mui/material";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import groupNew from "./groupHandler";
+import {
+  groupNew,
+  getAll,
+  getMy,
+  DeleteGroup,
+  groupEdit,
+} from "./groupHandler";
 import InformationBox from "./InformationBox";
+import { getId } from "../accountIdHandler";
+import { getIdentity } from "../identityHandler";
+import { getTeachers, getCourse } from "../course/[courseId]/courseHandler";
+import getCourseOverview from "../course/courseOverviewHandler";
+
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -62,81 +71,160 @@ function InformationBoxesContainer() {
       GroupId: 12110924,
       GroupSize: 5,
       GroupDeadline: dayjs(),
-      GroupTab: 0,
+      GroupTab: 1,
       GroupTeacher: "LHY",
+      GroupHide: 0,
     },
     {
       GroupName: "Group2",
       GroupId: 12110924,
       GroupSize: 3,
       GroupDeadline: dayjs().add(1, "day"),
-      GroupTab: 1,
+      GroupTab: 2,
       GroupTeacher: "LHY",
+      GroupHide: 0,
     },
   ]);
+  const cour = [
+    { name: "OOAD", id: 1 },
+    { name: "DSAA", id: 3 },
+    { name: "CS110", id: 4 },
+  ];
+  const [course, setCourse] = useState(cour);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(0);
+  const [editedName, setEditedName] = useState("GroupName");
+  const [editedGroupNumber, setEditedGroupNumber] = useState(1);
+  const [editedGroupDeadline, setEditedGroupDeadline] = useState(dayjs());
+  const [Teachers, setTeachers] = useState("");
+  const [Sizes, setSizes] = useState(5);
+  const [editedGroupHide, setEditedGroupHide] = useState(0);
+  const [identity, setIdentity] = useState("student");
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    let paramA = searchParams.get("course");
+    if (paramA === null) paramA = "1";
+    const classid = parseInt(paramA);//maybe need to fix:当没有classid1时出错
+    getCourseOverview("1", "admin").then((getcourse) => {
+      const newcourse = getcourse.map((item) => ({
+        name: item.name,
+        id: parseInt(item.id),
+      }));
+      setCourse(newcourse);
+      setValue(newcourse.findIndex(item => item.id === classid));
+    }); 
+    Promise.all([getIdentity(), getCourse(classid.toString()), getTeachers(classid.toString())])
+      .then(([identity, getcourse, getteachers]) => {
+        setIdentity(identity);
+        let s = Sizes
+        if (getcourse !== null) {
+          setSizes(getcourse.groupHigh);
+          s = getcourse.groupHigh
+        }
+        const teachers = getteachers.map((item) => item.name).join(",");
+        setTeachers(teachers);
+        getAll(classid).then((getall) => {
+          const newinfo = getall.map((item) => ({
+            GroupTab: item.classId,
+            GroupDeadline: dayjs(item.groupDeadline),
+            GroupId: item.groupId,
+            GroupName: item.groupName,
+            GroupSize: s,
+            GroupTeacher: teachers,
+            GroupHide: 0,
+          }));
+          setInformationBoxes(newinfo);
+        });
+      })
+  }, []);
 
   const addInformationBox = () => {
     setOpen(true);
   };
 
-  const handleInformationBoxEdit = (
+  const handleInformationBoxEdit = async (
     index: number,
     GroupName: string,
-    GroupId: number,
-    GroupSize: number,
     GroupDeadline: any,
-    GroupTeacher: string
+    GroupTeacher: string,
+    GroupHide: number
   ) => {
-    const updatedInformationBoxes = [...informationBoxes];
-    updatedInformationBoxes[index].GroupName = GroupName;
-    updatedInformationBoxes[index].GroupId = GroupId;
-    updatedInformationBoxes[index].GroupSize = GroupSize;
-    updatedInformationBoxes[index].GroupDeadline = GroupDeadline;
-    updatedInformationBoxes[index].GroupTeacher = GroupTeacher;
-    setInformationBoxes(updatedInformationBoxes);
+    const responseText = await groupEdit(0, {
+      classId: index,
+      groupDeadline: GroupDeadline.format("YYYY-MM-DDThh:mm:ss"),
+      groupName: GroupName,
+      groupTask: "",
+      groupVisible: GroupHide,
+    });
+    if (responseText === "success!") {
+      const updatedInformationBoxes = [...informationBoxes];
+      updatedInformationBoxes[index].GroupName = GroupName;
+      updatedInformationBoxes[index].GroupDeadline = GroupDeadline;
+      updatedInformationBoxes[index].GroupTeacher = GroupTeacher;
+      updatedInformationBoxes[index].GroupHide = GroupHide;
+      setInformationBoxes(updatedInformationBoxes);
+    } else {
+      console.log("404");
+    }
   };
 
-  const handleDelete = (index: number) => {
-    const updatedInformationBoxes = informationBoxes.filter(
-      (_, i) => i !== index
-    );
-    setInformationBoxes(updatedInformationBoxes);
+  const handleDelete = async (index: number, id: number) => {
+    const res = await DeleteGroup(id);
+    if (res == true) {
+      const updatedInformationBoxes = informationBoxes.filter(
+        (_, i) => i !== index
+      );
+      setInformationBoxes(updatedInformationBoxes);
+    }
   };
   const [value, setValue] = React.useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = async (
+    event: React.SyntheticEvent,
+    newValue: number
+  ) => {
     setValue(newValue);
-  };
-
-  //
-  const [open, setOpen] = useState(false);
-  const [editedName, setEditedName] = useState("GroupName");
-  const [editedGroupId, setEditedGroupId] = useState(0);
-  const [editedGroupSize, setEditedGroupSize] = useState(0);
-  const [editedGroupDeadline, setEditedGroupDeadline] = useState(dayjs());
-  const [editedGroupTeacher, setEditedGroupTeacher] = useState("GroupTeacher");
-
-  const handleSaveClick = async (tabindex: number) => {
-    const responseText = await groupNew({
-      groupDeadline: dayjs(),
-      groupName: editedName,
-      groupNumber: editedGroupId,
-      groupSize: editedGroupSize,
-      groupTask: "",
-      teacherId: 0,
-    });
-    if (responseText === "success!") {
-      const newInformationBox = {
-        GroupName: editedName,
-        GroupId: editedGroupId,
-        GroupSize: editedGroupSize,
-        GroupDeadline: editedGroupDeadline,
-        GroupTab: tabindex,
-        GroupTeacher: editedGroupTeacher,
-      };
-      setInformationBoxes([...informationBoxes, newInformationBox]);
+    if (open2 === 0) {
+      getAll(course[newValue].id).then((getall) => {
+        const newinfo = getall.map((item) => ({
+          GroupTab: item.classId,
+          GroupDeadline: dayjs(item.groupDeadline),
+          GroupId: item.groupId,
+          GroupName: item.groupName,
+          GroupSize: Sizes,
+          GroupTeacher: Teachers,
+          GroupHide: 0,
+        }));
+        setInformationBoxes(newinfo);
+      });
     } else {
-      console.log("404");
+    }
+  };
+  const handleSaveClick = async (tabindex: number) => {
+    for (let i = 0; i < editedGroupNumber; i++) {
+      const responseText = await groupNew(
+        tabindex,
+        editedName,
+        editedGroupDeadline.format("YYYY-MM-DD hh:mm:ss")
+      );
+      if (responseText !== 0) {
+        const newInformationBox = {
+          GroupName: editedName,
+          GroupId: responseText,
+          GroupSize: Sizes,
+          GroupDeadline: editedGroupDeadline,
+          GroupTab: tabindex,
+          GroupTeacher: Teachers,
+          GroupHide: editedGroupHide,
+        };
+        setInformationBoxes((prevInformationBoxes) => [
+          ...prevInformationBoxes,
+          newInformationBox,
+        ]);
+      } else {
+        console.log("404");
+      }
     }
     setOpen(false);
   };
@@ -151,6 +239,44 @@ function InformationBoxesContainer() {
     //单个page
     let count = 0;
 
+    const handleAllGroupClick = async () => {
+      getAll(tabindex).then((getall) => {
+        const newinfo = getall.map((item) => ({
+          GroupTab: item.classId,
+          GroupDeadline: dayjs(item.groupDeadline),
+          GroupId: item.groupId,
+          GroupName: item.groupName,
+          GroupSize: Sizes,
+          GroupTeacher: Teachers, 
+          GroupHide: 0,
+        }));
+        setInformationBoxes(newinfo);
+        setOpen2(0);
+      });
+    };
+
+    const handleMyGroupClick = async () => {
+      getId().then((id) => {
+        getMy(tabindex, id).then((getmy) => {
+          if (identity === "teacher") {
+            const newinfo = [
+              {
+                GroupTab: getmy.classId,
+                GroupDeadline: dayjs(getmy.groupDeadline),
+                GroupId: getmy.groupId,
+                GroupName: getmy.groupName,
+                GroupSize: getmy.groupSize,
+                GroupTeacher: "LHY", //need to do
+                GroupHide: 0,
+              },
+            ];
+            setInformationBoxes(newinfo);
+          }
+          setOpen2(1);
+        });
+      });
+    };
+
     return (
       <Box
         sx={{
@@ -161,7 +287,7 @@ function InformationBoxesContainer() {
           justifyContent: "flex-start",
         }}
       >
-        {identity === 1 && (
+        {(identity === "teacher" || identity === "admin") && (
           <Box
             sx={{
               position: "absolute",
@@ -174,12 +300,32 @@ function InformationBoxesContainer() {
               onClick={() => addInformationBox()}
               color="primary"
             >
-              <AddCircleIcon style={{ fontSize: '50px' }}/>
+              <AddCircleIcon style={{ fontSize: "50px" }} />
             </IconButton>
           </Box>
         )}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "10px",
+            left: "300px",
+          }}
+        >
+          {open2 === 1 ? (
+            <Button variant="text" onClick={handleAllGroupClick}>
+              All Group
+            </Button>
+          ) : (
+            <Button variant="text" onClick={handleMyGroupClick}>
+              My Group
+            </Button>
+          )}
+        </Box>
         {informationBoxes.map((informationBox, index) => {
-          if (informationBox.GroupTab === tabindex) {
+          if (
+            informationBox.GroupTab === tabindex &&
+            (informationBox.GroupHide === 0 || open2 === 1)
+          ) {
             count = count + 1;
             if (count >= pageindex * 9 - 8 && count <= pageindex * 9) {
               return (
@@ -190,23 +336,22 @@ function InformationBoxesContainer() {
                     GroupSize={informationBox.GroupSize}
                     GroupDeadline={informationBox.GroupDeadline}
                     GroupTeacher={informationBox.GroupTeacher}
+                    GroupHide={informationBox.GroupHide}
                     onEdit={(
                       GroupName,
-                      GroupId,
-                      GroupSize,
                       GroupDeadline,
-                      GroupTeacher
+                      GroupTeacher,
+                      GroupHide
                     ) =>
                       handleInformationBoxEdit(
                         index,
                         GroupName,
-                        GroupId,
-                        GroupSize,
                         GroupDeadline,
-                        GroupTeacher
+                        GroupTeacher,
+                        GroupHide
                       )
                     }
-                    onDelete={() => handleDelete(index)}
+                    onDelete={() => handleDelete(index, informationBox.GroupId)}
                     identity={identity}
                   />
                 </Box>
@@ -215,6 +360,7 @@ function InformationBoxesContainer() {
           }
           return null;
         })}
+
         <Dialog open={open} onClose={handleClose}>
           <DialogTitle>New Group</DialogTitle>
           <DialogContent>
@@ -230,46 +376,25 @@ function InformationBoxesContainer() {
             </Grid>
             <Grid item xs={12} style={{ marginTop: "10px" }}>
               <TextField
-                label="Group ID"
-                value={editedGroupId}
+                label="Group Visibility"
+                value={editedGroupHide === 1 ? "Hide" : "No hide"}
+                select
                 onChange={(e: { target: { value: string } }) => {
-                  const inputValue = parseInt(e.target.value);
+                  const inputValue = e.target.value;
 
-                  if (!isNaN(inputValue)) {
-                    setEditedGroupId(inputValue);
+                  if (inputValue === "Hide") {
+                    setEditedGroupHide(1);
                   } else {
-                    setEditedGroupId(0);
+                    setEditedGroupHide(0);
                   }
                 }}
                 fullWidth
-              />
+              >
+                <MenuItem value="Hide">Hide</MenuItem>
+                <MenuItem value="No hide">no hide</MenuItem>
+              </TextField>
             </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Teacher"
-                value={editedGroupTeacher}
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setEditedGroupTeacher(e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} style={{ marginTop: "10px" }}>
-              <TextField
-                label="Group Size"
-                value={editedGroupSize}
-                onChange={(e: { target: { value: string } }) => {
-                  const inputValue = parseInt(e.target.value);
 
-                  if (!isNaN(inputValue)) {
-                    setEditedGroupSize(inputValue);
-                  } else {
-                    setEditedGroupSize(0);
-                  }
-                }}
-                fullWidth
-              />
-            </Grid>
             <Grid item xs={12} style={{ marginTop: "10px" }}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
@@ -280,6 +405,22 @@ function InformationBoxesContainer() {
                   onChange={handleDateChange}
                 />
               </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} style={{ marginTop: "10px" }}>
+              <TextField
+                label="Number of new groups"
+                value={editedGroupNumber}
+                onChange={(e: { target: { value: string } }) => {
+                  const inputValue = parseInt(e.target.value);
+
+                  if (!isNaN(inputValue)) {
+                    setEditedGroupNumber(inputValue);
+                  } else {
+                    setEditedGroupNumber(0);
+                  }
+                }}
+                fullWidth
+              />
             </Grid>
           </DialogContent>
           <DialogActions>
@@ -316,7 +457,6 @@ function InformationBoxesContainer() {
       </Stack>
     );
   };
-  const identity = 1; //0 student   1 teacher
   const [page, setPage] = React.useState(1);
   const handleChangePage = (
     event: React.ChangeEvent<unknown>,
@@ -334,20 +474,16 @@ function InformationBoxesContainer() {
             onChange={handleChange}
             aria-label="basic tabs example"
           >
-            <Tab label="OOAD" {...a11yProps(0)} />
-            <Tab label="DSAA" {...a11yProps(1)} />
-            <Tab label="CS110" {...a11yProps(2)} />
+            {course.map((item, index) => (
+              <Tab key={index} label={item.name} {...a11yProps(index)} />
+            ))}
           </Tabs>
         </Box>
-        <CustomTabPanel value={value} index={0}>
-          {tabs(0)}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={1}>
-          {tabs(1)}
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={2}>
-          {tabs(2)}
-        </CustomTabPanel>
+        {course.map((item, index) => (
+          <CustomTabPanel value={value} index={index} key={index}>
+            {tabs(item.id)}
+          </CustomTabPanel>
+        ))}
       </Box>
     </Container>
   );
