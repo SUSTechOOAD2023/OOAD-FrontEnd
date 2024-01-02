@@ -1,5 +1,7 @@
 'use server'
 
+import dayjs, { Dayjs } from "dayjs"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -35,6 +37,36 @@ export async function getAllNotice(id: string): Promise<AllNoticeInfo[]> {
     })))
   } else {
     console.log(`Error on getting all notice of student ${id}, status code ${res.status}`)
+    return []
+  }
+}
+
+export interface DeadlineInfo {
+  homeworkId: string, 
+  homeworkTitle: string, 
+  homeworkDdl: Dayjs, 
+  classId: string, 
+  courseName: string
+}
+
+export async function getDeadline(id: string): Promise<DeadlineInfo[]> {
+  if (debug === "true") {
+    return []
+  }
+
+  const res = await fetch(`${path}/homework/listDDL?studentId=${id}`, {
+    method: "POST", 
+    cache: "no-store"
+  })
+
+  if (res.ok) {
+    return res.json().then(homework => homework.map(homework => ({
+      ...homework, 
+      homeworkId: homework.homeworkId.toString(),  
+      classId: homework.classId.toString()
+    })))
+  } else {
+    console.log(`Error on getting deadline of student ${id}, status code ${res.status}`)
     return []
   }
 }
