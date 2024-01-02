@@ -21,7 +21,7 @@ export default function TeacherInterface({
     const [homework, setHomework] = useState<HomeworkOverview>({
         id: '',
         name: '',
-        deadline: new Date(),
+        deadline: '',
         courseName: '',
         resubmission: 0,
         description: '',

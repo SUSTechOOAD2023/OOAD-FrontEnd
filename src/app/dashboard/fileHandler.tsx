@@ -24,17 +24,17 @@ export async function downloadFile(id: string)  {
     }
 }
 
-export async function uploadFile(id: string, data: FormData) {
+export async function uploadFile(filename: string, data: FormData) {
     if (debug === "true") {
         return true
     }
 
-    const res = await fetch(`${path}/upload/file?accountID=${id}`, {
+    const res = await fetch(`${path}/upload/file?fileName=${filename}`, {
         method: "POST",
         body: data
     })
 
-    revalidateTag("file" + id)
+    revalidateTag("file" + filename)
 
     return res.ok
 }
@@ -45,7 +45,10 @@ export async function uploadFiles(id: string, data: FormData) {
 
     const res = await fetch(`${path}/upload/files?accountID=${id}`, {
         method: "POST",
-        body: data
+        body: data, 
+        next: {
+            tags: ["file" + id]
+        }
     })
 
     revalidateTag("file" + id)

@@ -10,6 +10,10 @@ import { hidden } from "next/dist/lib/picocolors";
 import { handleDownload, updateJsonFromCsv } from '../detail/utils';
 import { getStudentId } from '../../identityIdHandler';
 import dayjs from 'dayjs';
+import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
+const now = dayjs()
 
 export default function TeacherInterface({
     params,
@@ -21,7 +25,7 @@ export default function TeacherInterface({
     const [homework, setHomework] = useState<HomeworkOverview>({
         name: 'Genshin Homework',
         id: '',
-        deadline: new Date(),
+        deadline: '',
         courseName: '',
         resubmission: 0,
         description: '',
@@ -76,16 +80,24 @@ export default function TeacherInterface({
         <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
             <Typography variant="h4" gutterBottom>
                 {isAdding ? 'Add Assignment' : 'Review ' + homework.name}
+                {/* {dayjs(homework.deadline).format('YYYY-MM-DDTHH:mm')} */}
             </Typography>
-
-            <TextField
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-cn">
+                <DateTimePicker
+                  label="Due Date"
+                  value={dayjs(homework.deadline)}
+                  onChange={handleDueDateChange}
+                  minDateTime={now}
+                />
+            {/* <DateCalendar
                 label="Due Date"
                 type="datetime-local"
-                defaultValue={dayjs(homework.deadline).format('YYYY-MM-DDTHH:mm')}
+                defaultValue={.format('YYYY-MM-DDTHH:mm')}
                 // defaultValue={`${homework.deadline.getFullYear()}-${(homework.deadline.getMonth() + 1).toString().padStart(2, '0')}-${homework.deadline.getDate().toString().padStart(2, '0')}T${homework.deadline.getHours().toString().padStart(2, '0')}:${homework.deadline.getMinutes().toString().padStart(2, '0')}`}
                 sx={{ width: 300, mb: 2 }}
                 onChange={handleDueDateChange}
-            />
+            /> */}
+            </LocalizationProvider>
             <TextField
                 label="Allow Resubmission"
                 type="number"
