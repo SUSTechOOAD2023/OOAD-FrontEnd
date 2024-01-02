@@ -1,8 +1,10 @@
 'use client'
 
+import {downloadAvatar2} from "@/app/dashboard/testHandler";
+
 const path = process.env.path
 import Image from 'next/image';
-import { downloadAvatar } from './avatarHandler';
+import {downloadAvatar} from './avatarHandler';
 import { getId } from './accountIdHandler';
 import { useEffect, useState } from 'react';
 
@@ -17,33 +19,22 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
   const [avatarSrc, setAvatarSrc] = useState("/paimon.png")
 
   useEffect(() => {
-    if ((!id || id === "-1")) {
-      getId().then(id => {
-        const idCurrent = id;
-        downloadAvatar(idCurrent).then(t => {
-          if (t !== null) {
-            const binData = atob(t);
-            const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)));
-            const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
-            setAvatarSrc(url);
-          } else {
-            setAvatarSrc("/paimon.png");
-          }
-        });
-      });
-    } else {
-      // const idCurrent = id;
-      // downloadAvatar("6")//.then(t => {
-      //   if (t !== null) {
-      //     const binData = atob(t);
-      //     const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)));
-      //     const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
-      //     setAvatarSrc(url);
-      //   } else {
-      //     setAvatarSrc("/paimon.png");
-      //   }
-      // });
-    }
+    let idCurrent = id;
+    const fetchData = async () => {
+      console.log(id);
+      idCurrent = (!id || id === "-1") ? await getId() : id
+      const t = await downloadAvatar(idCurrent);
+      if (t !== null) {
+        const binData = atob(t);
+        const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)));
+        const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
+        setAvatarSrc(url);
+      } else {
+        setAvatarSrc("/paimon.png");
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (

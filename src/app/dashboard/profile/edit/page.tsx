@@ -164,6 +164,7 @@ const EditProfile = () => {
                         variant="outlined"
                         value={userProfile.name}
                         onChange={handleNameChange}
+                        inputProps={{ maxLength: 18 }}
                     />
                 ) : (
                     <Typography variant="h4" marginTop={2} marginRight={1}>
@@ -203,6 +204,7 @@ const EditProfile = () => {
                             multiline
                             rows={4}
                             onChange={handleInputChange}
+                            inputProps={{ maxLength: 200 }}
                         />
 
                     </Grid>

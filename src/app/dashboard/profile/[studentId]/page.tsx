@@ -15,6 +15,8 @@ import Image from 'next/image';
 import UserAvatar from '../../UserAvatar';
 import getAccountInfo, { AccountInfo, getStudentInfo } from '../../accountInfo';
 import { getId } from '../../accountIdHandler';
+import {getIdentity} from "@/app/dashboard/identityHandler";
+import {id} from "postcss-selector-parser";
 const debug = process.env.debug
 
 
@@ -31,6 +33,8 @@ export default function StudentProfile({
     params: { slug: string }
     searchParams: { [key: string]: string | string[] | undefined }
 }) {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [identity, setIdentity] = useState("admin")
     useEffect(() => {
         const setProfile = async () => {
             const id = params["studentId"]
@@ -39,8 +43,9 @@ export default function StudentProfile({
             else setUserProfile(await getAccountInfo(await getId()))
         }
         if (debug !== "true") {
-            setProfile()
+            setProfile().then(() => setIsLoaded(true)).then(() => getIdentity().then(identity => setIdentity(identity)))
         }
+        else setIsLoaded(true)
     }, [])
     const [userProfile, setUserProfile] = useState<AccountInfo>({
         name: "Hu Tao",
@@ -52,10 +57,17 @@ export default function StudentProfile({
     if (!userProfile) return (
         <Box>404 not found</Box>
     )
+    else if (!isLoaded) {
+        return (
+            <div style={{display: "flex", justifyContent: "center", height: "100%", alignItems: "center"}}>
+                <h1 className="title">Loading...</h1>
+            </div>
+        );
+    }
     else return (
         <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
             <Avatar sx={{ width: 100, height: 100 }}>
-                <UserAvatar width={100} height={100} id={params["studentId"] ? params["studentId"] : undefined} />
+                <UserAvatar width={100} height={100} id={params["studentId"] ? userProfile.id : undefined} />
             </Avatar>
             <Typography variant="h4" marginTop={2}>
                 {userProfile.name}
@@ -70,15 +82,14 @@ export default function StudentProfile({
                 {userProfile.sign}
             </Typography>
             <Divider style={{ width: '60%', marginTop: 2, marginBottom: 2 }} />
-
-            <Grid container spacing={6} justifyContent="center" style={{ minWidth: '100%' }}>
-                <Grid item style={{ maxWidth: '60%' }}>
+            {(identity === "student" || (identity === "teacher" && params["studentId"] && params["studentId"] !== "-1")) && <Grid container spacing={6} justifyContent="center" style={{minWidth: '100%'}}>
+                <Grid item style={{maxWidth: '60%'}}>
                     <Typography variant="h6" marginTop={2}>
                         Enrolled Classes
                     </Typography>
                     <List>
                         {events.map((event, index) => (
-                            <ListItem key={index} style={{ padding: '0 0' }}>
+                            <ListItem key={index} style={{padding: '0 0'}}>
                                 <Box display="flex" flexDirection="column">
                                     <button
                                         style={{
@@ -88,9 +99,11 @@ export default function StudentProfile({
                                             padding: '0',
                                             textDecoration: 'underline',
                                         }}
-                                        onClick={() => { }}
+                                        onClick={() => {
+                                        }}
                                     >
-                                        <Typography variant="body1" style={{ textAlign: 'left' }}>{event.eventName}</Typography>
+                                        <Typography variant="body1"
+                                                    style={{textAlign: 'left'}}>{event.eventName}</Typography>
                                     </button>
                                     <Typography variant="body2" color="textSecondary">{event.eventTime}</Typography>
                                     <Typography variant="caption">{event.role}</Typography>
@@ -100,7 +113,7 @@ export default function StudentProfile({
                         ))}
                     </List>
                 </Grid>
-                <Grid item style={{ maxWidth: '40%' }}>
+                <Grid item style={{maxWidth: '40%'}}>
                     <Typography variant="h6" marginTop={2}>
                         Technical Stack
                     </Typography>
@@ -108,14 +121,14 @@ export default function StudentProfile({
                         {userProfile.techStack.map((tech, index) => (
                             <ListItem key={index}>
                                 <ListItemIcon>
-                                    <CodeIcon />
+                                    <CodeIcon/>
                                 </ListItemIcon>
-                                <ListItemText primary={tech} style={{ whiteSpace: 'normal', wordWrap: 'break-word' }} />
+                                <ListItemText primary={tech} style={{whiteSpace: 'normal', wordWrap: 'break-word'}}/>
                             </ListItem>
                         ))}
                     </List>
                 </Grid>
-            </Grid>
+            </Grid>}
         </Box>
     );
 }

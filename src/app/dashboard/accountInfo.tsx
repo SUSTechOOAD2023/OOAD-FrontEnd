@@ -99,15 +99,18 @@ export async function getStudentInfo(studentId: string): Promise<AccountInfo> {
         return {
           name: "No Such Student",
           email: "404",
-          techStack: []
+          techStack: [],
+            id: "-2"
         };
       });
   }
 interface RequestBody {
     studentId?: number;
+    teacherId?: number;
     studentName?: string;
     studentInformation?: string;
     technicalStack?: string;
+    teacherName?: string;
 }
 export async function updateStudentInfo(studentId: string, studentInfo: AccountInfo) {
     // console.log(studentInfo)
@@ -142,8 +145,9 @@ export async function updateStudentInfo(studentId: string, studentInfo: AccountI
         if (!response.ok) {
             console.log(`modify failed`);
             throw new Error('Request failed');
+            return response.json();
         }
-        return response.json();
+        return "response.json();"
     })
     .then(responseData => {
         return true;
@@ -159,12 +163,13 @@ export async function updateTeacherInfo(teacherId: string, info: AccountInfo) {
     const requestBody: RequestBody = {};
 
     if (teacherId !== undefined) {
-        requestBody.studentId = parseInt(teacherId);
+        requestBody.teacherId = parseInt(teacherId);
     }
 
     if (info.name !== undefined) {
-        requestBody.studentName = info.name;
+        requestBody.teacherName = info.name;
     }
+    console.log(requestBody)
 
     const jsonString = JSON.stringify(requestBody);
     return fetch(`${path}/teacher/update`, {
@@ -179,7 +184,7 @@ export async function updateTeacherInfo(teacherId: string, info: AccountInfo) {
             console.log(`modify failed`);
             throw new Error('Request failed');
         }
-        return response.json();
+        return true;//response.json();
     })
     .then(responseData => {
         return true;
