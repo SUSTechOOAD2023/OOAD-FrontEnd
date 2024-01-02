@@ -12,7 +12,8 @@ export interface AccountInfo {
     sign?: string,
     joinedDate?: String,
     techStack?: string[],
-    email?: string
+    email?: string,
+    id?: string
 }
 
 export default async function getAccountInfo(id: string): Promise<AccountInfo> {
@@ -83,20 +84,22 @@ export async function getStudentInfo(studentId: string): Promise<AccountInfo> {
       .then((responseData) => {
         let stack = [];
         if (responseData.student && responseData.student.technicalStack) {
-          stack = responseData.student.technicalStack.split('?');
+          stack = responseData.student.technicalStack.split(';');
         }
         return {
           name: responseData.student.studentName,
           sign: responseData.student.studentInformation,
           techStack: stack,
-          email: responseData.account.email
+          email: responseData.account.email,
+          id: responseData.student.accountId
         };
       })
       .catch((error) => {
         console.log("Invalid JSON response");
         return {
           name: "No Such Student",
-          email: "404"
+          email: "404",
+          techStack: []
         };
       });
   }
@@ -107,7 +110,7 @@ interface RequestBody {
     technicalStack?: string;
 }
 export async function updateStudentInfo(studentId: string, studentInfo: AccountInfo) {
-    console.log(studentInfo)
+    // console.log(studentInfo)
     const requestBody: RequestBody = {};
 
     if (studentId !== undefined) {
@@ -125,7 +128,7 @@ export async function updateStudentInfo(studentId: string, studentInfo: AccountI
     if (Array.isArray(studentInfo.techStack)) {
         requestBody.technicalStack = studentInfo.techStack.join(';');
     }
-
+    console.log(requestBody)
     const jsonString = JSON.stringify(requestBody);
     return fetch(`${path}/student/update`, {
         method: 'POST',
@@ -135,6 +138,7 @@ export async function updateStudentInfo(studentId: string, studentInfo: AccountI
         body: jsonString
     })
     .then(response => {
+        // console.log(response.text())
         if (!response.ok) {
             console.log(`modify failed`);
             throw new Error('Request failed');

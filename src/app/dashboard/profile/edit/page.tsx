@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Box, Typography, TextField, Button, Snackbar, Alert } from "@mui/material";
 import { Edit, Save } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -24,13 +24,19 @@ const EditProfile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [cnt, setCnt] = useState(0);
+    const [alertText, setAlertText] = useState<string>("")
+    const [alertDisplay, setAlertDisplay] = useState(false)
     useEffect(() => {
         if (selectedFile) {
             // console.log(selectedFile);
             const formData = new FormData();
             formData.append('file', selectedFile);
             const func = async () => {
-                uploadAvatar(await getId(), formData);
+                const res = await uploadAvatar(await getId(), formData);
+                if (res !== "ok") {
+                    setAlertDisplay(true)
+                    setAlertText(res)
+                }
             }
             func();
             setCnt(cnt + 1);
@@ -243,6 +249,15 @@ const EditProfile = () => {
                 Save Profile
             </Button>
             <input type="file" ref={fileInputRef} style={{ display: 'none' }} />
+            <Snackbar
+                autoHideDuration={3000}
+                open={alertDisplay}
+                onClose={() => setAlertDisplay(false)}  
+            >
+                <Alert severity="error" sx={{ width: '100%' }}>
+                    {alertText}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

@@ -35,3 +35,4 @@ export async function clearCookie() {
 export async function testCookie() {
   return cookies().getAll().length !== 0;
 }
+

@@ -49,7 +49,10 @@ export default function StudentProfile({
         sign: "The 77th generation master of the \"Wangsheng Funeral Parlor\" in Liyue, a crucial figure in charge of Liyue's funeral affairs.",
         techStack: ['C++', 'Java', 'Python', 'C#', 'C+++++++++++++++++++++++++++++++++++++++++++++++++++++++']
     });
-    return (
+    if (!userProfile) return (
+        <Box>404 not found</Box>
+    )
+    else return (
         <Box display="flex" flexDirection="column" alignItems="center" width="60%" margin="auto">
             <Avatar sx={{ width: 100, height: 100 }}>
                 <UserAvatar width={100} height={100} id={params["studentId"] ? params["studentId"] : undefined} />
