@@ -14,6 +14,7 @@ import {
   addCourse, 
   deleteCourse, 
   editCourse, 
+  setCourseSAs, 
   setCourseTeachers 
 } from './[courseId]/courseHandler';
 import CourseCard from './CourseCard';
@@ -27,7 +28,7 @@ export default function CoursePage() {
   useEffect(() => {
     Promise.all([getId(), getIdentity()])
       .then(([id, identity]) => {
-        getCourseOverview(id)
+        getCourseOverview(id, identity)
           .then(courses => setCourses(courses))
         setIdentity(identity)
       })
@@ -56,6 +57,7 @@ export default function CoursePage() {
         }
       })
     setCourseTeachers(course.id, course.teacher.map(item => item.id))
+    setCourseSAs(course.id, course.sa.map(item => item.id))
   }
 
   const handleDelete = (course: CourseOverview) => {

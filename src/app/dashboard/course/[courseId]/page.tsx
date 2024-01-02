@@ -26,7 +26,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AddIcon from '@mui/icons-material/Add';
 import { notFound } from 'next/navigation';
-import { getCourse, Course, Notice, getStudents, editNotice, deleteNotice, getNotice, addNotice, editCourse, setCourseStudents } from './courseHandler'
+import { getCourse, Course, Notice, getStudents, editNotice, deleteNotice, getNotice, addNotice, editCourse, setCourseStudents, getTeachers } from './courseHandler'
 import { User } from "./User";
 import { getIdentity } from '../../identityHandler';
 import Link from "next/link"
@@ -60,9 +60,8 @@ export default function CoursePage({ params }: { params: { courseId: string } })
         getCourse(courseId)
             .then(course => {
                 if (course) {
-                    setCourse(course)
-                    Promise.all([getIdentity(), getStudents(courseId)])
-                        .then(([identity, students]) => {
+                    Promise.all([getIdentity(), getTeachers(courseId), getStudents(courseId)])
+                        .then(([identity, teachers, students]) => {
                             setIdentity(identity)
                             setStudents(students)
                             if (identity === "admin") {
@@ -75,13 +74,15 @@ export default function CoursePage({ params }: { params: { courseId: string } })
                                     .then(id => getNotice(courseId, id))
                                     .then(notice => setCourse({
                                         ...course, 
-                                        notice
+                                        teacher: teachers.map(item => item.name), 
+                                        notice: notice
                                     }))
                             } else {
                                 getNotice(courseId)
                                     .then(notice => setCourse({
                                         ...course, 
-                                        notice
+                                        teacher: teachers.map(item => item.name), 
+                                        notice: notice
                                     }))
                             }
                         })

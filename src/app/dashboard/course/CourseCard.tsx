@@ -45,7 +45,7 @@ export default function CourseCard({ course, identity, onEdit, onDelete }: {
 
   useEffect(() => {
     if (identity === "admin") {
-      Promise.all([getTeachers(course.id), getSAs(course.id)])
+      Promise.all([getTeachers(), getSAs()])
         .then(([teachers, sas]) => {
           setAllTeacher(teachers)
           setAllSA(sas)

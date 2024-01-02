@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidateTag } from "next/cache"
 import { User } from "./User"
 
 const debug = process.env.debug
@@ -36,14 +37,28 @@ export async function getCourse(id: string): Promise<Course | null> {
     }
   }
 
-  const res = await fetch(`${path}/dd?courseID=${id}`, {
+  const res = await fetch(`${path}/class/list`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify({
+      classId: parseInt(id), 
+    }), 
     next: {
       tags: ["course" + id]
     }
   })
 
   if (res.ok) {
-    return await res.json()
+    return res.json().then((course): Course => ({
+      name: course[0].courseName, 
+      title: course[0].courseTitle, 
+      teacher: [], 
+      groupLow: course[0].minimumGroupSize, 
+      groupHigh: course[0].maximumGroupSize, 
+      notice: []
+    }))
   } else {
     console.log(`Error on getting course ${id}`)
     return null
@@ -55,13 +70,12 @@ export async function addCourse(name: string, title: string): Promise<string> {
     return "7"
   }
 
-  const res = await fetch(`${path}/addCourse`, {
+  const res = await fetch(`${path}/class/new?courseName=${name}&courseTitle=${title}`, {
     method: "POST", 
-    headers: {
-      'Content-Type': "application/json", 
-    }, 
-    body: JSON.stringify({ name, title })
+    cache: "no-store"
   })
+
+  revalidateTag("course")
   
   if (res.ok) {
     return res.text()
@@ -77,8 +91,9 @@ export async function deleteCourse(id: string): Promise<boolean> {
     return true
   }
 
-  const res = await fetch(`${path}/dC?courseID=${id}`, {
-    method: "POST"
+  const res = await fetch(`${path}/class/delete?classId=${id}`, {
+    method: "PATCH", 
+    cache: "no-store"
   })
 
   return res.ok
@@ -97,13 +112,25 @@ export async function editCourse(payload: CourseEditInfo): Promise<boolean> {
     return true
   }
 
-  const res = await fetch(`${path}/dC`, {
+  console.log("payload=" + JSON.stringify(payload))
+
+  const res = await fetch(`${path}/class/update`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      classId: payload.id, 
+      courseName: payload.name, 
+      courseTitle: payload.title, 
+      maximumGroupSize: payload.groupHigh, 
+      minimumGroupSize: payload.groupLow
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("course")
+  revalidateTag("course" + payload.id)
 
   return res.ok
 }
@@ -131,11 +158,18 @@ export async function getNotice(id: string, sid?: string): Promise<Notice[]> {
     : `${path}/notice/studentSearch?classId=${id}&studentId=${sid}`
 
   const res = await fetch(url, {
-    method: "POST"
+    method: "POST", 
+    next: {
+      tags: ["notice"]
+    }
   })
 
   if (res.ok) {
-    return res.json()
+    return res.json().then((notices): Notice[] => notices.map(notice => ({
+      id: notice.noticeId.toString(), 
+      title: notice.noticeTitle, 
+      description: notice.noticeContent
+    })))
   } else {
     console.log(`Error on getting notice of course ${id}`)
     return []
@@ -149,7 +183,11 @@ export async function deleteNotice(id: string) : Promise<boolean> {
 
   // TODO: verify delete notice
 
-  const res = await fetch(`${path}/notice/delete?noticeId=${id}`)
+  const res = await fetch(`${path}/notice/delete?noticeId=${id}`, {
+    cache: "no-store"
+  })
+
+  revalidateTag("notice")
 
   return res.ok
 }
@@ -175,8 +213,18 @@ export async function editNotice(payload: NoticeEditInfo): Promise<boolean> {
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      ...payload, 
+      noticeId: parseInt(payload.noticeId), 
+      classId: parseInt(payload.classId), 
+      listStudentId: payload.listStudentId 
+        ? payload.listStudentId.map(item => parseInt(item)) 
+        : payload.listStudentId
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("notice")
 
   return res.ok
 }
@@ -199,8 +247,15 @@ export async function addNotice(payload: NoticeAddInfo): Promise<string> {
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(payload)
+    body: JSON.stringify({
+      ...payload, 
+      classId: parseInt(payload.classId), 
+      listStudentId: payload.listStudentId.map(item => parseInt(item))
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("notice")
 
   if (res.ok) {
     return res.text()
@@ -208,7 +263,6 @@ export async function addNotice(payload: NoticeAddInfo): Promise<string> {
     console.log(`Error on adding notice, status code ${res.status}`)
     return ""
   }
-
 }
 
 export async function getVisibleStudents(id: string): Promise<string[]> {
@@ -218,10 +272,15 @@ export async function getVisibleStudents(id: string): Promise<string[]> {
 
   // TODO: verify notice search
 
-  const res = await fetch(`${path}/notice/noticeSearch?noticeId=${id}`)
+  const res = await fetch(`${path}/notice/noticeSearch?noticeId=${id}`, {
+    method: "POST", 
+    next: {
+      tags: ["notice"]
+    }
+  })
 
   if (res.ok) {
-    return res.json()
+    return res.json().then(students => students.map(item => item.toString()))
   } else {
     console.log(`Error on getting visible students of notice ${id}`)
     return []
@@ -250,12 +309,30 @@ export async function getStudents(id?: string): Promise<User[]> {
     ]
   }
   
-  const url = id === undefined ? `${path}/dC` : `${path}/dC?courseID=${id}`
-  const res = await fetch(url)
+  const body = {}
+
+  if (id !== undefined) {
+    body["courseId"] = parseInt(id)
+  }
+
+  const res = await fetch(`${path}/relationshipCourse/selectStudent`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify(body), 
+    next: {
+      tags: ["students" + (id ?? "")]
+    }
+  })
 
   if (res.ok) {
-    return res.json()
+    return res.json().then((users): User[] => users.map(user => ({
+      id: user.studentId.toString(), 
+      name: user.studentName
+    })))
   } else {
+    console.log(`Error in getting student, status code ${res.status}`)
     return []
   }
 }
@@ -265,13 +342,20 @@ export async function setCourseStudents(courseId: string, studentId: string[]): 
     return true
   }
 
-  const res = await fetch(`${path}/scs?courseId=${courseId}`, {
+  const res = await fetch(`${path}/relationshipCourse/addStudentList`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(studentId)
+    body: JSON.stringify({
+      id: studentId.map(item => parseInt(item)), 
+      courseId: parseInt(courseId)
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("students")
+  revalidateTag("students" + courseId)
 
   return res.ok
 }
@@ -294,12 +378,30 @@ export async function getTeachers(id?: string): Promise<User[]> {
     ]
   }
   
-  const url = id === undefined ? `${path}/dC` : `${path}/dC?courseID=${id}`
-  const res = await fetch(url)
+  const body = {}
+
+  if (id !== undefined) {
+    body["courseId"] = parseInt(id)
+  }
+
+  const res = await fetch(`${path}/relationshipCourse/selectTeacher`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify(body), 
+    next: {
+      tags: ["teachers" + (id ?? "")]
+    }
+  })
 
   if (res.ok) {
-    return res.json()
+    return res.json().then((users): User[] => users.map(user => ({
+      id: user.teacherId.toString(), 
+      name: user.teacherName
+    })))
   } else {
+    console.log(`Error in getting teacher, status code ${res.status}`)
     return []
   }
 }
@@ -309,13 +411,20 @@ export async function setCourseTeachers(courseId: string, teacherId: string[]): 
     return true
   }
 
-  const res = await fetch(`${path}/sct?courseId=${courseId}`, {
+  const res = await fetch(`${path}/relationshipCourse/addTeacherList`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(teacherId)
+    body: JSON.stringify({
+      id: teacherId.map(item => parseInt(item)), 
+      courseId: parseInt(courseId)
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("teachers")
+  revalidateTag("teachers" + courseId)
 
   return res.ok
 }
@@ -338,12 +447,30 @@ export async function getSAs(id?: string): Promise<User[]> {
     ]
   }
   
-  const url = id === undefined ? `${path}/dC` : `${path}/dC?courseID=${id}`
-  const res = await fetch(url)
+  const body = {}
+
+  if (id !== undefined) {
+    body["courseId"] = parseInt(id)
+  }
+
+  const res = await fetch(`${path}/relationshipCourse/selectSA`, {
+    method: "POST", 
+    headers: {
+      'Content-Type': "application/json", 
+    }, 
+    body: JSON.stringify(body), 
+    next: {
+      tags: ["sas" + (id ?? "")]
+    }
+  })
 
   if (res.ok) {
-    return res.json()
+    return res.json().then((users): User[] => users.map(user => ({
+      id: user.SAId.toString(), 
+      name: user.SAName
+    })))
   } else {
+    console.log(`Error in getting SA, status code ${res.status}`)
     return []
   }
 }
@@ -353,13 +480,20 @@ export async function setCourseSAs(courseId: string, saId: string[]): Promise<bo
     return true
   }
 
-  const res = await fetch(`${path}/sct?courseId=${courseId}`, {
+  const res = await fetch(`${path}/relationshipCourse/addSAList`, {
     method: "POST", 
     headers: {
       'Content-Type': "application/json", 
     }, 
-    body: JSON.stringify(saId)
+    body: JSON.stringify({
+      id: saId.map(item => parseInt(item)), 
+      courseId: parseInt(courseId)
+    }), 
+    cache: "no-store"
   })
+
+  revalidateTag("sas")
+  revalidateTag("sas" + courseId)
 
   return res.ok
 }
