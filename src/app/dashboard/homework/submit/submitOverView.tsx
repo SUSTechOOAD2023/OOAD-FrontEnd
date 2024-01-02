@@ -8,8 +8,15 @@ export interface SubmitOverView {
     score: number,
     comment?: string,
     content: string,
+    id: number,
+    modified: boolean
 }
-export default async function getSubmitOverview(studentId: string, homeworkId: string) {
+const urls = {
+  "all": "/submission/list",
+  "max": "/submission/queryMaxScore",
+  "latest": "/submission/listLatest"
+}
+export default async function getSubmitOverview(studentId: string | null, homeworkId: string, mode="all") {
     const debugValue = [
         {
             studentName: "Hu Tao",
@@ -27,19 +34,25 @@ export default async function getSubmitOverview(studentId: string, homeworkId: s
     if (debug === 'true') return debugValue;
     else {
         try {
-            const response = await fetch(`${path}/submission/list`, {
+          console.log("finding submission")
+            const bodys: any = {
+              homeworkId: homeworkId
+            }
+            if (studentId) {
+              bodys.studentId = studentId
+            }
+            console.log(`${path}${urls[mode]}`)
+
+            const response = await fetch(`${path}${urls[mode]}`, {
               method: 'POST',
               headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store'
               },
-              body: JSON.stringify({
-                homeworkId: homeworkId
-
-              })
+              body: JSON.stringify(bodys)
             });
         
             if (!response.ok) {
-                console.log(`${studentId}, ${homeworkId}`)
               throw new Error('Request failed');
             }
         
@@ -47,10 +60,12 @@ export default async function getSubmitOverview(studentId: string, homeworkId: s
             // const jsonArr = JSON.parse(responseData)
             const formattedArr = responseData.map((submission) => {
                 return {
-                  studentName: String( submission.studentId),
+                  studentName: submission.studentName,
                   score: submission.submissionScore,
                   comment: submission.submissionComment || "",
-                  content: submission.submissionContent
+                  content: submission.submissionContent,
+                  id: submission.submissionId,
+                  modified: false
                 };
               });
             return formattedArr;
