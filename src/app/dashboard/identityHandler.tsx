@@ -7,16 +7,18 @@ const path = process.env.path
 
 export async function getIdentity() {
   if (debug === "true") {
-    return "teacher"
+    return "teacher";
   }
 
-  const request = new Request(`${path}/account/getIdentity`)
-  const res = await fetch(await getCookie(request))
-
-  if (res.ok) {
-    return await res.text()
-  } else {
-    console.log(`Error in getting identity: status code ${res.status}`)
-    return ""
-  }
+  const request = new Request(`${path}/account/getIdentity`);
+  return getCookie(request)
+    .then(fetch)
+    .then((res) => {
+      if (res.ok) {
+        return res.text();
+      } else {
+        console.log(`Error in getting identity: status code ${res.status}`);
+        return "";
+      }
+    });
 }

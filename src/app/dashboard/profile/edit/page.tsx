@@ -14,7 +14,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import UserAvatar from '../../UserAvatar';
 import { uploadAvatar } from '../../avatarHandler';
 import { getIdentity } from '../../identityHandler';
-import getAccountInfo, { AccountInfo } from '../../accountInfo';
+import getAccountInfo, { AccountInfo, updateInfo } from '../../accountInfo';
+import { useRouter } from 'next/navigation';
 const debug = process.env.debug
 
 
@@ -23,15 +24,6 @@ const EditProfile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [cnt, setCnt] = useState(0);
-    useEffect(() => {
-        const setProfile = async () => {
-            setUserProfile(await getAccountInfo(await getId()))
-        }
-        if (debug !== "true") {
-            setProfile()
-        }
-    }, [])
-
     useEffect(() => {
         if (selectedFile) {
             // console.log(selectedFile);
@@ -44,6 +36,14 @@ const EditProfile = () => {
             setCnt(cnt + 1);
         }
     }, [selectedFile]);
+
+    useEffect(() => {
+        getIdentity().then(t => setIsStudent(t === 'student')).then(() => console.log(isStudent))
+    }, [])
+    useEffect(() => {
+        if (debug !== "true")
+        getId().then(id => getAccountInfo(id).then(x => setUserProfile(x)))
+    }, [])
 
     useEffect(() => {
         const uploadFile = () => {
@@ -126,12 +126,11 @@ const EditProfile = () => {
 
     const handleNameChange = (e) => {
         setName(e.target.value);
+        setUserProfile({ ...userProfile, name: e.target.value})
     };
     const [isStudent, setIsStudent] = useState(false);
 
-    useEffect(() => {
-        getIdentity().then(t => setIsStudent(t === 'student'))
-    }, [])
+    const router = useRouter()
 
     return (
 
@@ -227,11 +226,16 @@ const EditProfile = () => {
             <Typography variant="body2" color="textSecondary">
                 Joined: {userProfile.joinedDate}
             </Typography>
-            <Button component={Link} href="/dashboard/profile"
+            <Button 
+            // component={Link} href="/dashboard/profile"
                 variant="contained"
                 color="primary"
                 startIcon={<Save />}
                 style={{ marginTop: 20 }}
+                onClick={async () => {
+                    await updateInfo(await getId(), userProfile)
+                    router.push("/dashboard/profile")
+                }}
             >
                 Save Profile
             </Button>

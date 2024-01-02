@@ -6,7 +6,7 @@ import { getId } from './accountIdHandler';
 import { useEffect, useState } from 'react';
 
 interface UserAvatarParam {
-  width: number, 
+  width: number,
   height: number,
   id?: string
 }
@@ -17,20 +17,25 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
   useEffect(() => {
     let idCurrent = id;
     const fetchData = async () => {
+      let t: Promise<any> | null = null
       // console.log(id);
-      if ((!id || id === "-1")) getId().then(id => idCurrent = id)
-      else idCurrent = id
-      const t = await downloadAvatar(idCurrent);
-      if (t !== null) {
-        const binData = atob(t);
-        const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)));
-        const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
-        setAvatarSrc(url);
-      } else {
-        setAvatarSrc("/paimon.png");
-      }
+      if ((!id || id === "-1")) getId()
+        .then(id => downloadAvatar(id))
+        .then((t) => {
+          if (t !== null) {
+            const binData = atob(t);
+            const bytes = new Uint8Array(binData.split("").map(c => c.charCodeAt(0)));
+            const url = URL.createObjectURL(new Blob([bytes], { type: "image/jpeg" }));
+            setAvatarSrc(url);
+          } else {
+            setAvatarSrc("/paimon.png");
+          }
+        }
+        )
+      // const t = await downloadAvatar(idCurrent);
+
     };
-  
+
     fetchData();
   }, []);
 
@@ -40,7 +45,7 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
       alt="Avatar"
       width={width}
       height={height}
-      style={{ 
+      style={{
         objectFit: "cover"
       }}
       priority
