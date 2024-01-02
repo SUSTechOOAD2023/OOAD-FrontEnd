@@ -50,8 +50,6 @@ export default async function getCourseOverview(id: string, identity: string):
     body[identity + "Id"] = parseInt(id)
   }
 
-  console.log("body="+JSON.stringify(body))
-
   const res = await fetch(`${path}/relationshipCourse/selectCourse`, {
     method: "POST", 
     headers: {
