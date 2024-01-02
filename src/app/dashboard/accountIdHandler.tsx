@@ -6,18 +6,24 @@ const debug = process.env.debug
 const path = process.env.path
 
 export async function getId() {
-  console.log("getid")
+  console.log("getid");
   if (debug === "true") {
-    return "1"
+    return Promise.resolve("1");
   }
 
-  const request = new Request(`${path}/account/getID`)
-  const res = await fetch(await getCookie(request))
-
-  if (res.ok) {
-    return await res.text()
-  } else {
-    console.log(`Error in getting ID: status code ${res.status}`)
-    return "0"
-  }
+  const request = new Request(`${path}/account/getID`);
+  return getCookie(request)
+    .then((response) => fetch(response))
+    .then((res) => {
+      if (res.ok) {
+        return res.text();
+      } else {
+        console.log(`Error in getting ID: status code ${res.status}`);
+        return "0";
+      }
+    })
+    .catch((error) => {
+      console.log(`Error in getting ID: ${error}`);
+      return "0";
+    });
 }

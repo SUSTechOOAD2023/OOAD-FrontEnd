@@ -37,12 +37,15 @@ const EditProfile = () => {
         }
     }, [selectedFile]);
 
-    useEffect(() => {
-        getIdentity().then(t => setIsStudent(t === 'student')).then(() => console.log(isStudent))
-    }, [])
+    // useEffect(() => {
+    //     setIsStudent(true)
+    //     getIdentity().then(t => setIsStudent(t === 'student')).then(() => console.log(isStudent))
+    // }, [])
     useEffect(() => {
         if (debug !== "true")
         getId().then(id => getAccountInfo(id).then(x => setUserProfile(x)))
+        .then(() => getIdentity()).then(t => setIsStudent(t === 'student')).then(() => console.log(isStudent))
+    
     }, [])
 
     useEffect(() => {
@@ -91,7 +94,7 @@ const EditProfile = () => {
         email: "hutao@genshin.com",
         joinedDate: "2023-07-15",
         sign: "The 77th generation master of the \"Wangsheng Funeral Parlor\" in Liyue, a crucial figure in charge of Liyue's funeral affairs.",
-        techStack: ['C++', 'Java', 'Python', 'C#', 'C+++++++++++++++++++++++++++++++++++++++++++++++++++++++']
+        techStack: []
     });
 
     const handleInputChange = (event) => {

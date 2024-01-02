@@ -73,30 +73,33 @@ export default async function getAccountInfo(id: string): Promise<AccountInfo> {
 }
 
 export async function getStudentInfo(studentId: string): Promise<AccountInfo> {
-    const res = await fetch(`${path}/student/list?studentId=${studentId}`)
-    if (!res.ok) {
-        throw new Error('Request failed');
-    }
-    try {
-        const responseData = await res.json();
-        let stack = []
-        if (responseData.student && responseData.student.technicalStack) stack = responseData.student.technicalStack.split('?');
-        return {
-            name: responseData.student.studentName,
-            sign: responseData.student.studentInformation,
-            techStack: stack,
-            email: responseData.account.email
-        };
-    }
-    catch (error) {
-        console.log("Invalid JSON response");
-
-        return {
-            name: "No Such Student",
-            email: "404"
+    return fetch(`${path}/student/list?studentId=${studentId}`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Request failed');
         }
-    }
-}
+        return res.json();
+      })
+      .then((responseData) => {
+        let stack = [];
+        if (responseData.student && responseData.student.technicalStack) {
+          stack = responseData.student.technicalStack.split('?');
+        }
+        return {
+          name: responseData.student.studentName,
+          sign: responseData.student.studentInformation,
+          techStack: stack,
+          email: responseData.account.email
+        };
+      })
+      .catch((error) => {
+        console.log("Invalid JSON response");
+        return {
+          name: "No Such Student",
+          email: "404"
+        };
+      });
+  }
 interface RequestBody {
     studentId?: number;
     studentName?: string;
@@ -124,28 +127,29 @@ export async function updateStudentInfo(studentId: string, studentInfo: AccountI
     }
 
     const jsonString = JSON.stringify(requestBody);
-    try {
-        const response = await fetch(`${path}/student/update`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonString
-        });
-
+    return fetch(`${path}/student/update`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonString
+    })
+    .then(response => {
         if (!response.ok) {
-            console.log(`modify failed`)
+            console.log(`modify failed`);
             throw new Error('Request failed');
         }
-
-        const responseData = await response.json();
-        return true
-    }
-    catch (error) {
-        return false
-    }
-    return false
+        return response.json();
+    })
+    .then(responseData => {
+        return true;
+    })
+    .catch(error => {
+        console.error(error);
+        return false;
+    });
 }
+
 export async function updateTeacherInfo(teacherId: string, info: AccountInfo) {
     console.log(info)
     const requestBody: RequestBody = {};
@@ -157,34 +161,40 @@ export async function updateTeacherInfo(teacherId: string, info: AccountInfo) {
     if (info.name !== undefined) {
         requestBody.studentName = info.name;
     }
-    const jsonString = JSON.stringify(requestBody);
-    try {
-        const response = await fetch(`${path}/teacher/update`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: jsonString
-        });
 
+    const jsonString = JSON.stringify(requestBody);
+    return fetch(`${path}/teacher/update`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: jsonString
+    })
+    .then(response => {
         if (!response.ok) {
-            console.log(`modify failed`)
+            console.log(`modify failed`);
             throw new Error('Request failed');
         }
+        return response.json();
+    })
+    .then(responseData => {
+        return true;
+    })
+    .catch(error => {
+        console.error(error);
+        return false;
+    });
+}
 
-        const responseData = await response.json();
-        return true
-    }
-    catch (error) {
-        return false
-    }
-    return false
-}
 export async function updateInfo(id: string, info: AccountInfo) {
-    const identity = await getIdentity();
-    if (identity === 'student' || identity === 'SA') return updateStudentInfo(await getStudentId(id), info);
-    else if (identity === 'teacher') {
-        return updateTeacherInfo((await getTeacherID(parseInt(id))).toString(), info)
-    }
-    else return false
-}
+    return getIdentity()
+      .then((identity) => {
+        if (identity === 'student' || identity === 'SA') {
+          return getStudentId(id).then((studentId) => updateStudentInfo(studentId, info));
+        } else if (identity === 'teacher') {
+          return getTeacherID(parseInt(id)).then((teacherId) => updateTeacherInfo(teacherId.toString(), info));
+        } else {
+          return false;
+        }
+      });
+  }
