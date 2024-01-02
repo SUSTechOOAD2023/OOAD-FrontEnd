@@ -73,7 +73,7 @@ export async function searchHomework(homeworkId: string) {
         name: responseData2.homeworkTitle,
         deadline: new Date(responseData2.homeworkDdl),
         courseName: '',
-        resubmission: 0,
+        resubmission: responseData2.allowResubmit | 999,
         description: responseData2.homeworkContent
     };
 }
