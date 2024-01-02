@@ -1,12 +1,12 @@
 'use client'
 
-import {downloadAvatar2} from "@/app/dashboard/testHandler";
-
 const path = process.env.path
+
 import Image from 'next/image';
 import {downloadAvatar} from './avatarHandler';
 import { getId } from './accountIdHandler';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from './userContext';
 
 interface UserAvatarParam {
   width: number,
@@ -17,12 +17,12 @@ interface UserAvatarParam {
 
 export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam) {
   const [avatarSrc, setAvatarSrc] = useState("/paimon.png")
+  const userProp = useContext(UserContext)
 
   useEffect(() => {
     let idCurrent = id;
     const fetchData = async () => {
-      console.log(id);
-      idCurrent = (!id || id === "-1") ? await getId() : id
+      idCurrent = (!id || id === "-1") ? userProp.id : id
       const t = await downloadAvatar(idCurrent);
       if (t !== null) {
         const binData = atob(t);

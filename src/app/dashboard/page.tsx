@@ -1,3 +1,5 @@
+'use client'
+
 import Box from "@mui/material/Box"
 import NoticeBoard from "./NoticeBoard"
 import Typography from "@mui/material/Typography"
