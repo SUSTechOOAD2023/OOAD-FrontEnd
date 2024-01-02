@@ -30,7 +30,8 @@ export default function TeacherInterface({
     const fileInput = useRef(null);
     useEffect(() => {
         const fetchData = async () => {
-            setSubmitList(await getSubmitOverview(await getStudentId(await getId()), params["homeworkId"]));
+            getSubmitOverview(null, params["homeworkId"], "latest").then(x => setSubmitList(x))
+            // setSubmitList(await getSubmitOverview(await getId(), params["homeworkId"]));
             const homework1 = await searchHomework(homeworkId)
             setHomework(homework1)
         };
@@ -49,6 +50,7 @@ export default function TeacherInterface({
         if (field === 'score') updateSubmit[index].score = value
         else if (field === 'comment') updateSubmit[index].comment = value
         else if (field === 'content') updateSubmit[index].content = value
+        updateSubmit[index].modified = true
         setSubmitList(updateSubmit)
     }
     const resubmissionChange = (event) => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import Papa from 'papaparse'
+import { SubmitOverView } from '../submit/submitOverView';
 export function convertToCSV(data) {
     const separator = ',';
     const keys = Object.keys(data[0]).filter(key => key === 'studentName' || key === 'score' || key === 'comment');
@@ -38,6 +39,9 @@ export const updateJsonFromCsv = (csvFile, jsondata) => {
                 for (let csvRow of csvData) {
                     let jsonRecord = newSubmitList.find(record => record.studentName === csvRow?.studentName);
                     if (jsonRecord) {
+                        if (csvRow?.comment !== jsonRecord.comment || csvRow?.score != jsonRecord.score) {
+                            jsonRecord.modified = true;
+                        }
                         jsonRecord.comment = csvRow?.comment;
                         jsonRecord.score = csvRow?.score;
                     }
@@ -49,3 +53,10 @@ export const updateJsonFromCsv = (csvFile, jsondata) => {
     });
 };
   
+
+export const reviewHomeworks = (submission: SubmitOverView) => {
+    const id = submission.id
+    const bodys: any = {
+        homeworkId: homeworkId
+      }
+}
