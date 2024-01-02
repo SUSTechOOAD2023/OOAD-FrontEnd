@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { 
     Container, 
     Box, 
@@ -35,6 +35,7 @@ import ViewList from './ViewList';
 import NoticePage from './Notice';
 import { getId } from '../../accountIdHandler';
 import { getStudentId } from '../../identityIdHandler';
+import { UserContext } from '../../userContext';
 
 const defaultCourse: Course = {
     name: "",
@@ -48,7 +49,7 @@ const defaultCourse: Course = {
 export default function CoursePage({ params }: { params: { courseId: string } }) {
     const { courseId } = params;
 
-    const [identity, setIdentity] = useState<string>("");
+    const { id, identity } = useContext(UserContext)
     const [course, setCourse] = useState<Course>(defaultCourse);
     const [modifyGroupSize, setModifyGroupSize] = useState<boolean>(false);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -60,17 +61,15 @@ export default function CoursePage({ params }: { params: { courseId: string } })
         getCourse(courseId)
             .then(course => {
                 if (course) {
-                    Promise.all([getIdentity(), getTeachers(courseId), getStudents(courseId)])
-                        .then(([identity, teachers, students]) => {
-                            setIdentity(identity)
+                    Promise.all([getTeachers(courseId), getStudents(courseId)])
+                        .then(([teachers, students]) => {
                             setStudents(students)
                             if (identity === "admin") {
                                 getStudents()
                                     .then(students => setAllStudents(students))
                             }
                             if (identity === "student") {
-                                getId()
-                                    .then(id => getStudentId(id))
+                                getStudentId(id)
                                     .then(id => getNotice(courseId, id))
                                     .then(notice => setCourse({
                                         ...course, 

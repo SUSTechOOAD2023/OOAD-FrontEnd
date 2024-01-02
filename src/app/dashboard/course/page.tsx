@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { 
   Container, 
   Box, 
@@ -19,19 +19,17 @@ import {
 } from './[courseId]/courseHandler';
 import CourseCard from './CourseCard';
 import { ErrorSnackBar } from './ErrorSnackBar';
+import { UserContext } from '../userContext';
 
 export default function CoursePage() {
   const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
-  const [identity, setIdentity] = useState<string>("")
+  // const [identity, setIdentity] = useState<string>("")
   const [courses, setCourses] = useState<CourseOverview[]>([])
+  const { id, identity } = useContext(UserContext)
 
   useEffect(() => {
-    Promise.all([getId(), getIdentity()])
-      .then(([id, identity]) => {
-        getCourseOverview(id, identity)
-          .then(courses => setCourses(courses))
-        setIdentity(identity)
-      })
+    getCourseOverview(id, identity)
+      .then(courses => setCourses(courses))
   }, [])
 
   const handleAdd = (name: string, title: string) => {
