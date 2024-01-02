@@ -149,8 +149,6 @@ export async function getNotice(id: string, sid?: string): Promise<Notice[]> {
     ]
   }
 
-  // TODO: verify get notice
-
   const url = sid === undefined
     ? `${path}/notice/Search?classId=${id}`
     : `${path}/notice/studentSearch?classId=${id}&studentId=${sid}`
@@ -179,8 +177,6 @@ export async function deleteNotice(id: string) : Promise<boolean> {
     return true;
   }
 
-  // TODO: verify delete notice
-
   const res = await fetch(`${path}/notice/delete?noticeId=${id}`, {
     cache: "no-store"
   })
@@ -203,8 +199,6 @@ export async function editNotice(payload: NoticeEditInfo): Promise<boolean> {
   if (debug === "true") {
     return true
   }
-
-  // TODO: verify edit notice
 
   const res = await fetch(`${path}/notice/modify`, {
     method: "POST", 
@@ -267,8 +261,6 @@ export async function getVisibleStudents(id: string): Promise<string[]> {
   if (debug === "true") {
     return ["0", "1", "2", "3"]
   }
-
-  // TODO: verify notice search
 
   const res = await fetch(`${path}/notice/noticeSearch?noticeId=${id}`, {
     method: "POST", 
