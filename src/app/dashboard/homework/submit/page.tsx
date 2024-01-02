@@ -12,8 +12,9 @@ export default function SubmitHomework() {
   const [dueDate, setDueDate] = useState('');
   const [points, setPoints] = useState('');
   const [description, setDescription] = useState('');
-  const [files, setFiles] = useState([]);
-  const handleDelete = (index) => {
+  const [files, setFiles] = useState<File[]>([]);
+
+    const handleDelete = (index) => {
     const newFiles = [...files];
     newFiles.splice(index, 1);
     setFiles(newFiles);
@@ -24,10 +25,13 @@ export default function SubmitHomework() {
     description: "Play Genshin for 3 hours"
   };
 
-    const handleFileChange = (event) => {
-        const newFiles = Array.from(event.target.files);
-        setFiles([...files, ...newFiles]);
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const newFiles = Array.from(event.target.files) as File[];
+            setFiles([...files, ...newFiles]);
+        }
     };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -42,44 +46,44 @@ export default function SubmitHomework() {
         }
     };
 
-  return (
-    <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
-      <Box display="flex" alignContent="center" justifyContent="center">
-      <PublishIcon color="secondary" sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: '2px solid #000',
-          borderColor: 'purple', 
-          borderRadius: '50%',
-          width: '40px',
-          height: '40px',
-      }}/>
-      <Box width={20}></Box>
-        <Typography variant="h4" gutterBottom>
-          Submit Page
-        </Typography>
-      </Box>
-      <Grid container spacing={2}>
+    return (
+        <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
+            <Box display="flex" alignContent="center" justifyContent="center">
+                <PublishIcon color="secondary" sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '2px solid #000',
+                    borderColor: 'purple',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                }}/>
+                <Box width={20}></Box>
+                <Typography variant="h4" gutterBottom>
+                    Submit Page
+                </Typography>
+            </Box>
+            <Grid container spacing={2}>
 
-        <Grid item xs={6}>
-          <Card sx={{ minWidth: 275, marginBottom: '20px' }}>
+                <Grid item xs={6}>
+                    <Card sx={{ minWidth: 275, marginBottom: '20px' }}>
 
-            <CardContent>
-              <Typography variant="h5" component="div">
-                Due Date
-              </Typography>
-              <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                {/* <Typography sx={{ mb: 1.5 }} color="text.secondary"> */}
-                  {assignmentInfo.dueDate.toLocaleString()}
-                {/* </Typography> */}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+                        <CardContent>
+                            <Typography variant="h5" component="div">
+                                Due Date
+                            </Typography>
+                            <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                                {/* <Typography sx={{ mb: 1.5 }} color="text.secondary"> */}
+                                {assignmentInfo.dueDate.toLocaleString()}
+                                {/* </Typography> */}
+                            </Typography>
+                        </CardContent>
+                    </Card>
+                </Grid>
 
-        <Grid item xs={1}>
-        </Grid>
+                <Grid item xs={1}>
+                </Grid>
 
         <Grid item xs={4}>
           <Card sx={{ minWidth: 275, marginBottom: '20px' }}>
@@ -120,7 +124,7 @@ export default function SubmitHomework() {
             {files.map((file, index) => (
                 <li key={index}>
                     <span>{file.name} - {file.size} bytes</span>
-                    <Button onClick={() => handleDelete(index)} type="danger" size="mini">Delete</Button>
+                    <Button onClick={() => handleDelete(index)} size="small">Delete</Button>
                 </li>
             ))}
         </ul>

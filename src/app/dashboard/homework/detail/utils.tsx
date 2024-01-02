@@ -30,22 +30,22 @@ export const handleDownload = (data) => {
 
 export const updateJsonFromCsv = (csvFile, jsondata) => {
     return new Promise((resolve, reject) => {
-      const newSubmitList = [...jsondata];
-      Papa.parse(csvFile, {
-        header: true,
-        complete: (results) => {
-          const csvData = results.data;
-          for (let csvRow of csvData) {
-            let jsonRecord = newSubmitList.find(record => record.studentName === csvRow.studentName);
-            if (jsonRecord) {
-              jsonRecord.comment = csvRow.comment;
-              jsonRecord.score = csvRow.score;
+        const newSubmitList = [...jsondata];
+        Papa.parse(csvFile, {
+            header: true,
+            complete: (results) => {
+                const csvData = results.data;
+                for (let csvRow of csvData) {
+                    let jsonRecord = newSubmitList.find(record => record.studentName === csvRow?.studentName);
+                    if (jsonRecord) {
+                        jsonRecord.comment = csvRow?.comment;
+                        jsonRecord.score = csvRow?.score;
+                    }
+                }
+                //   console.log('Updated JSON:', newSubmitList);
+                resolve(newSubmitList);
             }
-          }
-        //   console.log('Updated JSON:', newSubmitList);
-          resolve(newSubmitList);
-        }
-      });
+        });
     });
-  };
+};
   

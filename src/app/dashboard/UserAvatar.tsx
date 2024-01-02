@@ -1,14 +1,18 @@
 'use client'
 
+import {downloadAvatar2} from "@/app/dashboard/testHandler";
+
+const path = process.env.path
 import Image from 'next/image';
-import { downloadAvatar } from './avatarHandler';
+import {downloadAvatar} from './avatarHandler';
 import { getId } from './accountIdHandler';
 import { useEffect, useState } from 'react';
 
 interface UserAvatarParam {
-  width: number, 
+  width: number,
   height: number,
-  id: string
+  id?: string,
+  student?: boolean
 }
 
 export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam) {
@@ -18,7 +22,7 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
     let idCurrent = id;
     const fetchData = async () => {
       console.log(id);
-      idCurrent = (id === "-1") ? await getId() : id
+      idCurrent = (!id || id === "-1") ? await getId() : id
       const t = await downloadAvatar(idCurrent);
       if (t !== null) {
         const binData = atob(t);
@@ -29,7 +33,7 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
         setAvatarSrc("/paimon.png");
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -39,7 +43,7 @@ export default function UserAvatar({ width, height, id = "-1" }: UserAvatarParam
       alt="Avatar"
       width={width}
       height={height}
-      style={{ 
+      style={{
         objectFit: "cover"
       }}
       priority

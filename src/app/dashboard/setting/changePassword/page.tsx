@@ -116,7 +116,7 @@ export default function LoginPage() {
           </Alert>
           <Snackbar 
             autoHideDuration={6000}
-            onClose={() => { setAlertDisplay2("none") }}
+            onClose={() => { setAlertDisplay2(false) }}
             open={alertDisplay2}>
               <Alert severity="success" sx={{ width: '100%' }}>
             {alertText}

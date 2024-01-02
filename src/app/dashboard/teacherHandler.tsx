@@ -14,7 +14,7 @@ export async function getTeacherID(id: number): Promise<number> {
 
         const data = await response.text();
         return Number(data);
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
         throw new Error(`Failed to get teacher ID for account ID ${id}: ${error.message}`);
     }

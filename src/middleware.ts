@@ -15,7 +15,7 @@ export async function middleware(req: NextRequest) {
   if (pathname.endsWith('viewInvitation')) {
     const identity = await getIdentity()
     if (identity !== 'admin')
-      return NextResponse.redirect(new URL('/dashboard', req.url))
+      return NextResponse.redirect(new URL('/dashboard/accessDenied', req.url))
   }
 
   return NextResponse.next(); // 继续处理请求
