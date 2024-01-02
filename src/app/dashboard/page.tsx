@@ -15,8 +15,8 @@ export default function MainPage() {
         mb: 4
       }}
     >
-      <Grid container columnSpacing={4} rowSpacing={10} justifyContent="space-between">
-        <Grid item xs={7}>
+      <Grid container columnSpacing={2} rowSpacing={10} justifyContent="space-between">
+        <Grid item xs={12} md={5} lg={6.5}>
           <Paper
             sx={{
               p: 2, 
@@ -28,7 +28,7 @@ export default function MainPage() {
             <NoticeBoard />
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} md={7} lg={4.5}>
           <Paper
             sx={{
               p: 2, 

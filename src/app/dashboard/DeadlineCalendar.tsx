@@ -78,7 +78,8 @@ export default function DeadlineCalendar() {
             } as any
           }}
           sx={{
-            m: 0
+            m: 0, 
+            alignSelf: "center" 
           }}
         />
       </LocalizationProvider>

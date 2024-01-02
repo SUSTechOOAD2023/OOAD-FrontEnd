@@ -1,17 +1,9 @@
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemIcon from "@mui/material/ListItemIcon"
-import SchoolIcon from '@mui/icons-material/School';
 import AppBar from "@mui/material/AppBar";
 import Typography from "@mui/material/Typography";
 import PersonIcon from '@mui/icons-material/Person';
-import GroupsIcon from '@mui/icons-material/Groups';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Copyright from "../Copyright";
@@ -21,6 +13,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import Image from 'next/image';
 import Avatar from "@mui/material/Avatar";
 import UserAvatar from "./UserAvatar";
+import DrawerItemList from "./DrawerItemList";
 
 const drawerWidth = 240
 
@@ -59,32 +52,7 @@ export default function MainLayout({
         anchor="left"
       >
         <Toolbar />
-        <List sx={{ flexGrow: 1 }}>
-          <ListItem key="Course" disablePadding>
-            <ListItemButton component={Link} href='/dashboard/course'>
-              <ListItemIcon>
-                <SchoolIcon />
-              </ListItemIcon>
-              <ListItemText primary="Course" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem key="Group" disablePadding>
-            <ListItemButton component={Link} href='/dashboard/group'>
-              <ListItemIcon>
-                <GroupsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Group" />
-            </ListItemButton>
-          </ListItem>
-          <ListItem key="Assignment" disablePadding>
-            <ListItemButton component={Link} href='/dashboard/homework'>
-              <ListItemIcon>
-                <AssignmentIcon />
-              </ListItemIcon>
-              <ListItemText primary="Assignment" />
-            </ListItemButton>
-          </ListItem>
-        </List>
+        <DrawerItemList />
         <Copyright sx={{ mb: 4 }} />
       </Drawer>
       <Box 
