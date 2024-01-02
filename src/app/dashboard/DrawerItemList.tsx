@@ -9,15 +9,12 @@ import SchoolIcon from '@mui/icons-material/School';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import Link from 'next/link';
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getIdentity } from "./identityHandler";
+import { UserContext } from "./userContext";
 
 export default function DrawerItemList() {
-  const [identity, setIdentity] = useState<string>("")
-
-  useEffect(() => {
-    getIdentity().then(identity => setIdentity(identity))
-  }, [])
+  const { id, identity } = useContext(UserContext)
 
   return (
     <List sx={{ flexGrow: 1 }}>
