@@ -1,43 +1,37 @@
 'use client'
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { Container, Box, Grid, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import * as querystring from "querystring";
 import {getIdentity} from "@/app/dashboard/identityHandler";
 import getCourseOverview, {CourseOverview} from "@/app/dashboard/course/courseOverviewHandler";
-import getHomeworkOverview, {HomeworkOverview} from "@/app/dashboard/homework/homeworkOverView";
+import getHomeworkOverview, {HomeworkOverview, getHomeworkByAccount, processHomeworkArray} from "@/app/dashboard/homework/homeworkOverView";
 import {getId} from "@/app/dashboard/accountIdHandler";
 import Button from "@mui/material/Button";
+import { UserContext } from '../userContext';
 
 const AssignmentCard = ({ assignment }) => {
-  const { name, score, comment, deadline, submit, courseName } = assignment;
-  const isDeadlinePassed = new Date() > deadline;
-  const cardStyle = {
-    padding: "20px",
-    position: "relative",
-    backgroundColor: isDeadlinePassed ? '#33ff99' : "white"
-  };
-
-  return (
+  const { name, grade, comment, deadline, submit, courseName, resubmission, description, passed } = assignment;
+    return (
     <Paper
       elevation={3}
       sx={{
         padding: "20px",
         position: "relative", // 保证这里的值是有效的CSS position属性值
-        backgroundColor: isDeadlinePassed ? "#00aa00" : "white",
+        backgroundColor: passed ? "#00aa00" : "white",
       }}
     >
       <Typography variant="h5" component="h2">
         {name} -- {courseName}
       </Typography>
       <Typography variant="body2">
-        Score: {score || "Not Available"}
+        Score: {grade || "Not Available"}
       </Typography>
       <Typography variant="body2">
         Teacher&apos;s Comment: {comment || "No comment"}
       </Typography>
       <Typography variant="body2">
-        Deadline: {deadline.toLocaleString()} 
+        Deadline: {deadline} 
         {/* {new Date().toLocaleString()} */}
       </Typography>
       <Typography variant="body2">
@@ -54,14 +48,28 @@ export default function AssignmentPage({params, searchParams,}: {
 }) {
     const router = useRouter();
     const [assignments, setAssignments] = useState<HomeworkOverview[]>([])
-    const [identity, setIdentity] = useState<string>("")
+    const { id, identity } = useContext(UserContext)
     useEffect(() => {
-        getId()
-            .then(id => getHomeworkOverview(id))
-            .then(homework => setAssignments(homework))
-        getIdentity()
-            .then(identity => setIdentity(identity))
-    }, [])
+      let tempAssignments: any = [];
+      let tempId = '';
+      let tempIdentity = ''
+    
+      
+      getHomeworkByAccount(id)
+        .then(homework => {
+          tempAssignments = homework; // 暂存作业数据
+          console.log(homework)
+          return processHomeworkArray(tempId, homework, tempIdentity);
+        })
+        .then(processedHomework => {
+          console.log(processedHomework)
+          setAssignments(processedHomework); // 最后一次性更新状态
+        })
+        .catch(error => {
+          console.error('An error occurred:', error);
+        });
+    }, []);
+    
     const courseParam = searchParams['course']; // 获取 'xx' 参数的值
     return (
       <Container component="main" maxWidth="xs" sx={{ minWidth:"55%" }}>
@@ -83,7 +91,7 @@ export default function AssignmentPage({params, searchParams,}: {
                         <Grid item xs={12} key={index}>
                             <Box
                                 onClick={() => router.push(identity === "student" ?
-                                    '/dashboard/homework/submit' : `/dashboard/homework/${assignment.uid}`)}
+                                    `/dashboard/homework/submit?homeworkId=${assignment.id}` : `/dashboard/homework/${assignment.uid}`)}
                                 sx={{ cursor: "pointer" }}>
                                 <AssignmentCard assignment={assignment} />
                             </Box>

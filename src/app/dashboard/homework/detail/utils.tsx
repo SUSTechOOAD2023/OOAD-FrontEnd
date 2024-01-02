@@ -1,6 +1,8 @@
 import React from 'react';
 import Papa from 'papaparse'
 import { SubmitOverView } from '../submit/submitOverView';
+import { HomeworkOverview } from '../homeworkOverView';
+
 export function convertToCSV(data) {
     const separator = ',';
     const keys = Object.keys(data[0]).filter(key => key === 'studentName' || key === 'score' || key === 'comment');
@@ -15,7 +17,18 @@ export function convertToCSV(data) {
 
     return `${headerRow}\n${bodyRows.join('\n')}`;
 }
-
+export function transformHomeworkData(jsonData: any[]): HomeworkOverview[] {
+    return jsonData.map(responseData => ({
+        id: responseData.homeworkId.toString(),
+        name: responseData.homeworkTitle,
+        deadline: responseData.homeworkDdl,
+        courseName: '',
+        resubmission: responseData.allowResubmit | 1,
+        description: responseData.homeworkContent,
+        passed: responseData.passed,
+        classId: responseData.classId
+    }));
+}
 export const handleDownload = (data) => {
     const csvData = convertToCSV(data);
     const blob = new Blob([csvData], { type: 'text/csv' });
@@ -53,10 +66,12 @@ export const updateJsonFromCsv = (csvFile, jsondata) => {
     });
 };
   
+export function getCurrentSecondsFrom2023() {
+    const millisecondsPerSecond = 1000;
+    const startYear = 2023;
 
-export const reviewHomeworks = (submission: SubmitOverView) => {
-    const id = submission.id
-    const bodys: any = {
-        homeworkId: homeworkId
-      }
+    const startMilliseconds = new Date(startYear, 0, 1).getTime();
+    const currentMilliseconds = new Date().getTime();
+    const seconds = Math.floor((currentMilliseconds - startMilliseconds) / millisecondsPerSecond);
+    return seconds;
 }
