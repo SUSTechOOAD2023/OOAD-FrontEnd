@@ -1,21 +1,27 @@
 'use server'
 
 import { getCookie } from "@/cookie"
+import { revalidateTag } from "next/cache";
 
 const debug = process.env.debug
 const path = process.env.path
 
 export async function getId() {
-  console.log("getid");
   if (debug === "true") {
-    return Promise.resolve("1");
+    return "1";
   }
+
 
   const request = new Request(`${path}/account/getID`);
   return getCookie(request)
     .then((response) => fetch(response))
     .then((res) => {
       if (res.ok) {
+        revalidateTag("course")
+        revalidateTag("notice")
+        revalidateTag("students")
+        revalidateTag("teachers")
+        revalidateTag("sas")
         return res.text();
       } else {
         console.log(`Error in getting ID: status code ${res.status}`);

@@ -13,6 +13,7 @@ import {
   Container,
   Typography,
   IconButton,
+  MenuItem,
 } from "@mui/material";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -26,6 +27,7 @@ function InformationBox({
     GroupSize,
     GroupDeadline,
     GroupTeacher,
+    GroupHide,
     onEdit,
     onDelete,
     identity,
@@ -35,23 +37,22 @@ function InformationBox({
     GroupSize: number;
     GroupDeadline: any;
     GroupTeacher: string;
+    GroupHide: number;
     onEdit: (
       editedName: string,
-      editedGroupId: number,
-      editedGroupSize: number,
       editedGroupDeadline: any,
-      editedGroupTeacher: string
+      editedGroupTeacher: string,
+      editedGroupHide: number,
     ) => void;
     onDelete: () => void;
-    identity: number;
+    identity: string;
   }) {
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [editedName, setEditedName] = useState(GroupName);
-    const [editedGroupId, setEditedGroupId] = useState(GroupId);
-    const [editedGroupSize, setEditedGroupSize] = useState(GroupSize);
     const [editedGroupDeadline, setEditedGroupDeadline] = useState(GroupDeadline);
     const [editedGroupTeacher, setEditedGroupTeacher] = useState(GroupTeacher);
+    const [editedGroupHide, setEditedGroupHide] = useState(GroupHide);
     const handleEditClick = () => {
       setOpen(true);
     };
@@ -59,10 +60,9 @@ function InformationBox({
     const handleSaveClick = () => {
       onEdit(
         editedName,
-        editedGroupId,
-        editedGroupSize,
         editedGroupDeadline,
-        editedGroupTeacher
+        editedGroupTeacher,
+        editedGroupHide,
       );
       setOpen(false);
     };
@@ -72,6 +72,7 @@ function InformationBox({
     };
     const handleConfirmDelete = () => {
       onDelete();
+      setOpen2(false);
     };
     const handleClose = () => {
       setOpen(false);
@@ -135,7 +136,7 @@ function InformationBox({
                       left: "260px",
                     }}
                   >
-                    {identity === 1 && (
+                    {(identity === "teacher"|| identity==="admin") && (
                       <IconButton
                         aria-label="fingerprint"
                         onClick={handleDelete}
@@ -152,7 +153,7 @@ function InformationBox({
                       left: "235px",
                     }}
                   >
-                    {identity === 1 && (
+                    { (identity === "teacher"|| identity==="admin") && (
                       <Button variant="text" onClick={handleEditClick}>
                         Edit
                       </Button>
@@ -176,47 +177,25 @@ function InformationBox({
                 />
               </Grid>
               <Grid item xs={12} style={{ marginTop: "10px" }}>
-                <TextField
-                  label="Group ID"
-                  value={editedGroupId}
-                  onChange={(e: { target: { value: string } }) => {
-                    const inputValue = parseInt(e.target.value);
-  
-                    if (!isNaN(inputValue)) {
-                      setEditedGroupId(inputValue);
-                    } else {
-                      setEditedGroupId(0);
-                    }
-                  }}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} style={{ marginTop: "10px" }}>
-                <TextField
-                  label="Teahcer"
-                  value={editedGroupTeacher}
-                  onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                  }) => setEditedGroupTeacher(e.target.value)}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} style={{ marginTop: "10px" }}>
-                <TextField
-                  label="Group Size"
-                  value={editedGroupSize}
-                  onChange={(e: { target: { value: string } }) => {
-                    const inputValue = parseInt(e.target.value);
-  
-                    if (!isNaN(inputValue)) {
-                      setEditedGroupSize(inputValue);
-                    } else {
-                      setEditedGroupSize(0);
-                    }
-                  }}
-                  fullWidth
-                />
-              </Grid>
+              <TextField
+                label="Group Visibility"
+                value={editedGroupHide===1?"Hide":"No hide"}
+                select
+                onChange={(e: { target: { value: string } }) => {
+                  const inputValue = e.target.value;
+
+                  if (inputValue==="Hide") {
+                    setEditedGroupHide(1);
+                  } else {
+                    setEditedGroupHide(0);
+                  }
+                }}
+                fullWidth
+              >
+                <MenuItem value="Hide">Hide</MenuItem>
+                <MenuItem value="No hide">no hide</MenuItem>
+              </TextField>
+            </Grid>
               <Grid item xs={12} style={{ marginTop: "10px" }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker

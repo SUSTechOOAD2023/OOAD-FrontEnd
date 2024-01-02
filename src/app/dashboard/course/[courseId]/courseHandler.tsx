@@ -149,8 +149,6 @@ export async function getNotice(id: string, sid?: string): Promise<Notice[]> {
     ]
   }
 
-  // TODO: verify get notice
-
   const url = sid === undefined
     ? `${path}/notice/Search?classId=${id}`
     : `${path}/notice/studentSearch?classId=${id}&studentId=${sid}`
@@ -179,8 +177,6 @@ export async function deleteNotice(id: string) : Promise<boolean> {
     return true;
   }
 
-  // TODO: verify delete notice
-
   const res = await fetch(`${path}/notice/delete?noticeId=${id}`, {
     cache: "no-store"
   })
@@ -203,8 +199,6 @@ export async function editNotice(payload: NoticeEditInfo): Promise<boolean> {
   if (debug === "true") {
     return true
   }
-
-  // TODO: verify edit notice
 
   const res = await fetch(`${path}/notice/modify`, {
     method: "POST", 
@@ -268,8 +262,6 @@ export async function getVisibleStudents(id: string): Promise<string[]> {
     return ["0", "1", "2", "3"]
   }
 
-  // TODO: verify notice search
-
   const res = await fetch(`${path}/notice/noticeSearch?noticeId=${id}`, {
     method: "POST", 
     next: {
@@ -307,22 +299,22 @@ export async function getStudents(id?: string): Promise<User[]> {
     ]
   }
   
-  const body = {}
-
-  if (id !== undefined) {
-    body["courseId"] = parseInt(id)
-  }
-
-  const res = await fetch(`${path}/relationshipCourse/selectStudent`, {
-    method: "POST", 
-    headers: {
-      'Content-Type': "application/json", 
-    }, 
-    body: JSON.stringify(body), 
-    next: {
-      tags: ["students" + (id ?? "")]
-    }
-  })
+  const res = id === undefined
+    ? await fetch(`${path}/student/listAllStudent`, {
+      next: {
+        tags: ["students"]
+      }
+    })
+    : await fetch(`${path}/relationshipCourse/selectStudent`, {
+      method: "POST", 
+      headers: {
+        'Content-Type': "application/json", 
+      }, 
+      body: JSON.stringify({ courseId: parseInt(id) }), 
+      next: {
+        tags: ["students" + id]
+      }
+    })
 
   if (res.ok) {
     return res.json().then((users): User[] => users.map(user => ({
@@ -375,23 +367,23 @@ export async function getTeachers(id?: string): Promise<User[]> {
       }
     ]
   }
-  
-  const body = {}
 
-  if (id !== undefined) {
-    body["courseId"] = parseInt(id)
-  }
-
-  const res = await fetch(`${path}/relationshipCourse/selectTeacher`, {
-    method: "POST", 
-    headers: {
-      'Content-Type': "application/json", 
-    }, 
-    body: JSON.stringify(body), 
-    next: {
-      tags: ["teachers" + (id ?? "")]
-    }
-  })
+  const res = id === undefined
+    ? await fetch(`${path}/teacher/listAll`, {
+      next: {
+        tags: ["teachers"]
+      }
+    })
+    : await fetch(`${path}/relationshipCourse/selectTeacher`, {
+      method: "POST", 
+      headers: {
+        'Content-Type': "application/json", 
+      }, 
+      body: JSON.stringify({ courseId: parseInt(id) }), 
+      next: {
+        tags: ["teachers" + id]
+      }
+    })
 
   if (res.ok) {
     return res.json().then((users): User[] => users.map(user => ({
@@ -444,32 +436,44 @@ export async function getSAs(id?: string): Promise<User[]> {
       }
     ]
   }
-  
-  const body = {}
 
-  if (id !== undefined) {
-    body["courseId"] = parseInt(id)
-  }
+  if (id === undefined) {
+    const res = await fetch(`${path}/student/listAllSA`, {
+      next: {
+        tags: ["sas"]
+      }
+    })
 
-  const res = await fetch(`${path}/relationshipCourse/selectSA`, {
-    method: "POST", 
-    headers: {
-      'Content-Type': "application/json", 
-    }, 
-    body: JSON.stringify(body), 
-    next: {
-      tags: ["sas" + (id ?? "")]
+    if (res.ok) {
+      return res.json().then((users): User[] => users.map(user => ({
+        id: user.studentId.toString(), 
+        name: user.studentName
+      })))
+    } else {
+      console.log(`Error in getting SA, status code ${res.status}`)
+      return []
     }
-  })
-
-  if (res.ok) {
-    return res.json().then((users): User[] => users.map(user => ({
-      id: user.SAId.toString(), 
-      name: user.SAName
-    })))
   } else {
-    console.log(`Error in getting SA, status code ${res.status}`)
-    return []
+    const res = await fetch(`${path}/relationshipCourse/selectSA`, {
+      method: "POST", 
+      headers: {
+        'Content-Type': "application/json", 
+      }, 
+      body: JSON.stringify({ courseId: parseInt(id) }), 
+      next: {
+        tags: ["sas" + id]
+      }
+    })
+  
+    if (res.ok) {
+      return res.json().then((users): User[] => users.map(user => ({
+        id: user.SAId.toString(), 
+        name: user.SAName
+      })))
+    } else {
+      console.log(`Error in getting SA, status code ${res.status}`)
+      return []
+    }
   }
 }
 
