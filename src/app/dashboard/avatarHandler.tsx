@@ -43,9 +43,9 @@ export async function uploadAvatar(id: string, data: FormData) {
 
   try {
     const res = await fetch(`${path}/upload/userimg?accountID=${id}`, {
-      method: "POST", 
+      method: "POST",
       body: data,
-      headers: noCacheHeader()
+      headers: noCacheHeader() as Headers
     });
 
     revalidateTag("avatar" + id);
