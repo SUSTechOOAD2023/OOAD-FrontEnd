@@ -70,7 +70,7 @@ export async function addCourse(name: string, title: string): Promise<string> {
     return "7"
   }
 
-  const res = await fetch(`${path}/class/new?courseName=${name}&courseTitle=${title}`, {
+  const res = await fetch(`${path}/class/new?shortName=${name}&name=${title}`, {
     method: "POST", 
     cache: "no-store"
   })
@@ -111,8 +111,6 @@ export async function editCourse(payload: CourseEditInfo): Promise<boolean> {
   if (debug === "true") {
     return true
   }
-
-  console.log("payload=" + JSON.stringify(payload))
 
   const res = await fetch(`${path}/class/update`, {
     method: "POST", 
