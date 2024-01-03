@@ -16,6 +16,9 @@ import {
   Pagination,
   Stack,
   MenuItem,
+  ListItemText,
+  ListItem,
+  Select,
 } from "@mui/material";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -28,6 +31,7 @@ import {
   getMy,
   DeleteGroup,
   groupEdit,
+  getSelc,
 } from "./groupHandler";
 import InformationBox from "./InformationBox";
 import { getId } from "../accountIdHandler";
@@ -100,44 +104,74 @@ function InformationBoxesContainer() {
   const [Sizes, setSizes] = useState(5);
   const [editedGroupHide, setEditedGroupHide] = useState(0);
   const [identity, setIdentity] = useState("student");
-
+  const [selectedValues, setSelectedValues] = useState({
+    expired: "-1",
+    valid: "-1",
+    visible: "-1",
+  });
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     let paramA = searchParams.get("course");
     if (paramA === null) paramA = "1";
-    const classid = parseInt(paramA);//maybe need to fix:当没有classid1时出错
+    const classid = parseInt(paramA); //maybe need to fix:当没有classid1时出错
     getCourseOverview("1", "admin").then((getcourse) => {
       const newcourse = getcourse.map((item) => ({
         name: item.name,
         id: parseInt(item.id),
       }));
       setCourse(newcourse);
-      setValue(newcourse.findIndex(item => item.id === classid));
-    }); 
-    Promise.all([getIdentity(), getCourse(classid.toString()), getTeachers(classid.toString())])
-      .then(([identity, getcourse, getteachers]) => {
-        setIdentity(identity);
-        let s = Sizes
-        if (getcourse !== null) {
-          setSizes(getcourse.groupHigh);
-          s = getcourse.groupHigh
-        }
-        const teachers = getteachers.map((item) => item.name).join(",");
-        setTeachers(teachers);
-        getAll(classid).then((getall) => {
-          const newinfo = getall.map((item) => ({
-            GroupTab: item.classId,
-            GroupDeadline: dayjs(item.groupDeadline),
-            GroupId: item.groupId,
-            GroupName: item.groupName,
-            GroupSize: s,
-            GroupTeacher: teachers,
-            GroupHide: 0,
-          }));
-          setInformationBoxes(newinfo);
-        });
-      })
+      setValue(newcourse.findIndex((item) => item.id === classid));
+    });
+    Promise.all([
+      getIdentity(),
+      getCourse(classid.toString()),
+      getTeachers(classid.toString()),
+    ]).then(([identity, getcourse, getteachers]) => {
+      setIdentity(identity);
+      let s = Sizes;
+      if (getcourse !== null) {
+        setSizes(getcourse.groupHigh);
+        s = getcourse.groupHigh;
+      }
+      const teachers = getteachers.map((item) => item.name).join(",");
+      setTeachers(teachers);
+      getAll(classid, identity).then((getall) => {
+        const newinfo = getall.map((item) => ({
+          GroupTab: item.classId,
+          GroupDeadline: dayjs(item.groupDeadline),
+          GroupId: item.groupId,
+          GroupName: item.groupName,
+          GroupSize: s,
+          GroupTeacher: teachers,
+          GroupHide: 0,
+        }));
+        setInformationBoxes(newinfo);
+      });
+    });
   }, []);
+
+  const handleValueChange = (event, option,tabindex: number) => {
+    const newValues = {
+      ...selectedValues,
+      [option]: event.target.value,
+    };
+    
+    setSelectedValues(newValues);
+
+    getSelc(tabindex,newValues.expired,newValues.valid,newValues.visible).then((getall) => {
+      const newinfo = getall.map((item) => ({
+        GroupTab: item.classId,
+        GroupDeadline: dayjs(item.groupDeadline),
+        GroupId: item.groupId,
+        GroupName: item.groupName,
+        GroupSize: Sizes,
+        GroupTeacher: Teachers,
+        GroupHide: 0,
+      }));
+      setInformationBoxes(newinfo);
+    });
+    //need to do
+  };
 
   const addInformationBox = () => {
     setOpen(true);
@@ -156,6 +190,8 @@ function InformationBoxesContainer() {
       groupName: GroupName,
       groupTask: "",
       groupVisible: GroupHide,
+      preName:"",
+      preTime:"",
     });
     if (responseText === "success!") {
       const updatedInformationBoxes = [...informationBoxes];
@@ -186,7 +222,7 @@ function InformationBoxesContainer() {
   ) => {
     setValue(newValue);
     if (open2 === 0) {
-      getAll(course[newValue].id).then((getall) => {
+      getAll(course[newValue].id, identity).then((getall) => {
         const newinfo = getall.map((item) => ({
           GroupTab: item.classId,
           GroupDeadline: dayjs(item.groupDeadline),
@@ -240,14 +276,14 @@ function InformationBoxesContainer() {
     let count = 0;
 
     const handleAllGroupClick = async () => {
-      getAll(tabindex).then((getall) => {
+      getAll(tabindex, identity).then((getall) => {
         const newinfo = getall.map((item) => ({
           GroupTab: item.classId,
           GroupDeadline: dayjs(item.groupDeadline),
           GroupId: item.groupId,
           GroupName: item.groupName,
           GroupSize: Sizes,
-          GroupTeacher: Teachers, 
+          GroupTeacher: Teachers,
           GroupHide: 0,
         }));
         setInformationBoxes(newinfo);
@@ -311,16 +347,65 @@ function InformationBoxesContainer() {
             left: "300px",
           }}
         >
-          {open2 === 1 ? (
+          {identity === "student" && open2 === 1 && (
             <Button variant="text" onClick={handleAllGroupClick}>
               All Group
             </Button>
-          ) : (
+          )}
+          {identity === "student" && open2 === 0 && (
             <Button variant="text" onClick={handleMyGroupClick}>
               My Group
             </Button>
           )}
         </Box>
+
+        {(identity === "teacher" || identity === "admin") && (
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: "10px",
+              left: "320px",
+            }}
+            display="flex"
+            flexDirection="row"
+          >
+            <TextField
+              label="Expired"
+              select
+              value={selectedValues.expired}
+              onChange={(event) => handleValueChange(event, "expired",tabindex)}
+              size="small"
+            >
+              <MenuItem value="1">True</MenuItem>
+              <MenuItem value="0">False</MenuItem>
+              <MenuItem value="-1">None</MenuItem>
+            </TextField>
+            <TextField
+              label="Valid"
+              select
+              value={selectedValues.valid}
+              onChange={(event) => handleValueChange(event, "valid",tabindex)}
+              size="small"
+              sx={{ml: 1}}
+            >
+              <MenuItem value="1">True</MenuItem>
+              <MenuItem value="0">False</MenuItem>
+              <MenuItem value="-1">None</MenuItem>
+            </TextField>
+            <TextField
+              label="Visible"
+              select
+              value={selectedValues.visible}
+              onChange={(event) => handleValueChange(event, "visible",tabindex)}
+              size="small"
+              sx={{ml: 1}}
+            >
+              <MenuItem value="1">True</MenuItem>
+              <MenuItem value="0">False</MenuItem>
+              <MenuItem value="-1">None</MenuItem>
+            </TextField>
+          </Box>
+        )}
         {informationBoxes.map((informationBox, index) => {
           if (
             informationBox.GroupTab === tabindex &&

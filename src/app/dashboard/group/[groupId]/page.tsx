@@ -56,11 +56,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
     { name: "hutaoB", id: "1" },
     { name: "hutaoC", id: "2" },
   ];
-  const pre = [
-    { name: "pre1", time: dayjs() },
-    { name: "pre2", time: dayjs(1000000) },
-  ];
-  const [groupPre, setGroupPre] = useState(pre);
   const [groupMembers, setGroupMembers] = useState(Members);
   const [MembersCount, setMembersCount] = useState(3);
   const [GroupName, setName] = useState("OOAD-1");
@@ -84,7 +79,10 @@ function GroupPage({ params }: { params: { groupId: number } }) {
   const [editedGroupDeadline, setEditedGroupDeadline] = useState(GroupDeadline);
   const [editedGroupTeacher, setEditedGroupTeacher] = useState(GroupTeacher);
   const [editedGroupInfo, setEditedGroupInfo] = useState(GroupInfo);
-  const [editedPre, setEditedPre] = useState(pre);
+  const [PreName, setPreName] = useState("pre");
+  const [Pretime, setPretime] = useState(dayjs());
+  const [editedPreName, setEditedPreName] = useState("pre");
+  const [editedPretime, setEditedPretime] = useState(dayjs());
   const [preindex, setpreindex] = useState(0);
   const [checked, setChecked] = useState<boolean[]>([]);
   const [students, setStudents] = useState(Members);
@@ -102,6 +100,8 @@ function GroupPage({ params }: { params: { groupId: number } }) {
           setGroupId(getinfo.groupId);
           setName(getinfo.groupName);
           setGroupInfo(getinfo.groupTask);
+          setPreName(getinfo.groupPresentation);
+          setPretime(dayjs(getinfo.presentationTime));
           getCourse(getinfo.classId).then((getcourse) => {
             if (getcourse !== null) {
               setGroupMinSize(getcourse.groupLow);
@@ -113,8 +113,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             setGroupTeacher(teachers);
           });
           refresh(parseInt(getid));
-
-          //need to do getpre
         });
       });
     });
@@ -163,14 +161,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
       setGroupMembers(studentinfo);
     });
   };
-  const handleChange = (event) => {
-    const e = event.target.value;
-    if (e === "new") {
-      //need to do
-    } else {
-      setpreindex(e);
-    }
-  };
 
   const handleJoinClick = () => {
     Join(GroupId, myid).then((join) => {
@@ -201,7 +191,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
       }));
       if (identity === "teacher" || identity === "admin")
         s = [...groupMembers, ...s];
-      //need to do students
       setStudents(s);
       generateChecked(groupMembers, s);
       setOpen3(true);
@@ -214,10 +203,12 @@ function GroupPage({ params }: { params: { groupId: number } }) {
   const handleSaveClick = async () => {
     const responseText = await groupEdit(1, {
       classId: 0,
-      groupDeadline: GroupDeadline.format("YYYY-MM-DDThh:mm:ss"),
-      groupName: GroupName,
-      groupTask: GroupInfo,
+      groupDeadline: editedGroupDeadline.format("YYYY-MM-DDThh:mm:ss"),
+      groupName: editedName,
+      groupTask: editedGroupInfo,
       groupVisible: 0,
+      preName: editedPreName,
+      preTime: editedPretime.format("YYYY-MM-DDThh:mm:ss"),
     });
     if (responseText === "success!") {
       setName(editedName);
@@ -227,6 +218,8 @@ function GroupPage({ params }: { params: { groupId: number } }) {
       setGroupDeadline(editedGroupDeadline);
       setGroupTeacher(editedGroupTeacher);
       setGroupInfo(editedGroupInfo);
+      setPreName(editedPreName);
+      setPretime(editedPretime);
       if (MembersCount < GroupMinSize) setAlertDisplay("flex");
     } else {
       console.log("404");
@@ -246,6 +239,10 @@ function GroupPage({ params }: { params: { groupId: number } }) {
   };
   const handleDateChange = (date: any) => {
     setEditedGroupDeadline(date);
+  };
+
+  const handlePreDateChange = (date: any) => {
+    setEditedPretime(date);
   };
 
   const handleDebugClick = () => {
@@ -301,7 +298,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
       width="100%"
       margin="50px auto auto auto"
     >
-      <Box display="flex" flexDirection="column" width="67%" margin="auto">
+      <Box display="flex" flexDirection="column" width="67%" sx={{mb: 1}}>
         <Typography variant="h4" marginTop={2}>
           {GroupName}
         </Typography>
@@ -310,7 +307,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             variant="contained"
             style={{
               position: "absolute",
-              right: 480,
+              right: 420,
               marginTop: 20,
             }}
             size="small"
@@ -358,6 +355,13 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             <Typography variant="body1" marginTop={2}>
               <b>Deadline:</b>{" "}
               {GroupDeadline.format("YYYY-MM-DD")}
+            </Typography>
+            <Typography variant="body1" marginTop={2}>
+              <b>Next Presentation:</b>&nbsp;{PreName}
+            </Typography>
+            <Typography variant="body1" marginTop={2}>
+              <b>Presentation Time:</b>{" "}
+              {Pretime.format("YYYY-MM-DD")}
             </Typography>
             <Typography variant="body1" marginTop={2}>
               <b>Group Task:</b>&nbsp;{GroupInfo}
@@ -445,19 +449,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
           </Grid>
         </Grid>
       </Grid>
-      {1 === 1 && (
-        <Button
-          variant="contained"
-          style={{
-            position: "absolute",
-            right: 20,
-            marginTop: -20,
-          }}
-          onClick={handleDebugClick}
-        >
-          Debug
-        </Button>
-      )}
 
       <Dialog
         open={open}
@@ -495,53 +486,30 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             </Grid>
           </Grid>
           <Grid container spacing={2} style={{ marginTop: "5px" }}>
-            {/* need to do */}
             <Grid item xs={6}>
               <TextField
                 label="pre name"
-                value={editedPre[preindex].name}
-                onChange={(e: { target: { value: string } }) => {
-                  const inputValue = parseInt(e.target.value);
-
-                  if (!isNaN(inputValue)) {
-                    setEditedGroupSize(inputValue);
-                  } else {
-                    setEditedGroupSize(0);
-                  }
-                }}
+                value={editedPreName}
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) => setEditedPreName(e.target.value)}
                 fullWidth
                 disabled={identity === "student"}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack spacing={2}>
                   <DatePicker
                     label="pre time"
-                    defaultValue={editedPre[preindex].time}
+                    defaultValue={editedPretime}
                     minDate={dayjs()}
                     views={["year", "month", "day"]}
-                    onChange={handleDateChange}
+                    onChange={handlePreDateChange}
                     disabled={identity === "student"}
                   />
                 </Stack>
               </LocalizationProvider>
-            </Grid>
-            <Grid item xs={1}>
-              <FormControl sx={{ m: 1 }} variant="standard">
-                <Select
-                  value={preindex}
-                  onChange={handleChange}
-                  input={<BootstrapInput />}
-                >
-                  <MenuItem value={0}>
-                    <em>1st</em>
-                  </MenuItem>
-                  <MenuItem value={1}>2nd</MenuItem>
-                  <MenuItem value={-1}>+</MenuItem>
-                </Select>
-              </FormControl>
-              {/*need to do*/}
             </Grid>
           </Grid>
           <Grid item xs={12} style={{ marginTop: "20px" }}>

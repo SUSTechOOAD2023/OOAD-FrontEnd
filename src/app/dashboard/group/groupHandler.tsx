@@ -10,8 +10,9 @@ interface Group {
   groupName: string;
   groupTask: string;
   groupVisible: number;
+  preName: string;
+  preTime: string;
 }
-
 
 export async function groupEdit(kind: number, param: Group) {
   if (debug === "true") {
@@ -29,6 +30,8 @@ export async function groupEdit(kind: number, param: Group) {
           groupDeadline: param.groupDeadline,
           groupName: param.groupName,
           groupTask: param.groupTask,
+          groupPresentation: param.preName,
+          presentationTime: param.preTime,
         };
 
   const res = await fetch(`${path}/group/update`, {
@@ -54,8 +57,11 @@ export async function groupNew(id: number, name: string, deadline: string) {
   const url = `${path}/group/new?classId=${id}&groupDeadline=${deadline}&groupName=${name}`;
   const res = await fetch(url, {
     method: "POST",
+    cache: "no-store",
   });
   const out = parseInt(await res.text());
+  console.log(out);
+  console.log(res);
   if (res.ok) {
     return out;
   } else {
@@ -70,15 +76,20 @@ export async function getInfo(id: number) {
       groupDeadline: 1684683000000,
       groupId: 4,
       groupName: "aaa",
-      groupSize: 3,
+      groupPresentation: "OOAD答辩",
+      groupSize: 19,
       groupTask: "ML",
+      groupVisible: 1,
+      presentationTime: 1706196780000,
     };
   }
   const url = `${path}/group/list?groupId=${id}`;
   const res = await fetch(url, {
     method: "POST",
+    cache: "no-store",
   });
   const out = await res.json();
+  console.log(out);
   if (res.ok) {
     return out;
   } else {
@@ -86,12 +97,93 @@ export async function getInfo(id: number) {
   }
 }
 
-export async function getAll(id: number) {
+export async function getAll(id: number, identity: string) {
   if (debug === "true") {
-    return true;
+    return [
+      {
+        classId: 1,
+        groupDeadline: 1684683000000,
+        groupId: 4,
+        groupName: "aaa",
+        groupSize: 18,
+        groupTask: "ML",
+      },
+      {
+        classId: 1,
+        groupDeadline: 1705483077000,
+        groupId: 18,
+        groupName: "asdd",
+        groupSize: 0,
+        groupTask: "",
+        groupVisible: 0,
+      },
+      {
+        classId: 1,
+        groupDeadline: 1704159188000,
+        groupId: 23,
+        groupName: "GroupName",
+        groupSize: 0,
+      },
+      {
+        classId: 1,
+        groupDeadline: 1704474640000,
+        groupId: 25,
+        groupName: "Group1",
+        groupSize: 0,
+      },
+    ];
   }
 
-  const url = `${path}/group/selectGroupStatus?classId=${id}`;
+  const url =
+    identity === "student"
+      ? `${path}/group/selectGroupStatus?classId=${id}&expired=0&visible=1`
+      : `${path}/group/selectGroupStatus?classId=${id}`;
+  const res = await fetch(url, {
+    method: "POST",
+    cache: "no-store",
+  });
+  const out = await res.json();
+  console.log("---------------");
+  console.log(out);
+  console.log("---------------");
+  if (out !== null) return out;
+  else return [];
+}
+
+export async function getSelc(
+  id: number,
+  expired: string,
+  valid: string,
+  visible: string
+) {
+  if (debug === "true") {
+    return [
+      {
+        classId: 1,
+        groupDeadline: 1684683000000,
+        groupId: 4,
+        groupName: "aaa",
+        groupSize: 18,
+        groupTask: "ML",
+      },
+      {
+        classId: 1,
+        groupDeadline: 1705483077000,
+        groupId: 18,
+        groupName: "asdd",
+        groupSize: 0,
+        groupTask: "",
+        groupVisible: 0,
+      },
+    ];
+  }
+
+  let url = `${path}/group/selectGroupStatus?classId=${id}`;
+  if (expired !== "-1") url = url + `&expired=${parseInt(expired)}`;
+  if (valid !== "-1") url = url + `&valid=${parseInt(valid)}`;
+  if (visible !== "-1") url = url + `&visible=${parseInt(visible)}`;
+  console.log(expired, valid, visible);
+  console.log(url);
   const res = await fetch(url, {
     method: "POST",
     cache: "no-store",
@@ -142,12 +234,7 @@ export async function Join(groupid: number, id: number) {
   const res = await fetch(url, {
     method: "POST",
     cache: "no-store",
-    
   });
-  console.log("join",groupid,id);
-  console.log("suc");
-  console.log(res)
-  console.log(res.ok);
   return res.ok;
 }
 
@@ -161,9 +248,6 @@ export async function Exit(groupid: number, id: number) {
     method: "POST",
     cache: "no-store",
   });
-  console.log("exit",groupid,id)
-  console.log(res)
-  console.log(res.ok);
   return res.ok;
 }
 
@@ -175,6 +259,7 @@ export async function Invite(groupid: number, recid: number, sendid: number) {
   const url = `${path}/joinGroupInvitation/add?groupId=${groupid}&receiveStudentId=${recid}&sendStudentId=${sendid}`;
   const res = await fetch(url, {
     method: "POST",
+    cache: "no-store",
   });
   console.log(res.ok);
   return res.ok;
@@ -183,7 +268,7 @@ export async function Invite(groupid: number, recid: number, sendid: number) {
 export async function getStudent(groupid: number) {
   if (debug === "true") {
     return [
-      { studentId: 1, studentName: "sending" },
+      { studentId: 2, studentName: "sending" },
       { studentId: 3, studentName: "student8" },
     ];
   }
@@ -194,9 +279,6 @@ export async function getStudent(groupid: number) {
     cache: "no-store",
   });
   const out = await res.json();
-  console.log("---------------");
-  console.log(out);
-  console.log("---------------");
   if (out !== null) return out;
   else return [];
 }
@@ -205,24 +287,21 @@ export interface User {
   id: string;
   name: string;
 }
-export async function getInvites(groupid: number) :Promise<User[]> {
+export async function getInvites(groupid: number) {
   if (debug === "true") {
     return [
-      { id: "7", name: "A" },
-      { id: "8", name: "B" },
-      { id: "9", name: "C" },
+      { studentId: "7", studentName: "A" },
+      { studentId: "8", studentName: "B" },
+      { studentId: "9", studentName: "C" },
     ];
   }
 
-  const url = `${path}/relationshipStudentClassGroup/listStudent?groupId=${groupid}`;
+  const url = `${path}/group/selectStudentNotInGroup?groupId=${groupid}`;
   const res = await fetch(url, {
     method: "POST",
     cache: "no-store",
   });
   const out = await res.json();
-  console.log("---------------");
-  console.log(out);
-  console.log("---------------");
   if (out !== null) return out;
   else return [];
 }
