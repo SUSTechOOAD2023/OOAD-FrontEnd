@@ -13,6 +13,8 @@ import dayjs from 'dayjs';
 import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useRouter } from 'next/navigation';
+import StringArrayComponent from '../../submit/fileSubmits';
+import Chart from '../../Chart';
 
 const now = dayjs()
 
@@ -24,6 +26,7 @@ export default function TeacherInterface({
     const isAdding = searchParams['add'] === 'true'
     const homeworkId = params['homeworkId']
     const [alertDisplay, setAlertDisplay] = useState(false)
+    const [gradeList, setGradeList] = useState([])
     const [homework, setHomework] = useState<HomeworkOverview>({
         name: 'Genshin Homework',
         id: '',
@@ -67,11 +70,17 @@ export default function TeacherInterface({
         // const homework1: HomeworkOverview | null = { ...homework };
         // homework1?.deadline = event.target.value;
     };
+    const [openVis, setOpenVis] = useState(false)
 
 
     const handleDescriptionChange = (event) => {
         // setDescription(event.target.value);
     };
+    const vis = (list) => {
+        const list2 = list.map(value => value.score)
+        setOpenVis(!openVis)
+        setGradeList(list2)
+    }
     const handleSaving = async () => {
         if (isAdding) {
             // await addHomework
@@ -149,6 +158,7 @@ export default function TeacherInterface({
                                     {submission.content}
                                 </Typography>
                                 <Typography variant="h5" sx={{}}>Files Submission:</Typography>
+                                <StringArrayComponent studentId={submission.studentId} homeworkId={homeworkId}></StringArrayComponent>
                                 <TextField
                                     label="Score"
                                     inputProps={{
@@ -169,6 +179,18 @@ export default function TeacherInterface({
                             </AccordionDetails>
                         </Accordion>
                     )))}
+            <Grid container maxWidth="md" justifyContent="center" sx={{ marginTop: 4 }}>
+            <Grid item xs={4}>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={event => vis(submitList)}
+                        sx={{ width: '100%', height: '50px', borderRadius: '20' }}
+                    >
+                        VISUALIZATION score
+                    </Button>
+                </Grid>
+            </Grid>     
             <Grid container maxWidth="md" justifyContent="center" sx={{ marginTop: 4 }}>
                 <Grid item xs={4}>
                     <Button
@@ -240,7 +262,7 @@ export default function TeacherInterface({
                     The uploaded type is wrong!
                 </Alert>
             </Snackbar>
-
+            {openVis && <Chart grade={gradeList}></Chart>}
         </Box>
     );
 }

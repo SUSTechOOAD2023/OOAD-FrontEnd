@@ -91,7 +91,7 @@ export default function AssignmentPage({params, searchParams,}: {
                         <Grid item xs={12} key={index}>
                             <Box
                                 onClick={() => router.push(identity === "student" ?
-                                    `/dashboard/homework/submit?homeworkId=${assignment.id}` : `/dashboard/homework/review/${assignment.uid}`)}
+                                    `/dashboard/homework/submit?homeworkId=${assignment.id}` : `/dashboard/homework/review/${assignment.id}`)}
                                 sx={{ cursor: "pointer" }}>
                                 <AssignmentCard assignment={assignment} />
                             </Box>
@@ -108,7 +108,7 @@ export default function AssignmentPage({params, searchParams,}: {
             </Grid>
             {identity === 'teacher' && (
                 <Grid item xs={12} sx={{ mt: 3}}>
-                    <Button variant="outlined" onClick={() => {router.push('/dashboard/homework/detail?add=true')}}>
+                    <Button variant="outlined" onClick={() => {router.push('/dashboard/homework/add')}}>
                         Add Homework
                     </Button>
                 </Grid>
