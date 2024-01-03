@@ -28,7 +28,7 @@ export async function getTeacherId(id: string) {
     return "1"
   }
 
-  const res = await fetch(`${path}/student/getTeacherID?accountID=${id}`, {
+  const res = await fetch(`${path}/teacher/getTeacherID?accountID=${id}`, {
     method: "POST", 
     next: {
       tags: ["identity"]
