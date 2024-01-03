@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useRouter } from 'next/navigation';
+import StringArrayComponent from '../../submit/fileSubmits';
 
 const now = dayjs()
 
@@ -149,6 +150,7 @@ export default function TeacherInterface({
                                     {submission.content}
                                 </Typography>
                                 <Typography variant="h5" sx={{}}>Files Submission:</Typography>
+                                <StringArrayComponent studentId={submission.studentId} homeworkId={homeworkId}></StringArrayComponent>
                                 <TextField
                                     label="Score"
                                     inputProps={{

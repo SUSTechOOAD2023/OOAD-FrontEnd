@@ -71,7 +71,7 @@ export default function SubmitHomework({
         const currentSecond = getCurrentSecondsFrom2023()
         for (let i = 0; i < files.length; i++) {
             formData.append('file', files[i]);
-            const success = await uploadFile(`${id}/${searchParams["homeworkId"]}/${currentSecond.toString()}/${files[i].name.replace(/\//g, '0')}`, formData);
+            const success = await uploadFile(`${await getStudentId(id)}/${searchParams["homeworkId"]}/${currentSecond.toString()}`, formData);
             console.log(success);
             formData.delete('file');
         }

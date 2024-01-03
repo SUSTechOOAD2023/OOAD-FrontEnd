@@ -19,6 +19,8 @@ export interface HomeworkOverview {
     grade?: number,
     comment?: string,
     classId?: string,
+    type?: string,
+    maxGrade?: number
 }
 const debugValue = [
     {
@@ -124,7 +126,19 @@ export async function searchHomework(homeworkId: string) {
     };
 }
 export async function addHomework(homework: HomeworkOverview) {
-    //TODO
+    const body = {"classId": homework.classId,
+            "name": homework.name ? homework.name : "New Homework"}
+
+    const res = await fetch(`${path}/homework/list`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            homeworkId: homeworkId
+
+        })
+    })
 }
 export async function getMaxScore(studentId: string, homework: HomeworkOverview) {
     const bodys: any = {

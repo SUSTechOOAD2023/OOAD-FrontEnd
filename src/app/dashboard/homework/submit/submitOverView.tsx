@@ -1,5 +1,7 @@
 'use server'
 
+import { revalidateTag } from "next/cache"
+
 const debug = process.env.debug
 const path = process.env.path
 
@@ -10,7 +12,8 @@ export interface SubmitOverView {
     content?: string,
     id: number | null,
     modified?: boolean,
-    submitTime?: string
+    submitTime?: string,
+    studentId: number
 }
 const urls = {
   "all": "/submission/list",
@@ -67,7 +70,8 @@ export default async function getSubmitOverview(studentId: string | null, homewo
                   content: submission.submissionContent,
                   id: submission.submissionId,
                   deadline: submission.homeworkDdl,
-                  modified: false
+                  modified: false,
+                  studentId: submission.studentId
                 };
               });
             return formattedArr;
@@ -154,4 +158,46 @@ export async function reviewSubmission(submissionId: string, submissionScore, su
       console.error('Error in reviewSubmission:', error);
       throw error;
   }
+}
+export async function getFileList(studentId, homeworkId) {
+  try {
+    const response = await fetch(`${path}/download/viewFileNames?fileName=file/${studentId}/${homeworkId}/`);
+      const responseData = await response.json()
+      const datas =responseData.data
+      // console.log(datas)
+      if (!datas || datas.length === 0) return []
+      const maxElement = datas.reduce((max, current) => {
+        if (current > max) {
+          return current;
+        } else {
+          return max;
+        }
+      });
+      const response2 = await fetch(`${path}/download/viewFileNames?fileName=${maxElement}`);
+      console.log(`${path}/download/viewFileNames?fileName=file/${studentId}/${homeworkId}/${maxElement}/`)
+      const responseData2 = await response2.json()
+      const datas2 = responseData2.data
+      console.log(datas2)
+      return datas2
+  } catch (error) {
+      console.error('Error in getFile:', error);
+      throw error;
+  }
+}
+export async function downloadFile(filepath) {
+  try {
+    const response = await fetch(`${path}/download/file?fileName=file/${filepath}`,{
+      next: {
+        tags: ["file" + filepath]
+      }
+    });
+    if (response.ok) {
+      revalidateTag("file" + filepath)
+      const data = await response.json()
+      return data.data.body
+    }
+  }catch (error) {
+    console.error('Error in getFile:', error);
+    throw error;
+}
 }

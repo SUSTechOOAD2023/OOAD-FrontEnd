@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, TextField, Typography, Box, CardContent, Card, Grid, Accordion, AccordionSummary, AccordionDetails, Snackbar, Alert } from '@mui/material';
+import { Button, TextField, Typography, Box, CardContent, Card, Grid, Accordion, AccordionSummary, AccordionDetails, Snackbar, Alert, FormControl, RadioGroup, FormControlLabel, Radio, FormLabel } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Link from "next/link";
 import { addHomework, HomeworkOverview, searchHomework } from "@/app/dashboard/homework/homeworkOverView";
@@ -35,6 +35,11 @@ export default function TeacherInterface({
     const handleChange = (key: keyof HomeworkOverview, value: any) => {
         setHomework({ ...homework, [key]: value });
     };
+    const [homeworkType, setHomeworkType] = useState('individual');
+
+  const handleHomeworkTypeChange = (event) => {
+    setHomeworkType(event.target.value);
+  };
 
     const handleSubmitChange = (index, value, field) => {
         const updateSubmit = [...submitList]
@@ -58,6 +63,7 @@ export default function TeacherInterface({
         // setDescription(event.target.value);
     };
     const handleSaving = async () => {
+        addHomework(homework)
     }
     // console.log(submitList)
     return (
@@ -66,6 +72,7 @@ export default function TeacherInterface({
                 Add Assignment
                 {/* {dayjs(homework.deadline).format('YYYY-MM-DDTHH:mm')} */}
             </Typography>
+            
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-cn">
                 <DateTimePicker
                   label="Due Date"
@@ -86,6 +93,27 @@ export default function TeacherInterface({
             />
 
             <TextField
+                label="Homework Title"
+                type="number"
+                defaultValue={homework.resubmission}
+                sx={{ width: 270, mb: 2, ml: 0 }}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                onChange={resubmissionChange}
+            />
+            <TextField
+                label="Allow Resubmission"
+                type="number"
+                defaultValue={homework.resubmission}
+                sx={{ width: 160, mb: 2, ml: 2 }}
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                onChange={resubmissionChange}
+            />
+
+            <TextField
                 label="Assignment Description"
                 multiline
                 rows={4}
@@ -93,6 +121,18 @@ export default function TeacherInterface({
                 sx={{ width: '100%', mb: 2 }}
                 onChange={handleDescriptionChange}
             />
+            <div>
+      <Typography variant="h5" component="p">
+        Homework Type:
+      </Typography>
+
+      <FormControl component="fieldset">
+        <RadioGroup name="homeworkType" value={homeworkType} onChange={handleHomeworkTypeChange}>
+          <FormControlLabel value="group" control={<Radio />} label="Group Homework" />
+          <FormControlLabel value="individual" control={<Radio />} label="Self Homework" />
+        </RadioGroup>
+      </FormControl>
+    </div>
             <Grid container maxWidth="md" justifyContent="center" sx={{ marginTop: 4 }}>
                 <Grid item xs={4}>
                     <Button
