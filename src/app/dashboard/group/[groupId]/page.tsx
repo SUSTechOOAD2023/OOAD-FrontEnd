@@ -19,7 +19,6 @@ import {
   FormControl,
   Select,
   MenuItem,
-  InputLabel,
   InputBase,
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -35,13 +34,16 @@ import {
   getStudent,
   getInvites,
 } from "../groupHandler";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
+import AddIcon from '@mui/icons-material/Add';
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import ViewList from "../../course/[courseId]/ViewList";
-import { getCourse } from "../../course/[courseId]/courseHandler";
+import { getTeachers, getCourse } from "../../course/[courseId]/courseHandler";
 import { getIdentity } from "../../identityHandler";
 import { styled } from "@mui/material/styles";
 import UserAvatar from "../../UserAvatar";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 export interface User {
   id: string;
@@ -105,6 +107,10 @@ function GroupPage({ params }: { params: { groupId: number } }) {
               setGroupMinSize(getcourse.groupLow);
               setGroupSize(getcourse.groupHigh);
             }
+          });
+          getTeachers(getinfo.classId).then((getteachers) => {
+            const teachers = getteachers.map((item) => item.name).join(", ");
+            setGroupTeacher(teachers);
           });
           refresh(parseInt(getid));
 
@@ -174,18 +180,12 @@ function GroupPage({ params }: { params: { groupId: number } }) {
     });
     setJoin(1);
   };
-  const handleExitClick = async () => {
-    //setExitid(await getId());
-    setExitid(myid);
-    setOpen2(true);
-  };
   const handleConfirmExit = () => {
     Exit(GroupId, exitid).then((exit) => {
       if (exit) {
         refresh();
       }
     });
-    setOpen2(false);
     setOpen5(false);
   };
 
@@ -195,7 +195,10 @@ function GroupPage({ params }: { params: { groupId: number } }) {
 
   const handleInviteClick = () => {
     getInvites(GroupId).then((getinvites) => {
-      let s = getinvites;
+      let s = getinvites.map((item) => ({
+        name: item.studentName,
+        id: item.studentId,
+      }));
       if (identity === "teacher" || identity === "admin")
         s = [...groupMembers, ...s];
       //need to do students
@@ -275,13 +278,14 @@ function GroupPage({ params }: { params: { groupId: number } }) {
   const reflectChecked = (allUser: User[]) => {
     const m = allUser.filter((x, index) => checked[index]);
     if (identity === "teacher" || identity == "admin") {
-      m.map((item)=>{
-        const id=item.id
-        if(!groupMembers.find(item=>item.id===id))Join(GroupId,parseInt(id));
+      m.map((item) => {
+        const id = item.id;
+        if (!groupMembers.find((item) => item.id === id))
+          Join(GroupId, parseInt(id));
       });
-      groupMembers.map((item)=>{
-        const id=item.id
-        if(!m.find(item=>item.id===id))Exit(GroupId,parseInt(id));
+      groupMembers.map((item) => {
+        const id = item.id;
+        if (!m.find((item) => item.id === id)) Exit(GroupId, parseInt(id));
       });
       refresh();
     } else {
@@ -303,7 +307,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
         </Typography>
         {identity === "student" && join === 0 && (
           <Button
-            variant="outlined"
+            variant="contained"
             style={{
               position: "absolute",
               right: 480,
@@ -312,36 +316,9 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             size="small"
             onClick={handleJoinClick}
             disabled={MembersCount >= GroupSize}
+            startIcon={<GroupAddIcon />}
           >
             Join
-          </Button>
-        )}
-        {identity === "student" && join === 1 && (
-          <Button
-            variant="outlined"
-            style={{
-              position: "absolute",
-              right: 480,
-              marginTop: 20,
-            }}
-            onClick={handleExitClick}
-            size="small"
-          >
-            Exit
-          </Button>
-        )}
-        {(identity === "teacher" || identity === "admin" || join === 1) && (
-          <Button
-            variant="outlined"
-            style={{
-              position: "absolute",
-              right: 400,
-              marginTop: 20,
-            }}
-            onClick={handleEditClick}
-            size="small"
-          >
-            Edit
           </Button>
         )}
       </Box>
@@ -353,29 +330,78 @@ function GroupPage({ params }: { params: { groupId: number } }) {
         justifyContent="center"
         style={{ minWidth: "100%" }}
       >
-        <Grid item style={{ width: "40%" }} marginLeft={15} marginTop={2}>
-          <Paper style={{ width: "40%", padding: "10px" }} elevation={3}>
+        <Grid item style={{ width: "50%" }} marginLeft={15} marginTop={2}>
+          <Paper
+            style={{
+              position: "relative",
+              width: "50%",
+              marginLeft: 50,
+              padding: 20,
+              paddingTop: 5,
+              paddingLeft: 30,
+              display: "flex", 
+              flexDirection: "column"
+            }}
+            elevation={3}
+          >
+            <Typography variant="body1" marginTop={2}>
+              <b>Group Teacher:</b>&nbsp;{GroupTeacher}
+            </Typography>
             <Typography
               variant="body1"
               marginTop={2}
               style={{ color: MembersCount < GroupMinSize ? "red" : "inherit" }}
             >
-              &nbsp;&nbsp;&nbsp;Group Size:{MembersCount}/{GroupMinSize}-
-              {GroupSize}
+              <b>Group Size:</b>&nbsp;
+              {MembersCount}/{GroupMinSize}-{GroupSize}
             </Typography>
             <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;Group Teacher:{GroupTeacher}
+              <b>Deadline:</b>{" "}
+              {GroupDeadline.format("YYYY-MM-DD")}
             </Typography>
             <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;Deadline: {GroupDeadline.format("YYYY-MM-DD")}
+              <b>Group Task:</b>&nbsp;{GroupInfo}
             </Typography>
-            <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;{GroupInfo}
-            </Typography>
+
+            <Button
+              component={Link}
+              href={`/dashboard/homework?groupId=${GroupId}`}
+              sx={{
+                mt: 2
+              }}
+            >
+              Assignment
+            </Button>
+            {(identity === "teacher" || identity === "admin" || join === 1) && (
+              <IconButton
+                style={{ position: "absolute", right: "0", bottom: "0" }}
+                aria-label="fingerprint"
+                onClick={handleEditClick}
+                size="small"
+                color="primary"
+              >
+                <EditIcon />
+              </IconButton>
+            )}
           </Paper>
         </Grid>
         <Grid item style={{ width: "40%" }}>
-          <Typography variant="h6">Member:</Typography>
+          <Box display="flex" alignItems="center">
+            <Typography variant="h6">Member</Typography>
+            {(identity === "teacher" ||
+                identity === "admin" ||
+                join === 1) && (
+                <IconButton
+                  aria-label="fingerprint"
+                  onClick={handleInviteClick}
+                  size="medium"
+                  color="primary"
+                  disabled={MembersCount >= GroupSize}
+                >
+                  <AddIcon />
+                </IconButton>
+              )}
+          </Box>
           <Grid container direction="column">
             {groupMembers.map((member, index) => (
               <Grid
@@ -401,10 +427,13 @@ function GroupPage({ params }: { params: { groupId: number } }) {
                   </Typography>
                 </Grid>
                 <Grid item marginLeft={1}>
-                  {(identity === "teacher" || identity === "admin") && (
+                  {(identity === "teacher" ||
+                    identity === "admin" ||
+                    parseInt(member.id) === myid) && (
                     <IconButton
                       aria-label="fingerprint"
                       onClick={() => handleDelete(member.id)}
+                      color="primary"
                       size="small"
                     >
                       <CloseIcon />
@@ -413,26 +442,12 @@ function GroupPage({ params }: { params: { groupId: number } }) {
                 </Grid>
               </Grid>
             ))}
-            <Grid item>
-              {(identity === "teacher" ||
-                identity === "admin" ||
-                join === 1) && (
-                <IconButton
-                  aria-label="fingerprint"
-                  onClick={handleInviteClick}
-                  size="large"
-                  disabled={MembersCount >= GroupSize}
-                >
-                  <AddCircleIcon />
-                </IconButton>
-              )}
-            </Grid>
           </Grid>
         </Grid>
       </Grid>
       {1 === 1 && (
         <Button
-          variant="outlined"
+          variant="contained"
           style={{
             position: "absolute",
             right: 20,
@@ -443,20 +458,6 @@ function GroupPage({ params }: { params: { groupId: number } }) {
           Debug
         </Button>
       )}
-
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        width="60%"
-        margin="auto"
-        component={Link}
-        href={`/dashboard/homework/submit`}
-      >
-        <Typography variant="body1" marginTop={2}>
-          Our Assignment
-        </Typography>
-      </Box>
 
       <Dialog
         open={open}
@@ -619,7 +620,9 @@ function GroupPage({ params }: { params: { groupId: number } }) {
 
       <Dialog open={open5} onClose={handleClose5}>
         <DialogTitle>
-          Are you sure you want to kick this student out of the group?
+          {identity === "student"
+            ? "Are you sure you want to quit this group?"
+            : "Are you sure you want to kick this student out of the group?"}
         </DialogTitle>
         <DialogActions>
           <Button variant="text" onClick={handleConfirmExit}>
