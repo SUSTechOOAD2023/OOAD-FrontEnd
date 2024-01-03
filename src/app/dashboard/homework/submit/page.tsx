@@ -6,7 +6,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import {uploadFile, uploadFiles} from "@/app/dashboard/fileHandler";
 import {id} from "postcss-selector-parser";
 import {getId} from "@/app/dashboard/accountIdHandler";
-import { getClassById } from '../homeworkOverView';
+import { getClassById, getGroup } from '../homeworkOverView';
 import { getHomeworkById } from '../homeworkHandler';
 import { UserContext } from '../../userContext';
 import { submitHomework } from './submitOverView';
@@ -52,6 +52,7 @@ export default function SubmitHomework({
         if (x.homeworkContent) setDescription(x.homeworkContent);
         if (x.homeworkDdl) setDueDate(x.homeworkDdl);
         if (x.homeworkTitle) setTitle(x.homeworkTitle)
+        if (x.homeworkType !== "individual") setHomeworkType("group")
       }
     )
   }, [])
@@ -71,11 +72,11 @@ export default function SubmitHomework({
         const currentSecond = getCurrentSecondsFrom2023()
         for (let i = 0; i < files.length; i++) {
             formData.append('file', files[i]);
-            const success = await uploadFile(`${id}/${searchParams["homeworkId"]}/${currentSecond.toString()}/${files[i].name.replace(/\//g, '0')}`, formData);
+            const success = await uploadFile(`${await getStudentId(id)}/${searchParams["homeworkId"]}/${currentSecond.toString()}`, formData);
             console.log(success);
             formData.delete('file');
         }
-        submitHomework(searchParams["homeworkId"], content, homeworkType === 'individual' ? await getStudentId(id) : null, homeworkType === 'individual' ? null : "0")
+        submitHomework(searchParams["homeworkId"], content, homeworkType === 'individual' ? await getStudentId(id) : await getGroup(id, searchParams["homeworkId"]), homeworkType === 'individual' ? null : "0")
         router.push("/dashboard")
     };
 
