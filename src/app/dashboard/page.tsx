@@ -60,7 +60,7 @@ export default function MainPage() {
               flexDirection: "column", 
             }}
           >
-            <DailyNew />
+            <DailyNew id={studentId}/>
           </Paper>
         </Grid>
       </Grid>
