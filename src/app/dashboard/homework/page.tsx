@@ -51,23 +51,26 @@ export default function AssignmentPage({params, searchParams,}: {
     const { id, identity } = useContext(UserContext)
     useEffect(() => {
       let tempAssignments: any = [];
-      let tempId = '';
+      let tempId = id;
       let tempIdentity = ''
     
-      
-      getHomeworkByAccount(id)
+      getIdentity().then(r => {
+        tempIdentity = r
+        getHomeworkByAccount(id)
         .then(homework => {
           tempAssignments = homework; // 暂存作业数据
-          console.log(homework)
+          // console.log(homework)
+          // console.log(222)
           return processHomeworkArray(tempId, homework, tempIdentity);
         })
         .then(processedHomework => {
-          console.log(processedHomework)
+          // console.log(processedHomework)
           setAssignments(processedHomework); // 最后一次性更新状态
         })
         .catch(error => {
           console.error('An error occurred:', error);
-        });
+        });})
+      
     }, []);
     
     const courseParam = searchParams['course']; // 获取 'xx' 参数的值

@@ -94,6 +94,7 @@ export const submitHomework = async (homeworkId, submissionContent, studentId: a
 
   // Prepare the body of the request
   const body: any = {
+      studentName: String(studentId),
       homeworkId: homeworkId,
       submissionContent: submissionContent
   };
@@ -104,6 +105,7 @@ export const submitHomework = async (homeworkId, submissionContent, studentId: a
   } else {
       body.groupId = groupId;
   }
+  console.log(body)
 
   try {
       const response = await fetch(`${path}/submission/new`, {

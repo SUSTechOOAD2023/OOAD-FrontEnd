@@ -76,6 +76,7 @@ export default function TeacherInterface({
 };
 
     const handleSaving = async () => {
+        console.log(homework)
         addHomework(homework)
     }
     // console.log(submitList)
@@ -124,7 +125,7 @@ export default function TeacherInterface({
                 onChange={r => handleHomeworkChange(r, "maxGrade")}
             />
             <AssignmentDropdown assignments={course} 
-            onSelectAssignment={(r) => setSelectHomework(r)} ></AssignmentDropdown>
+            onSelectAssignment={(r) => {setSelectHomework(r); handleHomeworkChange(r.courseId, "classId"); console.log(homework)}}></AssignmentDropdown>
 
             <TextField
                 label="Assignment Description"

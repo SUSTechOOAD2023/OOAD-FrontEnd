@@ -150,7 +150,7 @@ export default function TeacherInterface({
                                 aria-controls="panel1a-content"
                                 id="panel1a-header"
                             >
-                                <Typography>{submission.studentName}</Typography>
+                                <Typography>Student {submission.studentId}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Typography variant="h5" sx={{}}>Text Submission:</Typography>
