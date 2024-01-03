@@ -8,6 +8,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import SchoolIcon from '@mui/icons-material/School';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import ChatIcon from '@mui/icons-material/Chat';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from "react";
 import { getIdentity } from "./identityHandler";
@@ -44,6 +45,14 @@ export default function DrawerItemList() {
             <AssignmentIcon />
           </ListItemIcon>
           <ListItemText primary="Assignment" />
+        </ListItemButton>
+      </ListItem>
+      <ListItem key="Board" disablePadding>
+        <ListItemButton component={Link} href='/dashboard/chat'>
+          <ListItemIcon>
+            <ChatIcon />
+          </ListItemIcon>
+          <ListItemText primary="Board" />
         </ListItemButton>
       </ListItem>
     </List>
