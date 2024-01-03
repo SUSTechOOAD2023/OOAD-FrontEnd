@@ -4,14 +4,15 @@ import { Button, TextField, Typography, Box, CardContent, Card, Grid, Accordion,
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Link from "next/link";
 import { addHomework, HomeworkOverview, searchHomework } from "@/app/dashboard/homework/homeworkOverView";
-import getSubmitOverview, { SubmitOverView } from "@/app/dashboard/homework/submit/submitOverView";
+import getSubmitOverview, { SubmitOverView, reviewSubmission } from "@/app/dashboard/homework/submit/submitOverView";
 import { getId } from "@/app/dashboard/accountIdHandler";
 import { hidden } from "next/dist/lib/picocolors";
-import { handleDownload, updateJsonFromCsv } from '../detail/utils';
-import { getStudentId } from '../../identityIdHandler';
+import { handleDownload, handleKeyPress, updateJsonFromCsv } from '../../detail/utils';
+import { getStudentId } from '../../../identityIdHandler';
 import dayjs from 'dayjs';
 import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useRouter } from 'next/navigation';
 
 const now = dayjs()
 
@@ -19,6 +20,7 @@ export default function TeacherInterface({
     params,
     searchParams,
 }) {
+    const router = useRouter();
     const isAdding = searchParams['add'] === 'true'
     const homeworkId = params['homeworkId']
     const [alertDisplay, setAlertDisplay] = useState(false)
@@ -44,7 +46,7 @@ export default function TeacherInterface({
     const handleChange = (key: keyof HomeworkOverview, value: any) => {
         setHomework({ ...homework, [key]: value });
     };
-    console.log(isAdding)
+    // console.log(isAdding)
     // const [dueDate, setDueDate] = useState('2023-12-01T23:59:59');
     // const [description, setDescription] = useState('Play Genshin for 3 hours');
     // const [resubmission, setResubmission] = useState(6);
@@ -74,8 +76,24 @@ export default function TeacherInterface({
         if (isAdding) {
             // await addHomework
         }
+        else {
+            const handleReview = async (submission) => {
+                try {
+                    await reviewSubmission(submission.id, submission.score, submission.comment);
+                    console.log(`Reviewed submission with ID: ${submission.id}`);
+                } catch (error) {
+                    console.error(`Error reviewing submission with ID: ${submission.id}`, error);
+                }
+            };
+            submitList.forEach(submission => {
+                if (submission.modified) {
+                    handleReview(submission);
+                }
+            })
+            router.push("/dashboard")
+        }
     }
-
+    // console.log(submitList)
     return (
         <Box sx={{ maxWidth: 500, margin: 'auto', mt: 5 }}>
             <Typography variant="h4" gutterBottom>
@@ -89,14 +107,6 @@ export default function TeacherInterface({
                   onChange={handleDueDateChange}
                   minDateTime={now}
                 />
-            {/* <DateCalendar
-                label="Due Date"
-                type="datetime-local"
-                defaultValue={.format('YYYY-MM-DDTHH:mm')}
-                // defaultValue={`${homework.deadline.getFullYear()}-${(homework.deadline.getMonth() + 1).toString().padStart(2, '0')}-${homework.deadline.getDate().toString().padStart(2, '0')}T${homework.deadline.getHours().toString().padStart(2, '0')}:${homework.deadline.getMinutes().toString().padStart(2, '0')}`}
-                sx={{ width: 300, mb: 2 }}
-                onChange={handleDueDateChange}
-            /> */}
             </LocalizationProvider>
             <TextField
                 label="Allow Resubmission"
@@ -138,8 +148,12 @@ export default function TeacherInterface({
                                 <Typography>
                                     {submission.content}
                                 </Typography>
+                                <Typography variant="h5" sx={{}}>Files Submission:</Typography>
                                 <TextField
                                     label="Score"
+                                    inputProps={{
+                                        onKeyPress: handleKeyPress,
+                                      }}
                                     type="number"
                                     value={submission.score}
                                     onChange={(e) => handleSubmitChange(index, e.target.value, "score")}
@@ -163,7 +177,7 @@ export default function TeacherInterface({
                         onClick={event => handleDownload(submitList)}
                         sx={{ width: '100%', height: '50px', borderRadius: '20' }}
                     >
-                        Download csv Template
+                        Form Template
                     </Button>
                 </Grid>
                 <Grid item xs={4}>
@@ -173,7 +187,7 @@ export default function TeacherInterface({
                         onClick={event => { fileInput.current.click() }}
                         sx={{ width: '100%', height: '50px', borderRadius: '20', ml: 2 }}
                     >
-                        Upload csv
+                        Upload Form
                     </Button>
                 </Grid>
             </Grid>
@@ -210,7 +224,9 @@ export default function TeacherInterface({
                 <Grid item xs={4}>
                     <Button
                         variant="contained" color="primary"
-                        sx={{ width: '100%', height: '50px', borderRadius: '20' }}>
+                        sx={{ width: '100%', height: '50px', borderRadius: '20', mb: 2 }}
+                        onClick={handleSaving}
+                        >
                         {isAdding ? 'ADD' : 'SAVE'}
                     </Button>
                 </Grid>

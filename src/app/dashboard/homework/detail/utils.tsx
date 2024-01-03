@@ -75,3 +75,10 @@ export function getCurrentSecondsFrom2023() {
     const seconds = Math.floor((currentMilliseconds - startMilliseconds) / millisecondsPerSecond);
     return seconds;
 }
+export const handleKeyPress = (event) => {
+    const keyCode = event.keyCode || event.which;
+    const isValid = keyCode >= 48 && keyCode <= 57; // 检查字符编码是否为数字的范围
+    if (!isValid) {
+      event.preventDefault(); // 阻止默认的按键行为
+    }
+  };

@@ -117,7 +117,7 @@ export async function searchHomework(homeworkId: string) {
     return {
         id: responseData2.classId.toString(),
         name: responseData2.homeworkTitle,
-        deadline: new Date(responseData2.homeworkDdl),
+        deadline: new Date(responseData2.homeworkDdl).toLocaleString(),
         courseName: '',
         resubmission: responseData2.allowResubmit | 1,
         description: responseData2.homeworkContent
