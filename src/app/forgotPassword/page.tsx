@@ -20,6 +20,7 @@ import Alert from '@mui/material/Alert';
 import MenuItem from '@mui/material/MenuItem';
 import { checkCaptcha, getCaptcha } from './forgotPasswordHandler';
 import { ErrorSnackBar } from '../dashboard/course/ErrorSnackBar';
+import { validateEmail, validatePassword } from '../dashboard/validation';
 
 export default function ForgotPasswordPage() {
   const [sendTime, setSendTime] = useState<Dayjs>(dayjs("1970-01-01"))
@@ -37,13 +38,25 @@ export default function ForgotPasswordPage() {
       email: data.get("email"),
       identity: data.get("identity"), 
       captcha: data.get("captcha"), 
-      password: data.get("password")
+      password: data.get("password"), 
+      repeatPassword: data.get("repeat-password")
     });
     const email = data.get("email")?.toString()
     const identity = data.get("identity")?.toString()
     const captcha = data.get("captcha")?.toString()
     const password = data.get("password")?.toString()
+    const repeatPassword = data.get("repeat-password")?.toString()
     if (email && identity && captcha && password) {
+      if (password !== repeatPassword) {
+        setErrorMsg("Passwords do not match!")
+        setSnackBarOpen(true)
+        return
+      }
+      if (!validatePassword(password)) {
+        setErrorMsg("Password must be between 6 and 20 characters.")
+        setSnackBarOpen(true)
+        return
+      }
       checkCaptcha(email, identity, password, captcha)
         .then(response => {
           if (response === "Password is reset successfully!") {
@@ -141,6 +154,16 @@ export default function ForgotPasswordPage() {
                 type="password"
                 name="password"
                 autoComplete="new-password"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="repeat-password"
+                label="Repeat Password"
+                type="password"
+                id="repeat-password"
+                autoComplete="new-password"
                 autoFocus
               />
             </>
@@ -153,6 +176,9 @@ export default function ForgotPasswordPage() {
               const currentTime = dayjs()
               if (sendTime.add(1, "m").isAfter(currentTime)) {
                 setErrorMsg("There must be 60 seconds between two sendings!")
+                setSnackBarOpen(true)
+              } else if (!validateEmail(email)) {
+                setErrorMsg("Email address must be valid!")
                 setSnackBarOpen(true)
               } else {
                 setSendTime(currentTime)
