@@ -68,11 +68,16 @@ export default function TeacherInterface({
         // const homework1: HomeworkOverview | null = { ...homework };
         // homework1?.deadline = event.target.value;
     };
+    const [openVis, setOpenVis] = useState(false)
 
 
     const handleDescriptionChange = (event) => {
         // setDescription(event.target.value);
     };
+    const vis = (list) => {
+        const list2 = list.map(value => value.score)
+        setOpenVis(!setOpenVis)
+    }
     const handleSaving = async () => {
         if (isAdding) {
             // await addHomework
@@ -171,6 +176,18 @@ export default function TeacherInterface({
                             </AccordionDetails>
                         </Accordion>
                     )))}
+            <Grid container maxWidth="md" justifyContent="center" sx={{ marginTop: 4 }}>
+            <Grid item xs={4}>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={event => vis(submitList)}
+                        sx={{ width: '100%', height: '50px', borderRadius: '20' }}
+                    >
+                        VISUALIZATION score
+                    </Button>
+                </Grid>
+            </Grid>     
             <Grid container maxWidth="md" justifyContent="center" sx={{ marginTop: 4 }}>
                 <Grid item xs={4}>
                     <Button

@@ -1,9 +1,9 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, TextField, Typography, Box, CardContent, Card, Grid, Accordion, AccordionSummary, AccordionDetails, Snackbar, Alert, FormControl, RadioGroup, FormControlLabel, Radio, FormLabel } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Link from "next/link";
-import { addHomework, HomeworkOverview, searchHomework } from "@/app/dashboard/homework/homeworkOverView";
+import { addHomework, getTeacherClass, HomeworkOverview, searchHomework } from "@/app/dashboard/homework/homeworkOverView";
 import getSubmitOverview, { SubmitOverView, reviewSubmission } from "@/app/dashboard/homework/submit/submitOverView";
 import { getId } from "@/app/dashboard/accountIdHandler";
 import { hidden } from "next/dist/lib/picocolors";
@@ -12,6 +12,8 @@ import dayjs from 'dayjs';
 import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useRouter } from 'next/navigation';
+import { UserContext } from '../../userContext';
+import AssignmentDropdown from '../teacherAssignments';
 
 const now = dayjs()
 
@@ -21,17 +23,27 @@ export default function TeacherInterface({
 }) {
     const router = useRouter();
     const homeworkId = params['homeworkId']
+    const [course, setCourse] = useState([])
+    const [courseIds, setCourseIds] = useState([])
     const [alertDisplay, setAlertDisplay] = useState(false)
+    const {id, identity} = useContext(UserContext);
+    useEffect(() => {
+        getTeacherClass(id).then(r => {
+            setCourse(r.map(i => ({courseName: i.courseName, courseId: i.classId})))
+        })
+    }, [])
     const [homework, setHomework] = useState<HomeworkOverview>({
-        name: '',
+        name: 'New Homework',
         id: '',
         deadline: '',
         courseName: '',
         resubmission: 1,
         description: '',
+        maxGrade: 100
     });
     const [submitList, setSubmitList] = useState<SubmitOverView[]>([])
     const fileInput = useRef(null);
+    const [selectHomework, setSelectHomework] = useState(null)
     const handleChange = (key: keyof HomeworkOverview, value: any) => {
         setHomework({ ...homework, [key]: value });
     };
@@ -41,27 +53,28 @@ export default function TeacherInterface({
     setHomeworkType(event.target.value);
   };
 
-    const handleSubmitChange = (index, value, field) => {
-        const updateSubmit = [...submitList]
-        if (field === 'score') updateSubmit[index].score = value
-        else if (field === 'comment') updateSubmit[index].comment = value
-        else if (field === 'content') updateSubmit[index].content = value
-        updateSubmit[index].modified = true
-        setSubmitList(updateSubmit)
+  const handleHomeworkChange = (eventOrValue, field) => {
+    let newValue;
+
+    // 检查传入的第一个参数是事件对象还是直接的值
+    if (eventOrValue && eventOrValue.target) {
+        // 如果是事件对象，从event.target.value中获取值
+        newValue = eventOrValue.target.value;
+    } else {
+        // 否则，直接使用传入的值
+        newValue = eventOrValue;
     }
-    const resubmissionChange = (event) => {
-        // setResubmission(event.target.value)
-    }
 
-    const handleDueDateChange = (event) => {
-        // const homework1: HomeworkOverview | null = { ...homework };
-        // homework1?.deadline = event.target.value;
-    };
+    // 创建状态的副本
+    let newHomework = { ...homework };
 
+    // 更新副本
+    newHomework[field] = newValue;
 
-    const handleDescriptionChange = (event) => {
-        // setDescription(event.target.value);
-    };
+    // 使用setState更新状态
+    setHomework(newHomework);
+};
+
     const handleSaving = async () => {
         addHomework(homework)
     }
@@ -77,41 +90,41 @@ export default function TeacherInterface({
                 <DateTimePicker
                   label="Due Date"
                   value={dayjs(homework.deadline)}
-                  onChange={handleDueDateChange}
-                  minDateTime={now}
+                  onChange={r => handleHomeworkChange(r, "deadline")}
                 />
             </LocalizationProvider>
             <TextField
                 label="Allow Resubmission"
                 type="number"
-                defaultValue={homework.resubmission}
+                value={homework.resubmission}
                 sx={{ width: 180, mb: 2, ml: 2 }}
                 InputLabelProps={{
                     shrink: true,
                 }}
-                onChange={resubmissionChange}
+                onChange={r => handleHomeworkChange(r, "resubmission")}
             />
 
             <TextField
                 label="Homework Title"
-                type="number"
-                defaultValue={homework.resubmission}
+                value={homework.name}
                 sx={{ width: 270, mb: 2, ml: 0 }}
                 InputLabelProps={{
                     shrink: true,
                 }}
-                onChange={resubmissionChange}
+                onChange={r => handleHomeworkChange(r, "name")}
             />
             <TextField
-                label="Allow Resubmission"
+                label="Points possible"
                 type="number"
-                defaultValue={homework.resubmission}
+                value={homework.maxGrade}
                 sx={{ width: 160, mb: 2, ml: 2 }}
                 InputLabelProps={{
                     shrink: true,
                 }}
-                onChange={resubmissionChange}
+                onChange={r => handleHomeworkChange(r, "maxGrade")}
             />
+            <AssignmentDropdown assignments={course} 
+            onSelectAssignment={(r) => setSelectHomework(r)} ></AssignmentDropdown>
 
             <TextField
                 label="Assignment Description"
@@ -119,7 +132,7 @@ export default function TeacherInterface({
                 rows={4}
                 value={homework.description}
                 sx={{ width: '100%', mb: 2 }}
-                onChange={handleDescriptionChange}
+                onChange={r => handleHomeworkChange(r, "description")}
             />
             <div>
       <Typography variant="h5" component="p">
@@ -127,7 +140,7 @@ export default function TeacherInterface({
       </Typography>
 
       <FormControl component="fieldset">
-        <RadioGroup name="homeworkType" value={homeworkType} onChange={handleHomeworkTypeChange}>
+        <RadioGroup name="homeworkType" value={homework.type} onChange={r => handleHomeworkChange(r, "type")}>
           <FormControlLabel value="group" control={<Radio />} label="Group Homework" />
           <FormControlLabel value="individual" control={<Radio />} label="Self Homework" />
         </RadioGroup>
