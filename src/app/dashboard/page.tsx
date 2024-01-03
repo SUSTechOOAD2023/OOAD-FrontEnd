@@ -49,7 +49,7 @@ export default function MainPage() {
               flexDirection: "column", 
             }}
           >
-            <DeadlineCalendar />
+            <DeadlineCalendar id={studentId}/>
           </Paper>
         </Grid>
         <Grid item xs={12}>

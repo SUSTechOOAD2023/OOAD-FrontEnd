@@ -20,6 +20,7 @@ import {
 import CourseCard from './CourseCard';
 import { ErrorSnackBar } from './ErrorSnackBar';
 import { UserContext } from '../userContext';
+import { getStudentId, getTeacherId } from '../identityIdHandler';
 
 export default function CoursePage() {
   const [snackBarOpen, setSnackBarOpen] = useState<boolean>(false)
@@ -28,7 +29,12 @@ export default function CoursePage() {
   const { id, identity } = useContext(UserContext)
 
   useEffect(() => {
-    getCourseOverview(id, identity)
+    (identity === "admin"
+      ? Promise.resolve(id)
+      : identity === "student"
+        ? getStudentId(id)
+        : getTeacherId(id))
+      .then(id => getCourseOverview(id, identity))
       .then(courses => setCourses(courses))
   }, [])
 

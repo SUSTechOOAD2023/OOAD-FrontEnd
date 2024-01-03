@@ -9,7 +9,10 @@ export async function getStudentId(id: string) {
   }
 
   const res = await fetch(`${path}/student/getStudentID?accountID=${id}`, {
-    method: "POST"
+    method: "POST", 
+    next: {
+      tags: ["identity"]
+    }
   })
 
   if (res.ok) {
@@ -26,7 +29,10 @@ export async function getTeacherId(id: string) {
   }
 
   const res = await fetch(`${path}/student/getTeacherID?accountID=${id}`, {
-    method: "POST"
+    method: "POST", 
+    next: {
+      tags: ["identity"]
+    }
   })
 
   if (res.ok) {

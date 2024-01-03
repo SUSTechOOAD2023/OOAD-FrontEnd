@@ -17,6 +17,7 @@ export async function getId() {
     .then((response) => fetch(response))
     .then((res) => {
       if (res.ok) {
+        revalidateTag("identity")
         revalidateTag("course")
         revalidateTag("notice")
         revalidateTag("students")

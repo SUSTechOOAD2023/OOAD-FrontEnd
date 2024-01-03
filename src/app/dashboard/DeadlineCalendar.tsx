@@ -9,37 +9,16 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
+import { DeadlineInfo, getDeadline } from "./dashboardHandler";
+import Link from "next/link";
 
 const now = dayjs()
-const notesOnDays = [
-  {
-    day: 2, 
-    name: "Assignment 1", 
-    author: "OOAD"
-  }, 
-  {
-    day: 14, 
-    name: "Assignment 2", 
-    author: "OOAD"
-  }, 
-  {
-    day: 14, 
-    name: "Assignment 3", 
-    author: "OOAD"
-  }, 
-  {
-    day: 22, 
-    name: "Assignment 4", 
-    author: "OOAD"
-  }, 
-]
-type notesType = typeof notesOnDays
 
-function ServerDay(props: PickersDayProps<Dayjs> & { notesOnDays?: notesType }) {
+function ServerDay(props: PickersDayProps<Dayjs> & { notesOnDays?: DeadlineInfo[] }) {
   const { notesOnDays = [], day, outsideCurrentMonth, ...other } = props;
 
   const isOutside = props.outsideCurrentMonth 
-  const numOfDays = notesOnDays.filter(x => x.day === props.day.date()).length
+  const numOfDays = notesOnDays.filter(x => x.homeworkDdl.date() === props.day.date()).length
 
   return (
     <Badge
@@ -57,8 +36,18 @@ function ServerDay(props: PickersDayProps<Dayjs> & { notesOnDays?: notesType }) 
   );
 }
 
-export default function DeadlineCalendar() {
+export default function DeadlineCalendar({ id }: { id: string }) {
   const [date, setDate] = useState<Dayjs | null>(now)
+  const [deadline, setDeadline] = useState<DeadlineInfo[]>([])
+
+  useEffect(() => {
+    if (id) {
+      getDeadline(id).then(all => setDeadline(all.map(homework => ({
+        ...homework, 
+        homeworkDdl: dayjs(homework.homeworkDdl)
+      }))))
+    }
+  }, [id])
 
   return (
     <>  
@@ -67,6 +56,7 @@ export default function DeadlineCalendar() {
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="zh-cn">
         <DateCalendar 
+          minDate={now}
           value={date}
           onChange={(value) => setDate(value)}
           slots={{
@@ -74,8 +64,8 @@ export default function DeadlineCalendar() {
           }}
           slotProps={{
             day: {
-              notesOnDays
-            } as any
+              notesOnDays: deadline.filter(homework => homework.homeworkDdl.isSame(date, "month"))
+            }
           }}
           sx={{
             m: 0, 
@@ -83,25 +73,39 @@ export default function DeadlineCalendar() {
           }}
         />
       </LocalizationProvider>
-      {notesOnDays.filter(x => x.day === date?.date()).length > 0 && <Divider />}
+      {deadline.filter(x => x.homeworkDdl.isSame(date, "day")).length > 0 && <Divider />}
       <Stack
         divider={<Divider />}
       >
-        {notesOnDays.map((value => {
-          if (value.day === date?.date()) {
+        {deadline.map((value => {
+          if (value.homeworkDdl.isSame(date, "day")) {
             return (
               <Box 
-                key={`deadline-${value.name}`} 
+                key={value.homeworkId} 
                 display="flex" 
                 alignItems="center" 
                 justifyContent="space-between"
                 height={40}
               >
-                <Typography color="text.primary">
-                  {value.name}
+                <Typography 
+                  component={Link} 
+                  href={`/dashboard/homework/${value.homeworkId}`}
+                  color="text.primary"
+                  sx={{
+                    textDecoration: "none"
+                  }}
+                >
+                  {value.homeworkTitle}
                 </Typography>
-                <Typography color="text.secondary">
-                  {value.author}
+                <Typography 
+                  component={Link} 
+                  href={`/dashboard/course/${value.classId}`}
+                  color="text.secondary"
+                  sx={{
+                    textDecoration: "none"
+                  }}
+                >
+                  {value.courseName}
                 </Typography>
               </Box>
             )
