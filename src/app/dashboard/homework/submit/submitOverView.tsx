@@ -64,7 +64,7 @@ export default async function getSubmitOverview(studentId: string | null, homewo
             // const jsonArr = JSON.parse(responseData)
             const formattedArr = responseData.map((submission) => {
                 return {
-                  studentName: submission.studentName,
+                  studentName: submission.studentName === null ? submission.studentName : submission.groupName,
                   score: submission.submissionScore,
                   comment: submission.submissionComment || "",
                   content: submission.submissionContent,
