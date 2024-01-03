@@ -70,3 +70,105 @@ export async function getDeadline(id: string): Promise<DeadlineInfo[]> {
     return []
   }
 }
+
+export interface HomeworkEvent {
+  homeworkId: number, 
+  homeworkTitle: string, 
+  classId: number, 
+  courseName: string
+}
+
+export interface ReceiveInvitationEvent {
+  groupId: number, 
+  groupName: string, 
+  sendStudentId: number, 
+  sendStudentName: string, 
+  joinGroupInvitationId: number
+}
+
+export interface SendInvitationEvent {
+  groupId: number, 
+  groupName: string, 
+  receiveStudentId: number, 
+  receiveStudentName: string, 
+}
+
+export interface HomeworkReviewEvent {
+  homeworkId: number, 
+  homeworkName: string, 
+  submissionScore: number
+}
+
+export interface NoticeEvent {
+  classId: number, 
+  classShortName: string, 
+  noticeTitle: string
+}
+
+export type EventType = HomeworkEvent 
+  | ReceiveInvitationEvent 
+  | SendInvitationEvent 
+  | HomeworkReviewEvent 
+  | NoticeEvent
+
+export interface EventObject {
+  eventContent: EventType, 
+  eventTime: string, 
+  eventType: string
+}
+
+export async function getEvent(id: string): Promise<EventObject[]> {
+  if (debug === "true") {
+    return []
+  }
+
+  if (!id) {
+    return []
+  }
+
+  const res = await fetch(`${path}/student/recentEvent?studentId=${id}`, {
+    method: "POST", 
+    cache: "no-store"
+  })
+
+  if (res.ok) {
+    return res.json().then(events => events.reverse().slice(0, 10))
+  } else {
+    console.log(`Error on getting events of student ${id}, status code ${res.status}`)
+    return []
+  }
+}
+
+export async function acceptInvitation(id: number): Promise<boolean> {
+  if (debug === "true") {
+    return true
+  }
+
+  const res = await fetch(`${path}/joinGroupInvitation/accept?joinGroupInvitationId=${id}`, {
+    method: "POST", 
+    cache: "no-store"
+  })
+
+  if (!res.ok) {
+    console.log(`Accept invitation ${id} failed, status code ${res.status}`)
+  }
+
+  return res.ok
+}
+
+export async function rejectInvitation(id: number): Promise<boolean> {
+  if (debug === "true") {
+    return true
+  }
+
+  const res = await fetch(`${path}/joinGroupInvitation/reject?joinGroupInvitationId=${id}`, {
+    method: "POST", 
+    cache: "no-store"
+  })
+
+  if (!res.ok) {
+    console.log(`Reject invitation ${id} failed, status code ${res.status}`)
+  }
+
+  return res.ok
+}

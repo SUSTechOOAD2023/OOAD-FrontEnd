@@ -78,7 +78,7 @@ export default function NoticeBoard({ id }: { id: string }) {
       </Stack>
       <Divider />
       <Pagination 
-        count={Math.max(1, (notice.length + noticeInPage - 1) / noticeInPage)} 
+        count={Math.max(1, Math.ceil(notice.length / noticeInPage))} 
         color="primary" 
         page={page}
         onChange={(event, value) => setPage(value)}
