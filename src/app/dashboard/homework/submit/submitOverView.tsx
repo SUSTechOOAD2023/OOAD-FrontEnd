@@ -8,8 +8,9 @@ export interface SubmitOverView {
     score?: number,
     comment?: string,
     content?: string,
-    id: number,
-    modified?: boolean
+    id: number | null,
+    modified?: boolean,
+    submitTime?: string
 }
 const urls = {
   "all": "/submission/list",
@@ -79,12 +80,6 @@ export default async function getSubmitOverview(studentId: string | null, homewo
 
 
 
-export const reviewHomeworks = (submission: SubmitOverView) => {
-  const id = submission.id
-  const bodys: any = {
-    }
-
-}
 export const submitHomework = async (homeworkId, submissionContent, studentId: any = null, groupId: any = null) => {
   // Check that either studentId or groupId is provided, but not both
   // console.log(studentId)
@@ -130,3 +125,33 @@ export const submitHomework = async (homeworkId, submissionContent, studentId: a
       throw error;
   }
 };
+export async function reviewSubmission(submissionId: string, submissionScore, submissionComment) {
+  const url = `${path}/submission/review`;
+
+  const body: any = {
+      submissionId: parseInt(submissionId),
+  };
+  if (submissionScore) body.submissionScore = submissionScore;
+  if (submissionComment) body.submissionComment = submissionComment;
+
+  try {
+      const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+          throw new Error('Request failed with status: ' + response.status);
+      }
+
+      // Assuming the response is JSON. Modify as needed based on your API's response format.
+      const responseData = await response.json();
+      return responseData;
+  } catch (error) {
+      console.error('Error in reviewSubmission:', error);
+      throw error;
+  }
+}

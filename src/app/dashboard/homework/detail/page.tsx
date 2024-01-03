@@ -37,7 +37,7 @@ export default function TeacherInterface({
     const handleChange = (key: keyof HomeworkOverview, value: any) => {
         setHomework({ ...homework, [key]: value });
     };
-    console.log(isAdding)
+    // console.log(isAdding)
     // const [dueDate, setDueDate] = useState('2023-12-01T23:59:59');
     // const [description, setDescription] = useState('Play Genshin for 3 hours');
     // const [resubmission, setResubmission] = useState(6);
