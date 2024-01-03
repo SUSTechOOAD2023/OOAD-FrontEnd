@@ -239,7 +239,9 @@ export async function getTeacherClass(accountID: string) {
 export async function getTeacherHomework(accountID: string) {
     const teacherID = await getTeacherID(parseInt(accountID))
     console.log(accountID)
-    const res = await fetch(`${path}/homework/listTeacher?teacherId=${teacherID}`, {
+    // const res = await fetch(`${path}/homework/listTeacher?teacherId=${teacherID}`
+    const res = await fetch(`${path}/homework/all`
+    , {
         method: 'POST',
         cache: 'no-store',
         headers: {
@@ -252,4 +254,22 @@ export async function getTeacherHomework(accountID: string) {
     }
     const arr = await res.json()
     return arr
+}
+
+export async function getGroup(accountID: string, classId: string) {
+    // const res = await fetch(`${path}/homework/listTeacher?teacherId=${teacherID}`
+    const res = await fetch(`${path}/group/selectGroup?classId=${classId}&studentId=${await getStudentId(accountID)}`
+    , {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store'
+        }
+    })
+    if (!res.ok) {
+        throw new Error('Request failed');
+    }
+    const arr = await res.json()
+    return arr.groupId
 }

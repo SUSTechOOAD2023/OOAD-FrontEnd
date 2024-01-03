@@ -14,6 +14,7 @@ import { DateCalendar, DatePicker, DateTimePicker, LocalizationProvider } from '
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useRouter } from 'next/navigation';
 import StringArrayComponent from '../../submit/fileSubmits';
+import Chart from '../../Chart';
 
 const now = dayjs()
 
@@ -25,6 +26,7 @@ export default function TeacherInterface({
     const isAdding = searchParams['add'] === 'true'
     const homeworkId = params['homeworkId']
     const [alertDisplay, setAlertDisplay] = useState(false)
+    const [gradeList, setGradeList] = useState([])
     const [homework, setHomework] = useState<HomeworkOverview>({
         name: 'Genshin Homework',
         id: '',
@@ -76,7 +78,8 @@ export default function TeacherInterface({
     };
     const vis = (list) => {
         const list2 = list.map(value => value.score)
-        setOpenVis(!setOpenVis)
+        setOpenVis(!openVis)
+        setGradeList(list2)
     }
     const handleSaving = async () => {
         if (isAdding) {
@@ -259,7 +262,7 @@ export default function TeacherInterface({
                     The uploaded type is wrong!
                 </Alert>
             </Snackbar>
-
+            {openVis && <Chart grade={gradeList}></Chart>}
         </Box>
     );
 }
