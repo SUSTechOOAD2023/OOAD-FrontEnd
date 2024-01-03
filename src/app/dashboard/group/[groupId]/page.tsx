@@ -34,7 +34,7 @@ import {
   getStudent,
   getInvites,
 } from "../groupHandler";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import AddIcon from '@mui/icons-material/Add';
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
@@ -43,6 +43,7 @@ import { getTeachers, getCourse } from "../../course/[courseId]/courseHandler";
 import { getIdentity } from "../../identityHandler";
 import { styled } from "@mui/material/styles";
 import UserAvatar from "../../UserAvatar";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 export interface User {
   id: string;
@@ -306,7 +307,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
         </Typography>
         {identity === "student" && join === 0 && (
           <Button
-            variant="outlined"
+            variant="contained"
             style={{
               position: "absolute",
               right: 480,
@@ -315,6 +316,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             size="small"
             onClick={handleJoinClick}
             disabled={MembersCount >= GroupSize}
+            startIcon={<GroupAddIcon />}
           >
             Join
           </Button>
@@ -333,53 +335,50 @@ function GroupPage({ params }: { params: { groupId: number } }) {
             style={{
               position: "relative",
               width: "50%",
-              marginLeft: "10%",
-              padding: "20px",
+              marginLeft: 50,
+              padding: 20,
+              paddingTop: 5,
+              paddingLeft: 30,
+              display: "flex", 
+              flexDirection: "column"
             }}
             elevation={3}
           >
             <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;<b>Group Teacher:</b>
-            </Typography>
-            <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;{GroupTeacher}
+              <b>Group Teacher:</b>&nbsp;{GroupTeacher}
             </Typography>
             <Typography
               variant="body1"
               marginTop={2}
               style={{ color: MembersCount < GroupMinSize ? "red" : "inherit" }}
             >
-              &nbsp;&nbsp;&nbsp;<b>Group Size:</b>
+              <b>Group Size:</b>&nbsp;
               {MembersCount}/{GroupMinSize}-{GroupSize}
             </Typography>
             <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;<b>Deadline:</b>{" "}
+              <b>Deadline:</b>{" "}
               {GroupDeadline.format("YYYY-MM-DD")}
             </Typography>
             <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;<b>Group Task:</b>
-            </Typography>
-            <Typography variant="body1" marginTop={2}>
-              &nbsp;&nbsp;&nbsp;{GroupInfo}
+              <b>Group Task:</b>&nbsp;{GroupInfo}
             </Typography>
 
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
+            <Button
               component={Link}
               href={`/dashboard/homework?groupId=${GroupId}`}
+              sx={{
+                mt: 2
+              }}
             >
-              <Typography variant="body1" marginTop={2}>
-                Our Assignment
-              </Typography>
-            </Box>
+              Assignment
+            </Button>
             {(identity === "teacher" || identity === "admin" || join === 1) && (
               <IconButton
                 style={{ position: "absolute", right: "0", bottom: "0" }}
                 aria-label="fingerprint"
                 onClick={handleEditClick}
                 size="small"
+                color="primary"
               >
                 <EditIcon />
               </IconButton>
@@ -387,7 +386,22 @@ function GroupPage({ params }: { params: { groupId: number } }) {
           </Paper>
         </Grid>
         <Grid item style={{ width: "40%" }}>
-          <Typography variant="h6">Member:</Typography>
+          <Box display="flex" alignItems="center">
+            <Typography variant="h6">Member</Typography>
+            {(identity === "teacher" ||
+                identity === "admin" ||
+                join === 1) && (
+                <IconButton
+                  aria-label="fingerprint"
+                  onClick={handleInviteClick}
+                  size="medium"
+                  color="primary"
+                  disabled={MembersCount >= GroupSize}
+                >
+                  <AddIcon />
+                </IconButton>
+              )}
+          </Box>
           <Grid container direction="column">
             {groupMembers.map((member, index) => (
               <Grid
@@ -419,6 +433,7 @@ function GroupPage({ params }: { params: { groupId: number } }) {
                     <IconButton
                       aria-label="fingerprint"
                       onClick={() => handleDelete(member.id)}
+                      color="primary"
                       size="small"
                     >
                       <CloseIcon />
@@ -427,26 +442,12 @@ function GroupPage({ params }: { params: { groupId: number } }) {
                 </Grid>
               </Grid>
             ))}
-            <Grid item marginLeft={"1px"}>
-              {(identity === "teacher" ||
-                identity === "admin" ||
-                join === 1) && (
-                <IconButton
-                  aria-label="fingerprint"
-                  onClick={handleInviteClick}
-                  size="medium"
-                  disabled={MembersCount >= GroupSize}
-                >
-                  <AddCircleOutlineIcon />
-                </IconButton>
-              )}
-            </Grid>
           </Grid>
         </Grid>
       </Grid>
       {1 === 1 && (
         <Button
-          variant="outlined"
+          variant="contained"
           style={{
             position: "absolute",
             right: 20,
