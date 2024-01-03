@@ -153,7 +153,7 @@ export async function addHomework(homework: HomeworkOverview) {
     }
     return true;
 }
-export async function getMaxScore(studentId: string, homework: HomeworkOverview) {
+export async function getMaxScore(studentId: string, homework: any) {
     const bodys: any = {
         homeworkId: parseInt(homework.id),
         studentId: parseInt(studentId)
