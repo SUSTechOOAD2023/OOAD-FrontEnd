@@ -47,7 +47,7 @@ export default function StudentProfile({
         }
         else setIsLoaded(true)
     }, [])
-    const [userProfile, setUserProfile] = useState<AccountInfo>({
+    const [userProfile, setUserProfile] = useState<any>({
         name: "Hu Tao",
         email: "hutao@genshin.com",
         joinedDate: "2023-07-15",

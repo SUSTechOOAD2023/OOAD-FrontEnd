@@ -86,7 +86,7 @@ export async function getHomeworkByAccount(id: string) {
         const list1 = await getDDLHomework(studentId, 'ddl');
         const list1_ = list1.map((obj) => ({
             ...obj,
-            passed: false,
+            passed: false
         }));
         const list2 = await getDDLHomework(studentId, 'end');
         // console.log(list2)
@@ -153,7 +153,7 @@ export async function addHomework(homework: HomeworkOverview) {
     }
     return true;
 }
-export async function getMaxScore(studentId: string, homework: HomeworkOverview) {
+export async function getMaxScore(studentId: string, homework: any) {
     const bodys: any = {
         homeworkId: parseInt(homework.id),
         studentId: parseInt(studentId)
@@ -166,10 +166,14 @@ export async function getMaxScore(studentId: string, homework: HomeworkOverview)
         },
         body: JSON.stringify(bodys)
     })
+    console.log(bodys)
     if (!res.ok) {
         throw new Error('Request failed');
     }
     const arrJson = await res.json()
+    if (!arrJson[0]) {
+        return {}
+    }
     return {
         "grade": arrJson[0].score,
         "comment": arrJson[0].comment
@@ -197,8 +201,12 @@ export async function getClassById(classId: string | undefined) {
 export async function searchGrade(accountID: string, homework: HomeworkOverview, identity: string) {
     let newHomework = homework
     if (identity === "student") {
-        const arrJson = await getMaxScore(await getStudentId(accountID)
+        const studentId = await getStudentId(accountID)
+        console.log(studentId)
+        console.log("????")
+        const arrJson = await getMaxScore(studentId
         , homework)
+        console.log(arrJson)
         // console.log(arrJson)
         newHomework.grade = arrJson["grade"];
         newHomework.comment = arrJson["comment"];

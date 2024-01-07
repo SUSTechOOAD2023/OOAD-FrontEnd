@@ -39,6 +39,7 @@ function ServerDay(props: PickersDayProps<Dayjs> & { notesOnDays?: DeadlineInfo[
 export default function DeadlineCalendar({ id }: { id: string }) {
   const [date, setDate] = useState<Dayjs | null>(now)
   const [deadline, setDeadline] = useState<DeadlineInfo[]>([])
+  const notesOnDays = deadline.filter(homework => homework.homeworkDdl.isSame(date, "month"))
 
   useEffect(() => {
     if (id) {
@@ -64,8 +65,8 @@ export default function DeadlineCalendar({ id }: { id: string }) {
           }}
           slotProps={{
             day: {
-              notesOnDays: deadline.filter(homework => homework.homeworkDdl.isSame(date, "month"))
-            }
+              notesOnDays
+            } as any
           }}
           sx={{
             m: 0, 

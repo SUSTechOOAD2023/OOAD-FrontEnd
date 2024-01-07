@@ -48,7 +48,7 @@ export const updateJsonFromCsv = (csvFile, jsondata) => {
         Papa.parse(csvFile, {
             header: true,
             complete: (results) => {
-                const csvData = results.data;
+                const csvData: any = results.data;
                 for (let csvRow of csvData) {
                     let jsonRecord = newSubmitList.find(record => record.studentName === csvRow?.studentName);
                     if (jsonRecord) {

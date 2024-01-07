@@ -30,7 +30,6 @@ export default function TeacherInterface({
     const fileInput = useRef<HTMLInputElement>(null);
     useEffect(() => {
         const fetchData = async () => {
-            setSubmitList(await getSubmitOverview(parseInt(await getId())));
         };
         fetchData();
     }, []);

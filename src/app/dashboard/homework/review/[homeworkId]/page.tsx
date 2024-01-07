@@ -36,7 +36,7 @@ export default function TeacherInterface({
         description: '',
     });
     const [submitList, setSubmitList] = useState<SubmitOverView[]>([])
-    const fileInput = useRef(null);
+    const fileInput: any = useRef(null);
     useEffect(() => {
         const fetchData = async () => {
             getSubmitOverview(null, params["homeworkId"], "latest").then(x => setSubmitList(x))
@@ -150,7 +150,7 @@ export default function TeacherInterface({
                                 aria-controls="panel1a-content"
                                 id="panel1a-header"
                             >
-                                <Typography>{submission.studentName}</Typography>
+                                <Typography>Student {submission.studentId}</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Typography variant="h5" sx={{}}>Text Submission:</Typography>
@@ -206,7 +206,7 @@ export default function TeacherInterface({
                     <Button
                         variant="outlined"
                         color="secondary"
-                        onClick={event => { fileInput.current.click() }}
+                        onClick={event => { if (fileInput.current) fileInput.current.click() }}
                         sx={{ width: '100%', height: '50px', borderRadius: '20', ml: 2 }}
                     >
                         Upload Form
@@ -224,16 +224,16 @@ export default function TeacherInterface({
                             return
                         }
                         const fileInput = e.target;
-                        const file = fileInput.files[0];
+                        const file: any = fileInput? fileInput.files:null;
                         const allowedFormats = ['csv'];
-                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        const fileExtension: any = file? file.name.split('.').pop().toLowerCase():null;
                         console.log(fileExtension)
                         if (!allowedFormats.includes(fileExtension)) {
                             setAlertDisplay(true);
                             return;
                         }
                         updateJsonFromCsv(e.target.files[0], submitList).then(
-                            f => setSubmitList(f)
+                            f => setSubmitList(f as any)
                         )
                         e.target.value = ''
                     }
